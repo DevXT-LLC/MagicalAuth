@@ -7,3 +7,4 @@ pydantic
 requests
 psycopg2-binary
 pycryptodome
+pyotp
