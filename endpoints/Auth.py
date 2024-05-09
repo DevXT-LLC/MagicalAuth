@@ -69,3 +69,8 @@ def update_user(update: UserInfo, login: Login):
     user.company_name = update.company_name
     user.job_title = update.job_title
     return {"message": "User updated successfully."}
+
+
+@router.get("/status")
+def ready():
+    return {"message": "Ready."}

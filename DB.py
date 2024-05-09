@@ -68,6 +68,6 @@ if __name__ == "__main__":
         "Server:app",
         host="0.0.0.0",
         port=14374,
-        log_level=os.environ.get("LOGLEVEL", "INFO"),
+        log_level=str(os.environ.get("LOGLEVEL", "INFO")).lower(),
         workers=int(os.environ.get("UVICORN_WORKERS", 4)),
     )
