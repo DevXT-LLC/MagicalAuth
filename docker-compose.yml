@@ -11,7 +11,7 @@ services:
     volumes:
       - ./data:/var/lib/postgresql/data
   magicalauth:
-    image: ghcr.io/gt-ngpt/magicalauth:main
+    image: ghcr.io/devxt-llc/magicalauth:main
     init: true
     depends_on:
       - magicalauthdb
@@ -26,6 +26,7 @@ services:
       SENDGRID_API_KEY: ${SENDGRID_API_KEY}
       SENDGRID_FROM_EMAIL: ${SENDGRID_FROM_EMAIL}
       MAGIC_LINK_URL: ${MAGIC_LINK_URL}
+      REGISTRATION_WEBHOOK: ${REGISTRATION_WEBHOOK}
       UVICORN_WORKERS: 5
       LOGLEVEL: INFO
     restart: always

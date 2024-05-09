@@ -1,6 +1,7 @@
 from DB import User, get_session
 import os
 import pyotp
+import requests
 from datetime import datetime
 from fastapi import HTTPException
 from gtauthclient import GTAuthClient
@@ -21,6 +22,7 @@ Required environment variables:
 - SENDGRID_FROM_EMAIL: Default email address to send emails from
 - ENCRYPTION_SECRET: Encryption key for the GTAuthClient
 - MAGIC_LINK_URL: URL to send in the email for the user to click on
+- REGISTRATION_WEBHOOK: URL to send a POST request to when a user registers
 """
 
 
@@ -125,6 +127,10 @@ class MagicalAuth:
         session.add(user)
         session.commit()
         session.close()
+        # Send registration webhook out to third party application such as AGiXT to create a user there.
+        registration_webhook = os.environ.get("REGISTRATION_WEBHOOK", "")
+        if registration_webhook:
+            requests.post(registration_webhook, json={"email": self.email})
         # Return mfa_token for QR code generation
         return mfa_token
 
