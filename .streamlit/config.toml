@@ -1,0 +1,17 @@
+[theme]
+primaryColor="#FFD53A"
+backgroundColor="#111"
+secondaryBackgroundColor="#000"
+textColor="#999"
+font="sans serif"
+
+[browser]
+gatherUsageStats = false
+
+[client]
+toolbarMode = "minimal"
+showSidebarNavigation = false
+
+[server]
+port = 8507
+headless = true

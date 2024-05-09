@@ -107,7 +107,7 @@ def decrypt(passphrase, data):
 class MagicalAuth:
     def __init__(self, email: str, token: str = None):
         encryption_key = os.environ.get("ENCRYPTION_SECRET", "")
-        self.link = os.environ.get("MAGIC_LINK_URL", "https://localhost:8501/")
+        self.link = os.environ.get("MAGIC_LINK_URL", "https://localhost:8507/")
         self.encryption_key = f'{encryption_key}{datetime.now().strftime("%Y%m%d")}'
         self.email = email.lower()
         self.token = token
