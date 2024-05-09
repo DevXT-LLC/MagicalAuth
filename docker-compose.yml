@@ -1,0 +1,33 @@
+version: "3.7"
+services:
+  magicalauthdb:
+    image: postgres
+    ports:
+      - 5434:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${ENCRYPTION_SECRET}
+      POSTGRES_DB: postgres
+    volumes:
+      - ./data:/var/lib/postgresql/data
+  magicalauth:
+    image: ghcr.io/gt-ngpt/magicalauth:main
+    init: true
+    depends_on:
+      - magicalauthdb
+    environment:
+      ENCRYPTION_SECRET: ${ENCRYPTION_SECRET}
+      DATABASE_TYPE: postgres
+      DATABASE_NAME: postgres
+      DATABASE_HOST: magicalauthdb
+      DATABASE_PORT: 5432
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: ${ENCRYPTION_SECRET}
+      SENDGRID_API_KEY: ${SENDGRID_API_KEY}
+      SENDGRID_FROM_EMAIL: ${SENDGRID_FROM_EMAIL}
+      MAGIC_LINK_URL: ${MAGIC_LINK_URL}
+      UVICORN_WORKERS: 5
+      LOGLEVEL: INFO
+    restart: always
+    ports:
+      - 14374:14374

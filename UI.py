@@ -1,0 +1,72 @@
+import streamlit as st
+from MagicalAuth import MagicalAuth
+import qrcode
+import pyotp
+
+
+def login_page():
+    st.write("Please login to continue.")
+    new_user = st.checkbox("I am a new user")
+    email = st.text_input("Email")
+    if not new_user:
+        otp = st.text_input("MFA Token")
+        login_button = st.button("Login")
+        if login_button:
+            auth = MagicalAuth(email=email)
+            auth_response = auth.send_magic_link(otp)
+            st.write(auth_response)
+    else:
+        first_name = st.text_input("First Name")
+        last_name = st.text_input("Last Name")
+        company_name = st.text_input("Company Name")
+        job_title = st.text_input("Job Title")
+        register_button = st.button("Register")
+        if register_button:
+            auth = MagicalAuth(email=email)
+            mfa_token = auth.register(
+                first_name=first_name,
+                last_name=last_name,
+                company_name=company_name,
+                job_title=job_title,
+            )
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=10,
+                border=4,
+            )
+            qr.add_data(mfa_token)
+            qr.make(fit=True)
+            img = qr.make_image(fill_color="black", back_color="white")
+            st.write(
+                "Registration successful! Please add the MFA token to your authenticator app."
+            )
+            st.image(img, caption="Scan this QR code to enable MFA")
+            mfa_confirm = st.text_input(
+                "Enter the MFA token from your authenticator app"
+            )
+            confirm_button = st.button("Confirm MFA")
+            if confirm_button:
+                otp = pyotp.TOTP(mfa_token).verify(mfa_confirm)
+                if otp:
+                    st.write(
+                        "MFA token confirmed! Please check your email for the login link."
+                    )
+                    auth.send_magic_link(otp=otp)
+                else:
+                    st.write("Invalid MFA token. Please try again.")
+
+
+try:
+    email = st.query_params["email"]
+    token = st.query_params["token"]
+    auth = MagicalAuth(email=email, token=token)
+    user = auth.login()
+    st.write(f"Welcome back {user.first_name}!")
+except Exception as e:
+    st.write(e)
+    login_page()
+    st.stop()
+
+## The rest of the code for your app goes under here...
+st.title("Magical Auth")

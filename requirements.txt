@@ -1,0 +1,9 @@
+streamlit
+gtauthclient
+fastapi
+uvicorn
+sqlalchemy
+sqlalchemy_utils
+pydantic
+requests
+psycopg2-binary
