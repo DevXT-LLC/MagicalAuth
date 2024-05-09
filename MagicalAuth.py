@@ -2,9 +2,11 @@ from DB import User, get_session
 import os
 import pyotp
 import requests
+import base64
+from hashlib import md5
+from Crypto.Cipher import AES
 from datetime import datetime
 from fastapi import HTTPException
-from gtauthclient import GTAuthClient
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import (
     Attachment,
@@ -20,7 +22,7 @@ Required environment variables:
 
 - SENDGRID_API_KEY: SendGrid API key
 - SENDGRID_FROM_EMAIL: Default email address to send emails from
-- ENCRYPTION_SECRET: Encryption key for the GTAuthClient
+- ENCRYPTION_SECRET: Encryption key to encrypt and decrypt data
 - MAGIC_LINK_URL: URL to send in the email for the user to click on
 - REGISTRATION_WEBHOOK: URL to send a POST request to when a user registers
 """
@@ -57,6 +59,51 @@ def send_email(
         raise HTTPException(status_code=400, detail="Email could not be sent.")
 
 
+def encrypt(passphrase, data):
+    passphrase = passphrase.encode("utf-8")
+    salt = os.urandom(8)
+    passphrase += salt
+    key = md5(passphrase).digest()
+    final_key = key
+    while len(final_key) < 32 + 16:
+        key = md5(key + passphrase).digest()
+        final_key += key
+    key_iv = final_key[: 32 + 16]
+    key = key_iv[:32]
+    iv = key_iv[32:]
+    aes = AES.new(key, AES.MODE_CBC, iv)
+    padded_data = data.encode("utf-8") + (16 - len(data) % 16) * bytes(
+        [16 - len(data) % 16]
+    )
+    encrypted_data = aes.encrypt(padded_data)
+    encrypted = b"Salted__" + salt + encrypted_data
+    return base64.b64encode(encrypted).decode("utf-8")
+
+
+def decrypt(passphrase, data):
+    try:
+        passphrase = passphrase.encode("utf-8")
+        encrypted = base64.b64decode(data)
+        assert encrypted[0:8] == b"Salted__"
+        salt = encrypted[8:16]
+        assert len(salt) == 8, len(salt)
+        passphrase += salt
+        key = md5(passphrase).digest()
+        final_key = key
+        while len(final_key) < 32 + 16:
+            key = md5(key + passphrase).digest()
+            final_key += key
+        key_iv = final_key[: 32 + 16]
+        key = key_iv[:32]
+        iv = key_iv[32:]
+        aes = AES.new(key, AES.MODE_CBC, iv)
+        data = aes.decrypt(encrypted[16:])
+        decrypted = data[: -(data[-1] if type(data[-1]) == int else ord(data[-1]))]
+        return decrypted.decode("utf-8")
+    except:
+        return encrypted
+
+
 class MagicalAuth:
     def __init__(self, email: str, token: str = None):
         encryption_key = os.environ.get("ENCRYPTION_SECRET", "")
@@ -71,9 +118,7 @@ class MagicalAuth:
         session.close()
         if user is None:
             raise HTTPException(status_code=404, detail="User not found")
-        self.token = GTAuthClient(key=f"{self.encryption_key}{user.id}").encrypt(
-            data=user.id
-        )
+        self.token = encrypt(passphrase=f"{self.encryption_key}{user.id}", data=user.id)
         if not pyotp.TOTP(user.mfa_token).verify(otp):
             raise HTTPException(
                 status_code=401, detail="Invalid MFA token. Please try again."
@@ -91,9 +136,7 @@ class MagicalAuth:
         session.close()
         if user is None:
             raise HTTPException(status_code=404, detail="User not found")
-        user_id = GTAuthClient(key=f"{self.encryption_key}{user.id}").decrypt(
-            data=self.token
-        )
+        user_id = decrypt(passphrase=f"{self.encryption_key}{user.id}", data=self.token)
         if str(user.id) == user_id:
             return user
         raise HTTPException(
