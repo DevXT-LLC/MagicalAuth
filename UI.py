@@ -13,7 +13,9 @@ def login_page():
         login_button = st.button("Login")
         if login_button:
             auth = MagicalAuth(email=email)
-            auth_response = auth.send_magic_link(otp)
+            auth_response = auth.send_magic_link(
+                otp=otp, ip_address=st.request.headers["X-Forwarded-For"]
+            )
             st.write(auth_response)
     else:
         first_name = st.text_input("First Name")
@@ -61,7 +63,7 @@ try:
     email = st.query_params["email"]
     token = st.query_params["token"]
     auth = MagicalAuth(email=email, token=token)
-    user = auth.login()
+    user = auth.login(ip_address=st.request.headers["X-Forwarded-For"])
     st.write(f"Welcome back {user.first_name}!")
 except Exception as e:
     st.write(e)

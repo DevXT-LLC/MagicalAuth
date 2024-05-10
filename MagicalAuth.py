@@ -1,11 +1,11 @@
-from DB import User, get_session
+from DB import User, FailedLogins, get_session
 import os
 import pyotp
 import requests
 import base64
 from hashlib import md5
 from Crypto.Cipher import AES
-from datetime import datetime
+from datetime import datetime, timedelta
 from fastapi import HTTPException
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import (
@@ -115,7 +115,31 @@ class MagicalAuth:
         self.email = email.lower()
         self.token = token
 
-    def send_magic_link(self, otp):
+    def add_failed_login(self, ip_address):
+        session = get_session()
+        user = session.query(User).filter(User.email == self.email).first()
+        if user is not None:
+            failed_login = FailedLogins(user_id=user.id, ip_address=ip_address)
+            session.add(failed_login)
+            session.commit()
+        session.close()
+
+    def count_failed_logins(self):
+        session = get_session()
+        user = session.query(User).filter(User.email == self.email).first()
+        if user is None:
+            session.close()
+            return 0
+        failed_logins = (
+            session.query(FailedLogins)
+            .filter(FailedLogins.user_id == user.id)
+            .filter(FailedLogins.created_at >= datetime.now() - timedelta(hours=24))
+            .count()
+        )
+        session.close()
+        return failed_logins
+
+    def send_magic_link(self, otp, ip_address):
         session = get_session()
         user = session.query(User).filter(User.email == self.email).first()
         session.close()
@@ -123,6 +147,7 @@ class MagicalAuth:
             raise HTTPException(status_code=404, detail="User not found")
         self.token = encrypt(passphrase=f"{self.encryption_key}{user.id}", data=user.id)
         if not pyotp.TOTP(user.mfa_token).verify(otp):
+            self.add_failed_login(ip_address=ip_address)
             raise HTTPException(
                 status_code=401, detail="Invalid MFA token. Please try again."
             )
@@ -135,15 +160,22 @@ class MagicalAuth:
         # Upon clicking the link, the front end will call the login method and save the email and encrypted_id in the session
         return f"A login link has been sent to {self.email}, please check your email and click the link to log in. The link will expire in 24 hours."
 
-    def login(self):
+    def login(self, ip_address):
         session = get_session()
         user = session.query(User).filter(User.email == self.email).first()
         session.close()
         if user is None:
             raise HTTPException(status_code=404, detail="User not found")
+        failures = self.count_failed_logins()
+        if failures >= 50:
+            raise HTTPException(
+                status_code=429,
+                detail="Too many failed login attempts today. Please try again tomorrow.",
+            )
         user_id = decrypt(passphrase=f"{self.encryption_key}{user.id}", data=self.token)
         if str(user.id) == user_id:
             return user
+        self.add_failed_login(ip_address=ip_address)
         raise HTTPException(
             status_code=418,
             detail="Invalid login token. Please log out and try again.",
