@@ -36,8 +36,6 @@ def send_email(
     attachment_file_type=None,
     attachment_file_name=None,
 ):
-    if not os.environ.get("SENDGRID_API_KEY"):
-        return body
     message = Mail(
         from_email=os.environ.get("SENDGRID_FROM_EMAIL"),
         to_emails=email,
@@ -151,12 +149,13 @@ class MagicalAuth:
             raise HTTPException(
                 status_code=401, detail="Invalid MFA token. Please try again."
             )
-        em = send_email(
-            email=self.email,
-            message=f"<a href='{self.link}?email={self.email}&token={self.token}'>Click here to log in</a>",
-        )
-        if em != None:
-            return em
+        if os.environ.get("SENDGRID_API_KEY"):
+            send_email(
+                email=self.email,
+                message=f"<a href='{self.link}?email={self.email}&token={self.token}'>Click here to log in</a>",
+            )
+        else:
+            return f"{self.link}?email={self.email}&token={self.token}"
         # Upon clicking the link, the front end will call the login method and save the email and encrypted_id in the session
         return f"A login link has been sent to {self.email}, please check your email and click the link to log in. The link will expire in 24 hours."
 
