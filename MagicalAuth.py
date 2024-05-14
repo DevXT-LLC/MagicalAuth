@@ -205,12 +205,14 @@ class MagicalAuth:
         )
         session.add(user)
         session.commit()
-        session.close()
         # Send registration webhook out to third party application such as AGiXT to create a user there.
         registration_webhook = os.environ.get("REGISTRATION_WEBHOOK", "")
         if registration_webhook:
-            requests.post(registration_webhook, json={"email": self.email})
+            requests.post(
+                registration_webhook, json={"email": self.email, "id": user.id}
+            )
         # Return mfa_token for QR code generation
+        session.close()
         return mfa_token
 
     def update_user(self, **kwargs):
