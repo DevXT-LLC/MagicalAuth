@@ -7,6 +7,13 @@ import os
 import requests
 import time
 
+st.set_page_config(
+    page_title="Magical Auth",
+    page_icon=":robot:",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
 
 def get_user():
     base_uri = os.environ.get("MAGICALAUTH_SERVER", "http://localhost:12437")
@@ -127,16 +134,17 @@ def log_out():
     st.stop()
 
 
-st.title("Magical Auth")
 user = get_user()
 if user is None:
     st.stop()
 
 ## The rest of the code for your app goes under here...
-st.write(f"Welcome, {user['first_name']} {user['last_name']}!")
-st.write(f"About you: {user['job_title']} at {user['company_name']}")
-st.write(f"Your email: {user['email']}")
+st.title("Magical Auth")
 
 log_out_button = st.button("Log Out")
 if log_out_button:
     log_out()
+
+st.write(f"Welcome, {user['first_name']} {user['last_name']}!")
+st.write(f"About you: {user['job_title']} at {user['company_name']}")
+st.write(f"Your email: {user['email']}")
