@@ -2,6 +2,7 @@ import streamlit as st
 from MagicalAuth import MagicalAuth
 import qrcode
 import pyotp
+import io
 
 
 def login_page():
@@ -40,10 +41,13 @@ def login_page():
             qr.add_data(mfa_token)
             qr.make(fit=True)
             img = qr.make_image(fill_color="black", back_color="white")
+            img_bytes = io.BytesIO()
+            img.save(img_bytes, format="PNG")
+            img_bytes = img_bytes.getvalue()
             st.write(
                 "Registration successful! Please add the MFA token to your authenticator app."
             )
-            st.image(img, caption="Scan this QR code to enable MFA")
+            st.image(img_bytes, caption="Scan this QR code to enable MFA")
             mfa_confirm = st.text_input(
                 "Enter the MFA token from your authenticator app"
             )
