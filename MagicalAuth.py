@@ -113,7 +113,37 @@ class MagicalAuth:
         self.link = os.environ.get("MAGIC_LINK_URL", "https://localhost:8507/")
         self.encryption_key = f'{encryption_key}{datetime.now().strftime("%Y%m%d")}'
         self.email = email.lower()
-        self.token = token
+        self.token = (
+            token.replace("%2B", "+")
+            .replace("%2F", "/")
+            .replace("%3D", "=")
+            .replace("%20", " ")
+            .replace("%3A", ":")
+            .replace("%3F", "?")
+            .replace("%26", "&")
+            .replace("%23", "#")
+            .replace("%3B", ";")
+            .replace("%40", "@")
+            .replace("%21", "!")
+            .replace("%24", "$")
+            .replace("%27", "'")
+            .replace("%28", "(")
+            .replace("%29", ")")
+            .replace("%2A", "*")
+            .replace("%2C", ",")
+            .replace("%3B", ";")
+            .replace("%5B", "[")
+            .replace("%5D", "]")
+            .replace("%7B", "{")
+            .replace("%7D", "}")
+            .replace("%7C", "|")
+            .replace("%5C", "\\")
+            .replace("%5E", "^")
+            .replace("%60", "`")
+            .replace("%7E", "~")
+            if token
+            else None
+        )
 
     def add_failed_login(self, ip_address):
         session = get_session()
