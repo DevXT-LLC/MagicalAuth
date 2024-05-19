@@ -22,12 +22,12 @@ from sendgrid.helpers.mail import (
 """
 Required environment variables:
 
-- SENDGRID_API_KEY: SendGrid API key
-- SENDGRID_FROM_EMAIL: Default email address to send emails from
-- ENCRYPTION_SECRET: Encryption key to encrypt and decrypt data
-- MAGIC_LINK_URL: URL to send in the email for the user to click on
-- REGISTRATION_WEBHOOK: URL to send a POST request to when a user registers
-- ALLOWED_DOMAINS: Comma separated list of allowed domains for registration
+- SENDGRID_API_KEY: SendGrid API key.
+- SENDGRID_FROM_EMAIL: Default email address to send emails from.
+- ENCRYPTION_SECRET: Encryption key to encrypt and decrypt data.
+- MAGIC_LINK_URL: URL to send in the email for the user to click on.
+- REGISTRATION_WEBHOOK: URL to send a POST request to when a user registers.
+- ALLOWED_DOMAINS: Comma separated list of allowed domains for registration. Default is * for all domains.
 """
 
 
