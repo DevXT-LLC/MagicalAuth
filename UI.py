@@ -92,9 +92,19 @@ def get_user():
                         "job_title": job_title,
                     },
                 )
-                mfa_token = response.json()["mfa_token"]
-                set_cookie("email", email, 1)
-                set_cookie("mfa_token", mfa_token, 1)
+                mfa_token = (
+                    response.json()["mfa_token"]
+                    if response.status_code == 200
+                    else None
+                )
+                if mfa_token:
+                    st.write(
+                        "Registration successful! Please check your email for the MFA token."
+                    )
+                    set_cookie("email", email, 1)
+                    set_cookie("mfa_token", mfa_token, 1)
+                else:
+                    st.write(response.json())
                 st.rerun()
     return None
 
@@ -109,9 +119,8 @@ def log_out():
 
 st.title("Magical Auth")
 user = get_user()
-if user is None:
+if not user:
     st.stop()
-
 ## The rest of the code for your app goes under here...
 st.write(f"Welcome, {user['first_name']} {user['last_name']}!")
 st.write(f"About you: {user['job_title']} at {user['company_name']}")
