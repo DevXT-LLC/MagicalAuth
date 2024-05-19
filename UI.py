@@ -109,6 +109,7 @@ def get_user():
 def log_out():
     set_cookie("email", "", 1)
     set_cookie("token", "", 1)
+    st.query_params = {}
     st.write("You have been logged out.")
     st.rerun()
 
