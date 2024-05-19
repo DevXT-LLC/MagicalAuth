@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit_js_eval import streamlit_js_eval
 from MagicalAuth import MagicalAuth
 import qrcode
 import pyotp
@@ -60,7 +61,7 @@ def login_page():
                         "MFA token confirmed! Please check your email for the login link."
                     )
                     st.session_state = {}
-                    st.rerun()
+                    streamlit_js_eval(js_expressions="parent.window.location.reload()")
                 else:
                     st.write("Invalid MFA token. Please try again.")
                     st.stop()
