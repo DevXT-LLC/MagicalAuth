@@ -27,6 +27,7 @@ Required environment variables:
 - ENCRYPTION_SECRET: Encryption key to encrypt and decrypt data
 - MAGIC_LINK_URL: URL to send in the email for the user to click on
 - REGISTRATION_WEBHOOK: URL to send a POST request to when a user registers
+- ALLOWED_DOMAINS: Comma separated list of allowed domains for registration
 """
 
 
@@ -260,6 +261,12 @@ class MagicalAuth:
         company_name: str,
         job_title: str,
     ):
+        allowed_domains = os.environ.get("ALLOWED_DOMAINS", "").split(",")
+        domain = self.email.split("@")[1]
+        if domain not in allowed_domains:
+            raise HTTPException(
+                status_code=403, detail="Registration is not allowed for this domain."
+            )
         session = get_session()
         user = session.query(User).filter(User.email == self.email).first()
         if user is not None:
