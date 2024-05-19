@@ -7,8 +7,10 @@ import os
 import requests
 import time
 
+app_name = os.environ.get("APP_NAME", "Magical Auth")
+
 st.set_page_config(
-    page_title="Magical Auth",
+    page_title=app_name,
     page_icon=":robot:",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -41,7 +43,7 @@ def get_user():
         else:
             set_cookie("email", "", 1)
             set_cookie("token", "", 1)
-    st.title("Magical Auth")
+    st.title(app_name)
     if "mfa_token" in st.session_state:
         mfa_token = st.session_state["mfa_token"]
         totp = pyotp.TOTP(mfa_token)
@@ -140,7 +142,7 @@ if user is None:
     st.stop()
 
 ## The rest of the code for your app goes under here...
-st.title("Magical Auth")
+st.title(app_name)
 
 log_out_button = st.button("Log Out")
 if log_out_button:

@@ -16,6 +16,7 @@ services:
     depends_on:
       - magicalauthdb
     environment:
+      APP_NAME: ${APP_NAME}
       ENCRYPTION_SECRET: ${ENCRYPTION_SECRET}
       DATABASE_TYPE: postgres
       DATABASE_NAME: postgres
