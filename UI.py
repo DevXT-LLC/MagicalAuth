@@ -65,8 +65,8 @@ try:
     auth = MagicalAuth(email=email, token=token)
     user = auth.login(ip_address=st.request.headers["X-Forwarded-For"])
     st.write(f"Welcome back {user.first_name}!")
-except Exception as e:
-    st.write(e)
+except Exception as error_message:
+    st.write(error_message)
     login_page()
     st.stop()
 
