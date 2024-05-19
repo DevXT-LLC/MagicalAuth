@@ -261,12 +261,18 @@ class MagicalAuth:
         company_name: str,
         job_title: str,
     ):
-        allowed_domains = os.environ.get("ALLOWED_DOMAINS", "").split(",")
-        domain = self.email.split("@")[1]
-        if domain not in allowed_domains:
-            raise HTTPException(
-                status_code=403, detail="Registration is not allowed for this domain."
-            )
+        allowed_domains = os.environ.get("ALLOWED_DOMAINS", "*")
+        if allowed_domains != "*":
+            if "," in allowed_domains:
+                allowed_domains = allowed_domains.split(",")
+            else:
+                allowed_domains = [allowed_domains]
+            domain = self.email.split("@")[1]
+            if domain not in allowed_domains:
+                raise HTTPException(
+                    status_code=403,
+                    detail="Registration is not allowed for this domain.",
+                )
         session = get_session()
         user = session.query(User).filter(User.email == self.email).first()
         if user is not None:
