@@ -99,6 +99,13 @@ def get_user():
     return None
 
 
+def log_out():
+    set_cookie("email", "")
+    set_cookie("token", "")
+    st.write("You have been logged out.")
+    st.stop()
+
+
 st.title("Magical Auth")
 user = get_user()
 if user is None:
@@ -108,3 +115,7 @@ if user is None:
 st.write(f"Welcome, {user['first_name']} {user['last_name']}!")
 st.write(f"About you: {user['job_title']} at {user['company_name']}")
 st.write(f"Your email: {user['email']}")
+
+log_out_button = st.button("Log Out")
+if log_out_button:
+    log_out()
