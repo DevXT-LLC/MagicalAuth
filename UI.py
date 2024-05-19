@@ -32,13 +32,15 @@ def login_page():
                 company_name=company_name,
                 job_title=job_title,
             )
+            totp = pyotp.TOTP(mfa_token)
+            otp_uri = totp.provisioning_uri(name=email, issuer_name="Your App Name")
             qr = qrcode.QRCode(
                 version=1,
                 error_correction=qrcode.constants.ERROR_CORRECT_L,
                 box_size=10,
                 border=4,
             )
-            qr.add_data(mfa_token)
+            qr.add_data(otp_uri)
             qr.make(fit=True)
             img = qr.make_image(fill_color="black", back_color="white")
             img_bytes = io.BytesIO()
