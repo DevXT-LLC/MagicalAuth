@@ -15,7 +15,6 @@ def get_user():
         set_cookie("token", st.query_params["token"], 1)
     email = get_cookie("email")
     token = get_cookie("token")
-    mfa_token = get_cookie("mfa_token")
     if email and token:
         user_request = requests.post(
             f"{base_uri}/login",
