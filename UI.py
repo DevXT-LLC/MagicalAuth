@@ -59,10 +59,6 @@ def login_page():
                     st.success(
                         "MFA token confirmed! Please check your email for the login link."
                     )
-                    magic_link = MagicalAuth(email=email).send_magic_link(
-                        otp=otp, ip_address=st.query_params.get("ip", [""])[0]
-                    )
-                    st.write(magic_link)
                     st.rerun()
                 else:
                     st.write("Invalid MFA token. Please try again.")
