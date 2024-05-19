@@ -77,7 +77,7 @@ try:
     user = auth.login(ip_address=st.query_params.get("ip", [""])[0])
     st.write(f"Welcome back {user.first_name}!")
 except Exception as error_message:
-    st.write(error_message)
+    st.write(error_message if error_message else "Please login to continue.")
     login_page()
     st.stop()
 
