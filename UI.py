@@ -33,7 +33,9 @@ def get_user():
     if "mfa_token" in st.query_params:
         mfa_token = st.query_params["mfa_token"]
         totp = pyotp.TOTP(mfa_token)
-        otp_uri = totp.provisioning_uri(name=email, issuer_name="MagicalAuth")
+        otp_uri = totp.provisioning_uri(
+            name=st.query_params["email"], issuer_name="MagicalAuth"
+        )
         qr = qrcode.QRCode(
             version=1,
             error_correction=qrcode.constants.ERROR_CORRECT_L,
