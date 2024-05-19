@@ -62,12 +62,15 @@ def get_user():
         if confirm_button:
             otp = pyotp.TOTP(mfa_token).verify(mfa_confirm)
             if otp:
-                st.session_state["mfa_confirmed"] = True
                 # Send magic link
-                magic_link_response = requests.post(
-                    f"{base_uri}/send_magic_link",
-                    json={"email": email, "token": otp},
+                print(
+                    f"Sending to {st.session_state['email']} with token {mfa_confirm}"
                 )
+                _ = requests.post(
+                    f"{base_uri}/send_magic_link",
+                    json={"email": st.session_state["email"], "token": mfa_confirm},
+                )
+                st.session_state["mfa_confirmed"] = True
                 if "mfa_token" in st.session_state:
                     del st.session_state["mfa_token"]
                 st.rerun()
