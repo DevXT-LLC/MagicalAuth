@@ -99,9 +99,9 @@ def get_user():
                         json={"email": email, "token": otp},
                     )
                     if auth_response.status_code == 200:
-                        st.write(auth_response.json()["message"])
+                        st.success(auth_response.json()["message"])
                     else:
-                        st.write(auth_response.json())
+                        st.error(auth_response.json()["detail"])
         else:
             with st.form("register_form"):
                 email = st.text_input("Email")
