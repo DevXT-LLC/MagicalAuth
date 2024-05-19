@@ -16,6 +16,17 @@ from sqlalchemy.orm import sessionmaker, relationship, declarative_base
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import text
 
+"""
+Required environment variables:
+
+- DATABASE_USER: Database username
+- DATABASE_PASSWORD: Database password
+- DATABASE_HOST: Database host
+- DATABASE_PORT: Database port
+- DATABASE_NAME: Database name
+- LOGLEVEL: Logging level
+"""
+
 logging.basicConfig(
     level=os.environ.get("LOGLEVEL", "INFO"),
     format="%(asctime)s | %(levelname)s | %(message)s",

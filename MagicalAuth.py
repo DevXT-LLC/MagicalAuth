@@ -31,9 +31,9 @@ Required environment variables:
 
 
 def send_email(
-    email,
-    subject,
-    body,
+    email: str,
+    subject: str,
+    body: str,
     attachment_content=None,
     attachment_file_type=None,
     attachment_file_name=None,
