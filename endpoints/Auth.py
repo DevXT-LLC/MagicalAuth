@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from pydantic import BaseModel
 from MagicalAuth import MagicalAuth
 
@@ -41,9 +41,9 @@ def register(
 
 
 @router.post("/login")
-def login(login: Login):
+def login(login: Login, request: Request):
     auth = MagicalAuth(email=login.email, token=login.token)
-    user = auth.login()
+    user = auth.login(ip_address=request.client.host)
     return {
         "email": user.email,
         "first_name": user.first_name,
@@ -54,9 +54,9 @@ def login(login: Login):
 
 
 @router.post("/send_magic_link")
-def send_magic_link(login: Login):
+def send_magic_link(login: Login, request: Request):
     auth = MagicalAuth(email=login.email)
-    magic_link = auth.send_magic_link(otp=login.token)
+    magic_link = auth.send_magic_link(otp=login.token, ip_address=request.client.host)
     return {"message": magic_link}
 
 
