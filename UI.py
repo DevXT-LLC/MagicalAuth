@@ -60,10 +60,12 @@ def login_page():
                         "MFA token confirmed! Please check your email for the login link."
                     )
                     auth.send_magic_link(otp=otp)
-                    st.stop()
+                    new_user = False
+                    st.rerun()
                 else:
                     st.write("Invalid MFA token. Please try again.")
-    st.stop()
+    new_user = False
+    st.rerun()
 
 
 try:
