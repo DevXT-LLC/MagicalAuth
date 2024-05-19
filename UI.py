@@ -14,9 +14,8 @@ def login_page():
         login_button = st.button("Login")
         if login_button:
             auth = MagicalAuth(email=email)
-            auth_response = auth.send_magic_link(
-                otp=otp, ip_address=st.request.headers["X-Forwarded-For"]
-            )
+            ip_address = st.query_params.get("ip", [""])[0]
+            auth_response = auth.send_magic_link(otp=otp, ip_address=ip_address)
             st.write(auth_response)
     else:
         first_name = st.text_input("First Name")
@@ -63,6 +62,7 @@ def login_page():
                     auth.send_magic_link(otp=otp)
                 else:
                     st.write("Invalid MFA token. Please try again.")
+                st.rerun()
 
 
 try:
