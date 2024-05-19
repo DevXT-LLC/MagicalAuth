@@ -59,7 +59,9 @@ def login_page():
                     st.success(
                         "MFA token confirmed! Please check your email for the login link."
                     )
-                    auth.send_magic_link(otp=otp)
+                    auth.send_magic_link(
+                        otp=otp, ip_address=st.query_params.get("ip", [""])[0]
+                    )
                     new_user = False
                     st.rerun()
                 else:
