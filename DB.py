@@ -79,7 +79,7 @@ if __name__ == "__main__":
     uvicorn.run(
         "Server:app",
         host="0.0.0.0",
-        port=14374,
+        port=12437,
         log_level=str(os.environ.get("LOGLEVEL", "INFO")).lower(),
         workers=int(os.environ.get("UVICORN_WORKERS", 4)),
     )

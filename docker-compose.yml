@@ -31,5 +31,5 @@ services:
       LOGLEVEL: INFO
     restart: always
     ports:
-      - 14374:14374
+      - 12437:12437
       - 8519:8519

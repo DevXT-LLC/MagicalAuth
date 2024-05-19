@@ -7,7 +7,7 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 COPY . .
 
 # Expose and run the FastAPI server
-EXPOSE 14374
+EXPOSE 12437
 EXPOSE 8519
 RUN chmod +x /app/launch.sh
 ENTRYPOINT ["sh", "-c", "./launch.sh"]
