@@ -71,6 +71,14 @@ def update_user(update: UserInfo, login: Login):
     return {"message": "User updated successfully."}
 
 
+# Delete user
+@router.delete("/delete_user")
+def delete_user(login: Login):
+    user = MagicalAuth(email=login.email, token=login.token)
+    user.delete_user()
+    return {"message": "User deleted successfully."}
+
+
 @router.get("/status")
 def ready():
     return {"message": "Ready."}

@@ -236,3 +236,14 @@ class MagicalAuth:
         session.commit()
         session.close()
         return "User updated successfully"
+
+    def delete_user(self):
+        session = get_session()
+        user = session.query(User).filter(User.email == self.email).first()
+        if user is None:
+            session.close()
+            raise HTTPException(status_code=404, detail="User not found")
+        user.is_active = False
+        session.commit()
+        session.close()
+        return "User deleted successfully"
