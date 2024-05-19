@@ -104,7 +104,7 @@ def decrypt(passphrase, data):
         decrypted = data[: -(data[-1] if type(data[-1]) == int else ord(data[-1]))]
         return decrypted.decode("utf-8")
     except:
-        return encrypted
+        return data
 
 
 class MagicalAuth:
@@ -153,14 +153,44 @@ class MagicalAuth:
             raise HTTPException(
                 status_code=401, detail="Invalid MFA token. Please try again."
             )
+        token = (
+            self.token.replace("+", "%2B")
+            .replace("/", "%2F")
+            .replace("=", "%3D")
+            .replace(" ", "%20")
+            .replace(":", "%3A")
+            .replace("?", "%3F")
+            .replace("&", "%26")
+            .replace("#", "%23")
+            .replace(";", "%3B")
+            .replace("@", "%40")
+            .replace("!", "%21")
+            .replace("$", "%24")
+            .replace("'", "%27")
+            .replace("(", "%28")
+            .replace(")", "%29")
+            .replace("*", "%2A")
+            .replace(",", "%2C")
+            .replace(";", "%3B")
+            .replace("[", "%5B")
+            .replace("]", "%5D")
+            .replace("{", "%7B")
+            .replace("}", "%7D")
+            .replace("|", "%7C")
+            .replace("\\", "%5C")
+            .replace("^", "%5E")
+            .replace("`", "%60")
+            .replace("~", "%7E")
+        )
+        magic_link = f"{self.link}?email={self.email}&token={token}"
         if os.environ.get("SENDGRID_API_KEY"):
             send_email(
                 email=self.email,
                 subject="Magic Link",
-                body=f"<a href='{self.link}?email={self.email}&token={self.token}'>Click here to log in</a>",
+                body=f"<a href='{magic_link}'>Click here to log in</a>",
             )
         else:
-            return f"{self.link}?email={self.email}&token={self.token}"
+            return magic_link
         # Upon clicking the link, the front end will call the login method and save the email and encrypted_id in the session
         return f"A login link has been sent to {self.email}, please check your email and click the link to log in. The link will expire in 24 hours."
 

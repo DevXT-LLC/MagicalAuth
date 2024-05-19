@@ -62,18 +62,17 @@ def login_page():
                     auth.send_magic_link(
                         otp=otp, ip_address=st.query_params.get("ip", [""])[0]
                     )
-                    new_user = False
                     st.rerun()
                 else:
                     st.write("Invalid MFA token. Please try again.")
+                    st.stop()
 
 
 try:
     email = st.query_params["email"] if "email" in st.query_params else None
     token = st.query_params["token"] if "token" in st.query_params else None
     if email is None or token is None:
-        login_page()
-        st.stop()
+        raise Exception("")
     auth = MagicalAuth(email=email, token=token)
     user = auth.login(ip_address=st.query_params.get("ip", [""])[0])
     st.write(f"Welcome back {user.first_name}!")
