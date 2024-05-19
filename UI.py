@@ -10,9 +10,9 @@ import requests
 def get_user():
     base_uri = os.environ.get("MAGICALAUTH_SERVER", "http://localhost:12437")
     if "email" in st.query_params:
-        set_cookie("email", st.query_params["email"])
+        set_cookie("email", st.query_params["email"], 1)
     if "token" in st.query_params:
-        set_cookie("token", st.query_params["token"])
+        set_cookie("token", st.query_params["token"], 1)
     email = get_cookie("email")
     token = get_cookie("token")
     if email and token:
@@ -24,8 +24,8 @@ def get_user():
             user = user_request.json()
             return user
         else:
-            set_cookie("email", "")
-            set_cookie("token", "")
+            set_cookie("email", "", 1)
+            set_cookie("token", "", 1)
     if "mfa_token" in st.query_params:
         mfa_token = st.query_params["mfa_token"]
         totp = pyotp.TOTP(mfa_token)
@@ -100,8 +100,8 @@ def get_user():
 
 
 def log_out():
-    set_cookie("email", "")
-    set_cookie("token", "")
+    set_cookie("email", "", 1)
+    set_cookie("token", "", 1)
     st.write("You have been logged out.")
     st.stop()
 
