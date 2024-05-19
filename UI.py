@@ -12,7 +12,6 @@ def get_user():
     base_uri = os.environ.get("MAGICALAUTH_SERVER", "http://localhost:12437")
     email = get_cookie("email")
     token = get_cookie("token")
-    print(f"session state: {st.session_state}")
     if "mfa_confirmed" in st.session_state:
         st.success("MFA token confirmed! Please check your email for the login link.")
         time.sleep(1)
@@ -62,10 +61,6 @@ def get_user():
         if confirm_button:
             otp = pyotp.TOTP(mfa_token).verify(mfa_confirm)
             if otp:
-                # Send magic link
-                print(
-                    f"Sending to {st.session_state['email']} with token {mfa_confirm}"
-                )
                 _ = requests.post(
                     f"{base_uri}/send_magic_link",
                     json={"email": st.session_state["email"], "token": mfa_confirm},
