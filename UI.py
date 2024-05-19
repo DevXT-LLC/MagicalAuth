@@ -71,14 +71,13 @@ try:
     token = st.query_params["token"] if "token" in st.query_params else None
     if not email or not token:
         login_page()
-        st.stop()
-    auth = MagicalAuth(email=email, token=token)
-    user = auth.login(ip_address=st.query_params.get("ip", [""])[0])
-    st.write(f"Welcome back {user.first_name}!")
+    else:
+        auth = MagicalAuth(email=email, token=token)
+        user = auth.login(ip_address=st.query_params.get("ip", [""])[0])
+        st.write(f"Welcome back {user.first_name}!")
 except Exception as error_message:
     st.write(error_message if error_message else "Please login to continue.")
     login_page()
-    st.stop()
 
 ## The rest of the code for your app goes under here...
 st.title("Magical Auth")
