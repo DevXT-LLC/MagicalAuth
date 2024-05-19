@@ -60,8 +60,11 @@ def login_page():
 
 
 try:
-    email = st.query_params["email"]
-    token = st.query_params["token"]
+    email = st.query_params["email"] if "email" in st.query_params else None
+    token = st.query_params["token"] if "token" in st.query_params else None
+    if email is None or token is None:
+        login_page()
+        st.stop()
     auth = MagicalAuth(email=email, token=token)
     user = auth.login(ip_address=st.request.headers["X-Forwarded-For"])
     st.write(f"Welcome back {user.first_name}!")
