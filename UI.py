@@ -22,6 +22,7 @@ def get_user():
     email = get_cookie("email")
     token = get_cookie("token")
     if "mfa_confirmed" in st.session_state:
+        st.title(app_name)
         st.success("MFA token confirmed! Please check your email for the login link.")
         time.sleep(1)
         del st.session_state["mfa_confirmed"]
@@ -110,6 +111,16 @@ def get_user():
                 job_title = st.text_input("Job Title")
                 register_button = st.form_submit_button("Register")
                 if register_button:
+                    # Make sure nothing is empty
+                    if (
+                        email == ""
+                        or first_name == ""
+                        or last_name == ""
+                        or company_name == ""
+                        or job_title == ""
+                    ):
+                        st.write("Please fill out all fields.")
+                        st.stop()
                     response = requests.post(
                         f"{base_uri}/register",
                         json={
