@@ -1,3 +1,5 @@
+# uvicorn app:server --port 12437 --workers 4
+# streamlit run UI.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from endpoints import Auth

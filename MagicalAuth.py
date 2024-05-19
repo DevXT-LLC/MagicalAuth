@@ -1,3 +1,5 @@
+# uvicorn app:server --port 14374 --workers 4
+# streamlit run UI.py
 from DB import User, FailedLogins, get_session
 import os
 import pyotp
