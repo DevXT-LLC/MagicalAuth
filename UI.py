@@ -56,7 +56,8 @@ def get_user():
                     "MFA token confirmed! Please check your email for the login link."
                 )
                 del st.query_params["mfa_token"]
-                st.rerun()
+                del st.query_params["email"]
+                st.stop()
             else:
                 st.write("Invalid MFA token. Please try again.")
                 st.stop()
