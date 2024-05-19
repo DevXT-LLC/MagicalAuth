@@ -27,7 +27,8 @@ def get_user():
         else:
             set_cookie("email", "", 1)
             set_cookie("token", "", 1)
-    if mfa_token:
+    if "mfa_token" in st.query_params:
+        mfa_token = st.query_params["mfa_token"]
         totp = pyotp.TOTP(mfa_token)
         otp_uri = totp.provisioning_uri(name=email, issuer_name="MagicalAuth")
         qr = qrcode.QRCode(
@@ -54,7 +55,7 @@ def get_user():
                 st.success(
                     "MFA token confirmed! Please check your email for the login link."
                 )
-                set_cookie("mfa_token", "", 1)
+                del st.query_params["mfa_token"]
                 st.rerun()
             else:
                 st.write("Invalid MFA token. Please try again.")
@@ -92,19 +93,13 @@ def get_user():
                         "job_title": job_title,
                     },
                 )
-                mfa_token = (
-                    response.json()["mfa_token"]
-                    if response.status_code == 200
-                    else None
-                )
-                if mfa_token:
-                    st.write(
-                        "Registration successful! Please check your email for the MFA token."
-                    )
-                    set_cookie("email", email, 1)
-                    set_cookie("mfa_token", mfa_token, 1)
-                else:
+                try:
+                    mfa_token = response.json()["mfa_token"]
+                except Exception as e:
                     st.write(response.json())
+                    st.stop()
+                st.query_params["email"] = email
+                st.query_params["mfa_token"] = mfa_token
                 st.rerun()
     return None
 
@@ -112,15 +107,15 @@ def get_user():
 def log_out():
     set_cookie("email", "", 1)
     set_cookie("token", "", 1)
-    set_cookie("mfa_token", "", 1)
     st.write("You have been logged out.")
-    st.rerun()
+    st.stop()
 
 
 st.title("Magical Auth")
 user = get_user()
-if not user:
+if user is None:
     st.stop()
+
 ## The rest of the code for your app goes under here...
 st.write(f"Welcome, {user['first_name']} {user['last_name']}!")
 st.write(f"About you: {user['job_title']} at {user['company_name']}")
