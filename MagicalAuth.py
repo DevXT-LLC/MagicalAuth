@@ -145,7 +145,9 @@ class MagicalAuth:
         session.close()
         if user is None:
             raise HTTPException(status_code=404, detail="User not found")
-        self.token = encrypt(passphrase=f"{self.encryption_key}{user.id}", data=user.id)
+        self.token = encrypt(
+            passphrase=f"{self.encryption_key}{str(user.id)}", data=str(user.id)
+        )
         if not pyotp.TOTP(user.mfa_token).verify(otp):
             self.add_failed_login(ip_address=ip_address)
             raise HTTPException(
@@ -173,7 +175,9 @@ class MagicalAuth:
                 status_code=429,
                 detail="Too many failed login attempts today. Please try again tomorrow.",
             )
-        user_id = decrypt(passphrase=f"{self.encryption_key}{user.id}", data=self.token)
+        user_id = decrypt(
+            passphrase=f"{self.encryption_key}{str(user.id)}", data=self.token
+        )
         if str(user.id) == user_id:
             return user
         self.add_failed_login(ip_address=ip_address)

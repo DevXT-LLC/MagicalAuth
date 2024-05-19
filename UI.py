@@ -62,7 +62,7 @@ def login_page():
                     auth.send_magic_link(otp=otp)
                 else:
                     st.write("Invalid MFA token. Please try again.")
-                st.rerun()
+    st.stop()
 
 
 try:
