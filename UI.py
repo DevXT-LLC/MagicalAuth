@@ -27,6 +27,10 @@ def get_user():
         else:
             set_cookie("email", "", 1)
             set_cookie("token", "", 1)
+    if "mfa_confirmed" in st.query_params:
+        del st.query_params["mfa_confirmed"]
+        st.write("MFA token confirmed! Please check your email for the login link.")
+        st.stop()
     if "mfa_token" in st.query_params:
         mfa_token = st.query_params["mfa_token"]
         totp = pyotp.TOTP(mfa_token)
@@ -52,12 +56,10 @@ def get_user():
         if confirm_button:
             otp = pyotp.TOTP(mfa_token).verify(mfa_confirm)
             if otp:
-                st.success(
-                    "MFA token confirmed! Please check your email for the login link."
-                )
+                st.query_params["mfa_confirmed"] = "true"
                 del st.query_params["mfa_token"]
                 del st.query_params["email"]
-                st.stop()
+                st.rerun()
             else:
                 st.write("Invalid MFA token. Please try again.")
                 st.stop()
