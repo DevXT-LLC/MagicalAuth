@@ -104,7 +104,7 @@ def log_out():
     set_cookie("token", "", 1)
     set_cookie("mfa_token", "", 1)
     st.write("You have been logged out.")
-    st.stop()
+    st.rerun()
 
 
 st.title("Magical Auth")
