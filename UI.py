@@ -111,7 +111,7 @@ def get_user():
 def log_out():
     set_cookie("email", "", 1)
     set_cookie("token", "", 1)
-    st.query_params = {}
+    st.query_params["token"] = ""
     st.write("You have been logged out.")
     st.rerun()
 
@@ -120,11 +120,12 @@ st.title("Magical Auth")
 user = get_user()
 if user is None:
     st.stop()
-log_out_button = st.button("Log Out")
-if log_out_button:
-    log_out()
 
 ## The rest of the code for your app goes under here...
 st.write(f"Welcome, {user['first_name']} {user['last_name']}!")
 st.write(f"About you: {user['job_title']} at {user['company_name']}")
 st.write(f"Your email: {user['email']}")
+
+log_out_button = st.button("Log Out")
+if log_out_button:
+    log_out()
