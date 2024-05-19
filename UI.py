@@ -9,7 +9,6 @@ import requests
 
 def get_user():
     base_uri = os.environ.get("MAGICALAUTH_SERVER", "http://localhost:12437")
-
     email = get_cookie("email")
     token = get_cookie("token")
     if "email" in st.query_params:
@@ -18,6 +17,10 @@ def get_user():
     if "token" in st.query_params:
         set_cookie("token", st.query_params["token"], 1)
         token = st.query_params["token"]
+    if "mfa_confirmed" in st.query_params:
+        st.write("MFA token confirmed! Please check your email for the login link.")
+        del st.query_params["mfa_confirmed"]
+        st.stop()
     if token != "" and token is not None:
         user_request = requests.post(
             f"{base_uri}/login",
@@ -29,10 +32,6 @@ def get_user():
         else:
             set_cookie("email", "", 1)
             set_cookie("token", "", 1)
-    if "mfa_confirmed" in st.query_params:
-        st.write("MFA token confirmed! Please check your email for the login link.")
-        del st.query_params["mfa_confirmed"]
-        st.stop()
     if "mfa_token" in st.query_params:
         mfa_token = st.query_params["mfa_token"]
         totp = pyotp.TOTP(mfa_token)
@@ -61,8 +60,8 @@ def get_user():
             otp = pyotp.TOTP(mfa_token).verify(mfa_confirm)
             if otp:
                 st.query_params["mfa_confirmed"] = "true"
-                del st.query_params["mfa_token"]
-                del st.query_params["email"]
+                if "mfa_token" in st.query_params:
+                    del st.query_params["mfa_token"]
                 st.rerun()
             else:
                 st.write("Invalid MFA token. Please try again.")
