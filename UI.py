@@ -64,8 +64,6 @@ def login_page():
                     st.rerun()
                 else:
                     st.write("Invalid MFA token. Please try again.")
-    new_user = False
-    st.rerun()
 
 
 try:
