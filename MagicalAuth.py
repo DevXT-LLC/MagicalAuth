@@ -288,8 +288,6 @@ class MagicalAuth:
                 headers={"Authorization": os.environ.get("ENCRYPTION_SECRET", "")},
             )
         # Return mfa_token for QR code generation
-        # Send magic link
-        self.send_magic_link(otp=pyotp.TOTP(mfa_token).now(), ip_address="")
         return mfa_token
 
     def update_user(self, **kwargs):

@@ -5,16 +5,18 @@ import pyotp
 import io
 import os
 import requests
+import time
 
 
 def get_user():
     base_uri = os.environ.get("MAGICALAUTH_SERVER", "http://localhost:12437")
     email = get_cookie("email")
     token = get_cookie("token")
-    mfa_confirmed = get_cookie("mfa_confirmed")
-    if mfa_confirmed == "true":
+    print(f"session state: {st.session_state}")
+    if "mfa_confirmed" in st.session_state:
         st.success("MFA token confirmed! Please check your email for the login link.")
-        set_cookie("mfa_confirmed", "", 1)
+        time.sleep(1)
+        del st.session_state["mfa_confirmed"]
         st.stop()
     if "email" in st.query_params:
         set_cookie("email", st.query_params["email"], 1)
@@ -33,11 +35,11 @@ def get_user():
         else:
             set_cookie("email", "", 1)
             set_cookie("token", "", 1)
-    if "mfa_token" in st.query_params:
-        mfa_token = st.query_params["mfa_token"]
+    if "mfa_token" in st.session_state:
+        mfa_token = st.session_state["mfa_token"]
         totp = pyotp.TOTP(mfa_token)
         otp_uri = totp.provisioning_uri(
-            name=st.query_params["email"], issuer_name="MagicalAuth"
+            name=st.session_state["email"], issuer_name="MagicalAuth"
         )
         qr = qrcode.QRCode(
             version=1,
@@ -60,64 +62,71 @@ def get_user():
         if confirm_button:
             otp = pyotp.TOTP(mfa_token).verify(mfa_confirm)
             if otp:
-                set_cookie("email", email, 1)
-                set_cookie("mfa_confirmed", "true", 1)
-                if "mfa_token" in st.query_params:
-                    del st.query_params["mfa_token"]
+                st.session_state["mfa_confirmed"] = True
+                # Send magic link
+                magic_link_response = requests.post(
+                    f"{base_uri}/send_magic_link",
+                    json={"email": email, "token": otp},
+                )
+                if "mfa_token" in st.session_state:
+                    del st.session_state["mfa_token"]
                 st.rerun()
             else:
                 st.write("Invalid MFA token. Please try again.")
                 st.stop()
     else:
-        st.write("Please login to continue.")
         new_user = st.checkbox("I am a new user")
-        email = st.text_input("Email")
         if not new_user:
-            otp = st.text_input("MFA Token")
-            login_button = st.button("Login")
-            if login_button:
-                auth_response = requests.post(
-                    f"{base_uri}/send_magic_link",
-                    json={"email": email, "token": otp},
-                )
-                if auth_response.status_code == 200:
-                    st.write(auth_response.json()["message"])
-                else:
-                    st.write(auth_response.json())
+            with st.form("login_form"):
+                email = st.text_input("Email")
+                otp = st.text_input("MFA Token")
+                login_button = st.form_submit_button("Login")
+                if login_button:
+                    auth_response = requests.post(
+                        f"{base_uri}/send_magic_link",
+                        json={"email": email, "token": otp},
+                    )
+                    if auth_response.status_code == 200:
+                        st.write(auth_response.json()["message"])
+                    else:
+                        st.write(auth_response.json())
         else:
-            first_name = st.text_input("First Name")
-            last_name = st.text_input("Last Name")
-            company_name = st.text_input("Company Name")
-            job_title = st.text_input("Job Title")
-            register_button = st.button("Register")
-            if register_button:
-                response = requests.post(
-                    f"{base_uri}/register",
-                    json={
-                        "email": email,
-                        "first_name": first_name,
-                        "last_name": last_name,
-                        "company_name": company_name,
-                        "job_title": job_title,
-                    },
-                )
-                try:
-                    mfa_token = response.json()["mfa_token"]
-                except Exception as e:
-                    st.write(response.json())
-                    st.stop()
-                st.query_params["email"] = email
-                st.query_params["mfa_token"] = mfa_token
-                st.rerun()
+            with st.form("register_form"):
+                email = st.text_input("Email")
+                first_name = st.text_input("First Name")
+                last_name = st.text_input("Last Name")
+                company_name = st.text_input("Company Name")
+                job_title = st.text_input("Job Title")
+                register_button = st.form_submit_button("Register")
+                if register_button:
+                    response = requests.post(
+                        f"{base_uri}/register",
+                        json={
+                            "email": email,
+                            "first_name": first_name,
+                            "last_name": last_name,
+                            "company_name": company_name,
+                            "job_title": job_title,
+                        },
+                    )
+                    try:
+                        mfa_token = response.json()["mfa_token"]
+                    except Exception as e:
+                        st.write(response.json())
+                        st.stop()
+                    st.session_state["email"] = email
+                    st.session_state["mfa_token"] = mfa_token
+                    st.rerun()
     return None
 
 
 def log_out():
     set_cookie("email", "", 1)
     set_cookie("token", "", 1)
-    st.query_params["token"] = ""
-    st.write("You have been logged out.")
-    st.rerun()
+    st.session_state["token"] = ""
+    st.success("You have been logged out.")
+    time.sleep(2)
+    st.stop()
 
 
 st.title("Magical Auth")
