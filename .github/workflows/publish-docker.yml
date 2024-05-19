@@ -26,6 +26,6 @@ jobs:
     with:
       notebook: tests.ipynb
       image: ${{ needs.build-magicalauth.outputs.primary-image }}
-      port: "14374"
+      port: "12437"
       additional-python-dependencies: pyotp requests qrcode
     needs: build-magicalauth
