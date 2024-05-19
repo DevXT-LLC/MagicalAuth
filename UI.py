@@ -59,12 +59,14 @@ def login_page():
                     st.success(
                         "MFA token confirmed! Please check your email for the login link."
                     )
-                    st.session_state = None
+                    st.session_state = {}
                     st.rerun()
                 else:
                     st.write("Invalid MFA token. Please try again.")
                     st.stop()
 
+
+st.title("Magical Auth")
 
 try:
     email = st.query_params["email"] if "email" in st.query_params else None
@@ -80,4 +82,3 @@ except Exception as error_message:
     login_page()
 
 ## The rest of the code for your app goes under here...
-st.title("Magical Auth")
