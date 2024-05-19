@@ -8,5 +8,6 @@ COPY . .
 
 # Expose and run the FastAPI server
 EXPOSE 14374
+EXPOSE 8519
 RUN chmod +x /app/launch.sh
 ENTRYPOINT ["sh", "-c", "./launch.sh"]

@@ -13,5 +13,5 @@ toolbarMode = "minimal"
 showSidebarNavigation = false
 
 [server]
-port = 8507
+port = 8519
 headless = true

@@ -32,3 +32,4 @@ services:
     restart: always
     ports:
       - 14374:14374
+      - 8519:8519
