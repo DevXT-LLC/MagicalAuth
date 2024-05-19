@@ -41,6 +41,7 @@ def get_user():
         else:
             set_cookie("email", "", 1)
             set_cookie("token", "", 1)
+    st.title("Magical Auth")
     if "mfa_token" in st.session_state:
         mfa_token = st.session_state["mfa_token"]
         totp = pyotp.TOTP(mfa_token)
