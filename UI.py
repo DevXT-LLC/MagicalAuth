@@ -65,23 +65,26 @@ def get_user():
         st.write(
             "Registration successful! Please add the MFA token to your authenticator app."
         )
-        st.image(img_bytes, caption="Scan this QR code to enable MFA")
-        mfa_confirm = st.text_input("Enter the MFA token from your authenticator app")
-        confirm_button = st.button("Confirm MFA")
-        if confirm_button:
-            otp = pyotp.TOTP(mfa_token).verify(mfa_confirm)
-            if otp:
-                _ = requests.post(
-                    f"{base_uri}/send_magic_link",
-                    json={"email": st.session_state["email"], "token": mfa_confirm},
-                )
-                st.session_state["mfa_confirmed"] = True
-                if "mfa_token" in st.session_state:
-                    del st.session_state["mfa_token"]
-                st.rerun()
-            else:
-                st.write("Invalid MFA token. Please try again.")
-                st.stop()
+        with st.form("mfa_form"):
+            st.image(img_bytes, caption="Scan this QR code to enable MFA")
+            mfa_confirm = st.text_input(
+                "Enter the MFA token from your authenticator app"
+            )
+            confirm_button = st.form_submit_button("Confirm MFA")
+            if confirm_button:
+                otp = pyotp.TOTP(mfa_token).verify(mfa_confirm)
+                if otp:
+                    _ = requests.post(
+                        f"{base_uri}/send_magic_link",
+                        json={"email": st.session_state["email"], "token": mfa_confirm},
+                    )
+                    st.session_state["mfa_confirmed"] = True
+                    if "mfa_token" in st.session_state:
+                        del st.session_state["mfa_token"]
+                    st.rerun()
+                else:
+                    st.write("Invalid MFA token. Please try again.")
+                    st.stop()
     else:
         new_user = st.checkbox("I am a new user")
         if not new_user:
