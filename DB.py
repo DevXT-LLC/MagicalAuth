@@ -66,8 +66,6 @@ class FailedLogins(Base):
     created_at = Column(DateTime, server_default=text("now()"))
 
 
-# Check
-
 if __name__ == "__main__":
     import uvicorn
 
