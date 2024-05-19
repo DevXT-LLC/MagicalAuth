@@ -32,7 +32,7 @@ def login_page():
                 job_title=job_title,
             )
             totp = pyotp.TOTP(mfa_token)
-            otp_uri = totp.provisioning_uri(name=email, issuer_name="Your App Name")
+            otp_uri = totp.provisioning_uri(name=email, issuer_name="MagicalAuth")
             qr = qrcode.QRCode(
                 version=1,
                 error_correction=qrcode.constants.ERROR_CORRECT_L,
