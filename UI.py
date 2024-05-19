@@ -59,6 +59,7 @@ def login_page():
                     st.success(
                         "MFA token confirmed! Please check your email for the login link."
                     )
+                    st.session_state = None
                     st.rerun()
                 else:
                     st.write("Invalid MFA token. Please try again.")

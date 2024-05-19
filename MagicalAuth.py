@@ -225,6 +225,12 @@ class MagicalAuth:
         return f"A login link has been sent to {self.email}, please check your email and click the link to log in. The link will expire in 24 hours."
 
     def login(self, ip_address):
+        """ "
+        Login method to verify the token and return the user object
+
+        :param ip_address: IP address of the user
+        :return: User object
+        """
         session = get_session()
         user = session.query(User).filter(User.email == self.email).first()
         session.close()
