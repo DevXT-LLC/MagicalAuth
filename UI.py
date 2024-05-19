@@ -15,6 +15,7 @@ def get_user():
         set_cookie("token", st.query_params["token"], 1)
     email = get_cookie("email")
     token = get_cookie("token")
+    mfa_token = get_cookie("mfa_token")
     if email and token:
         user_request = requests.post(
             f"{base_uri}/login",
@@ -26,8 +27,7 @@ def get_user():
         else:
             set_cookie("email", "", 1)
             set_cookie("token", "", 1)
-    if "mfa_token" in st.query_params:
-        mfa_token = st.query_params["mfa_token"]
+    if mfa_token:
         totp = pyotp.TOTP(mfa_token)
         otp_uri = totp.provisioning_uri(name=email, issuer_name="MagicalAuth")
         qr = qrcode.QRCode(
@@ -54,7 +54,7 @@ def get_user():
                 st.success(
                     "MFA token confirmed! Please check your email for the login link."
                 )
-                del st.query_params["mfa_token"]
+                set_cookie("mfa_token", "", 1)
                 st.rerun()
             else:
                 st.write("Invalid MFA token. Please try again.")
@@ -93,8 +93,8 @@ def get_user():
                     },
                 )
                 mfa_token = response.json()["mfa_token"]
-                st.query_params["email"] = email
-                st.query_params["mfa_token"] = mfa_token
+                set_cookie("email", email, 1)
+                set_cookie("mfa_token", mfa_token, 1)
                 st.rerun()
     return None
 
@@ -102,6 +102,7 @@ def get_user():
 def log_out():
     set_cookie("email", "", 1)
     set_cookie("token", "", 1)
+    set_cookie("mfa_token", "", 1)
     st.write("You have been logged out.")
     st.stop()
 
