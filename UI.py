@@ -56,10 +56,11 @@ def login_page():
             if confirm_button:
                 otp = pyotp.TOTP(mfa_token).verify(mfa_confirm)
                 if otp:
-                    st.write(
+                    st.success(
                         "MFA token confirmed! Please check your email for the login link."
                     )
                     auth.send_magic_link(otp=otp)
+                    st.stop()
                 else:
                     st.write("Invalid MFA token. Please try again.")
     st.stop()

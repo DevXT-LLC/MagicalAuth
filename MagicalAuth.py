@@ -156,7 +156,8 @@ class MagicalAuth:
         if os.environ.get("SENDGRID_API_KEY"):
             send_email(
                 email=self.email,
-                message=f"<a href='{self.link}?email={self.email}&token={self.token}'>Click here to log in</a>",
+                subject="Magic Link",
+                body=f"<a href='{self.link}?email={self.email}&token={self.token}'>Click here to log in</a>",
             )
         else:
             return f"{self.link}?email={self.email}&token={self.token}"
