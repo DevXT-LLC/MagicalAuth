@@ -8,7 +8,7 @@ import requests
 import time
 
 app_name = os.environ.get("APP_NAME", "Magical Auth")
-auth_uri = os.environ.get("MAGICALAUTH_SERVER", "http://localhost:12437")
+
 
 st.set_page_config(
     page_title=app_name,
@@ -19,8 +19,8 @@ st.set_page_config(
 
 
 def get_user():
-    global app_name, auth_uri
-
+    global app_name
+    auth_uri = os.environ.get("MAGICALAUTH_SERVER", "http://localhost:12437")
     email = get_cookie("email")
     token = get_cookie("token")
     if "mfa_confirmed" in st.session_state:
@@ -144,30 +144,32 @@ def get_user():
     st.stop()
 
 
-def log_out():
-    set_cookie("email", "", 1)
-    set_cookie("token", "", 1)
-    st.session_state["token"] = ""
-    st.success("You have been logged out. Redirecting to login page...")
-    time.sleep(2)
-    st.write(
-        streamlit_js_eval(
-            js_expressions=f"window.location.href = '{auth_uri}'",
-            want_output=True,
-            key="redirect",
-        )
-    )
-    st.stop()
+def log_out_button():
+    token = get_cookie("token", "logout_token")
+    if token != "":
+        if st.button("Log Out"):
+            set_cookie("email", "", 1, "logout_set_email")
+            set_cookie("token", "", 1, "logout_set_token")
+            st.query_params["email"] = ""
+            st.query_params["token"] = ""
+            st.session_state["token"] = ""
+            st.success("You have been logged out. Redirecting to login page...")
+            time.sleep(2)
+            st.write(
+                streamlit_js_eval(
+                    js_expressions=f"window.location.href = '/'",
+                    want_output=True,
+                    key="redirect",
+                )
+            )
+            st.stop()
 
 
 user = get_user()
+st.title(app_name)
+log_out_button()
 
 ## The rest of the code for your app goes under here...
-
-log_out_button = st.button("Log Out")
-st.title(app_name)
-if log_out_button:
-    log_out()
 
 st.write(f"Welcome, {user['first_name']} {user['last_name']}!")
 st.write(f"About you: {user['job_title']} at {user['company_name']}")
