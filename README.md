@@ -5,7 +5,7 @@ MagicalAuth is a simple but magical authentication system for Python application
 ## Environment Variables
 
 - `APP_NAME`: The name of the application. This will be used in the magic link email to the user.
-- `ALLOWED_DOMAINS`: A comma-separated list of allowed email domains. If this is set, only users with email addresses from these domains will be allowed to register and login. If this is not set, all email domains will be allowed.
+- `ALLOWED_DOMAINS`: A comma-separated list of allowed email domains. If this is set, only users with email addresses from these domains will be allowed to register and login. If this is not set, it will default to `*` and all email domains will be allowed.
 - `ENCRYPTION_SECRET`: The secret key used to encrypt and decrypt the magic link tokens. This should be a long random string.
 - `MAGICALAUTH_SERVER`: The URL of the MagicalAuth server. This should be the URL of the server that is running the MagicalAuth FastAPI service.
 - `MAGIC_LINK_URL`: The URL that the magic link will point to. This should be the URL of the application that will handle the magic link. It will send query parameters `email` and `token` to this URL that will be used on the `MAGIC_LINK_URL` endpoint to authenticate the user.
@@ -26,12 +26,9 @@ docker-compose down && docker-compose pull && docker-compose up
 ```
 
 Access the FastAPI documentation at `http://localhost:12437` .
+
+### Web User Interface
+
+See [UI.py](UI.py) for an example of how to use MagicalAuth in a Streamlit application. It runs with the FastAPI service in the Docker Compose setup.
+
 Access the Streamlit UI at `http://localhost:8519` .
-
-## UI Example
-
-See [UI.py](UI.py) for an example of how to use MagicalAuth in a Streamlit application. You can run it with the following command:
-
-```bash
-streamlit run UI.py
-```
