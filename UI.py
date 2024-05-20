@@ -146,9 +146,9 @@ def log_out():
     set_cookie("email", "", 1)
     set_cookie("token", "", 1)
     st.session_state["token"] = ""
-    st.success("You have been logged out.")
+    st.success("You have been logged out. <a href='?'>Click here to log back in.</a>")
     time.sleep(2)
-    st.rerun()
+    st.stop()
 
 
 user = get_user()
