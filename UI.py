@@ -30,11 +30,15 @@ def get_user():
         del st.session_state["mfa_confirmed"]
         st.stop()
     if "email" in st.query_params:
-        set_cookie("email", st.query_params["email"], 1)
-        email = st.query_params["email"]
+        if st.query_params["email"] != "" and st.query_params["email"] is not None:
+            set_cookie("email", st.query_params["email"], 1)
+            email = st.query_params["email"]
+            st.query_params["email"] = ""
     if "token" in st.query_params:
-        set_cookie("token", st.query_params["token"], 1)
-        token = st.query_params["token"]
+        if st.query_params["token"] != "" and st.query_params["token"] is not None:
+            set_cookie("token", st.query_params["token"], 1)
+            token = st.query_params["token"]
+            st.query_params["token"] = ""
     if token != "" and token is not None:
         user_request = requests.post(
             f"{auth_uri}/login",
@@ -152,7 +156,6 @@ def log_out_button():
             set_cookie("token", "", 1, "logout_set_token")
             st.query_params["email"] = ""
             st.query_params["token"] = ""
-            st.query_params = {}
             st.session_state["token"] = ""
             st.success("You have been logged out. Redirecting to login page...")
             time.sleep(2)
