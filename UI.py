@@ -8,6 +8,7 @@ import requests
 import time
 
 app_name = os.environ.get("APP_NAME", "Magical Auth")
+auth_uri = os.environ.get("MAGICALAUTH_SERVER", "http://localhost:12437")
 
 st.set_page_config(
     page_title=app_name,
@@ -18,8 +19,8 @@ st.set_page_config(
 
 
 def get_user():
-    global app_name
-    base_uri = os.environ.get("MAGICALAUTH_SERVER", "http://localhost:12437")
+    global app_name, auth_uri
+
     email = get_cookie("email")
     token = get_cookie("token")
     if "mfa_confirmed" in st.session_state:
@@ -36,7 +37,7 @@ def get_user():
         token = st.query_params["token"]
     if token != "" and token is not None:
         user_request = requests.post(
-            f"{base_uri}/login",
+            f"{auth_uri}/login",
             json={"email": email, "token": token},
         )
         if user_request.status_code == 200:
@@ -77,7 +78,7 @@ def get_user():
                 otp = pyotp.TOTP(mfa_token).verify(mfa_confirm)
                 if otp:
                     _ = requests.post(
-                        f"{base_uri}/send_magic_link",
+                        f"{auth_uri}/send_magic_link",
                         json={"email": st.session_state["email"], "token": mfa_confirm},
                     )
                     st.session_state["mfa_confirmed"] = True
@@ -96,7 +97,7 @@ def get_user():
                 login_button = st.form_submit_button("Login")
                 if login_button:
                     auth_response = requests.post(
-                        f"{base_uri}/send_magic_link",
+                        f"{auth_uri}/send_magic_link",
                         json={"email": email, "token": otp},
                     )
                     if auth_response.status_code == 200:
@@ -123,7 +124,7 @@ def get_user():
                         st.write("Please fill out all fields.")
                         st.stop()
                     response = requests.post(
-                        f"{base_uri}/register",
+                        f"{auth_uri}/register",
                         json={
                             "email": email,
                             "first_name": first_name,
@@ -151,7 +152,7 @@ def log_out():
     time.sleep(2)
     st.write(
         streamlit_js_eval(
-            js_expressions="window.location.href = '?';",
+            js_expressions=f"window.location.href = '{auth_uri}'",
             want_output=True,
             key="redirect",
         )
