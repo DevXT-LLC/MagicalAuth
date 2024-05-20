@@ -148,7 +148,7 @@ def log_out():
     st.session_state["token"] = ""
     st.success("You have been logged out.")
     time.sleep(2)
-    st.stop()
+    st.rerun()
 
 
 user = get_user()
