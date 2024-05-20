@@ -152,14 +152,16 @@ def log_out_button():
             set_cookie("token", "", 1, "logout_set_token")
             st.query_params["email"] = ""
             st.query_params["token"] = ""
+            st.query_params = {}
             st.session_state["token"] = ""
             st.success("You have been logged out. Redirecting to login page...")
             time.sleep(2)
+            # Redirect to / to clear query params
             st.write(
                 streamlit_js_eval(
-                    js_expressions=f"window.location.href = '/'",
+                    js_expressions="window.location.href = '/';",
                     want_output=True,
-                    key="redirect",
+                    key="go_to_login",
                 )
             )
             st.stop()
