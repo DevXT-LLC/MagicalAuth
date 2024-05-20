@@ -7,7 +7,7 @@ import logging
 import os
 
 app = FastAPI(
-    title="MagicalAuth",
+    title=os.environ.get("APP_NAME", "MagicalAuth"),
     description="A magical authentication system.",
     version="0.0.1",
     docs_url="/",

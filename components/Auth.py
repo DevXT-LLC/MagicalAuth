@@ -1,11 +1,18 @@
-import streamlit as st
-from streamlit_js_eval import get_cookie, set_cookie
-import qrcode
-import pyotp
 import io
 import os
-import requests
 import time
+import pyotp
+import qrcode
+import requests
+import streamlit as st
+from streamlit_js_eval import get_cookie, set_cookie
+
+"""
+Required environment variables:
+
+- APP_NAME: Name of the application
+- MAGICALAUTH_SERVER: URL of the MagicalAuth server
+"""
 
 
 def get_user():

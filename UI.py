@@ -1,6 +1,6 @@
+import os
 import streamlit as st
 from components.Auth import get_user, log_out_button
-import os
 
 app_name = os.environ.get("APP_NAME", "Magical Auth")
 
