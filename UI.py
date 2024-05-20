@@ -1,5 +1,5 @@
 import streamlit as st
-from streamlit_js_eval import streamlit_js_eval, get_cookie, set_cookie
+from streamlit_js_eval import get_cookie, set_cookie
 import qrcode
 import pyotp
 import io
@@ -156,8 +156,12 @@ def log_out_button():
             st.query_params["token"] = ""
             st.session_state["token"] = ""
             st.success("You have been logged out. Redirecting to login page...")
+            st.markdown(
+                f'<meta http-equiv="refresh" content="2;URL=/">',
+                unsafe_allow_html=True,
+            )
             time.sleep(2)
-            st.rerun()
+            st.stop()
 
 
 user = get_user()
