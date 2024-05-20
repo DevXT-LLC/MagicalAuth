@@ -157,7 +157,7 @@ user = get_user()
 
 ## The rest of the code for your app goes under here...
 
-log_out_button = st.button("Log Out") if get_cookie("token") != "" else False
+log_out_button = st.button("Log Out")
 st.title(app_name)
 if log_out_button:
     log_out()
