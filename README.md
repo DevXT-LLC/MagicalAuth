@@ -19,6 +19,27 @@ MagicalAuth is a simple but magical authentication system for Python application
 - `DATABASE_NAME`: The name of the PostgreSQL database.
 - `LOGLEVEL`: The log level for the application. This should be one of `DEBUG`, `INFO`, `WARNING`, `ERROR`, or `CRITICAL`.
 
+### Environment File Example
+
+Replace the values with your own values and save it as `.env` in the root directory of the project.
+
+```env
+APP_NAME=MagicalAuth
+ALLOWED_DOMAINS=devxt.com,magicalauth.com
+ENCRYPTION_SECRET=supersecretkey
+MAGICALAUTH_SERVER=http://localhost:12437
+MAGIC_LINK_URL=http://localhost:8519
+SENDGRID_API_KEY=SG.x
+SENDGRID_FROM_EMAIL=your@email.com
+REGISTRATION_WEBHOOK=http://localhost:7437/api/user
+DATABASE_USER=postgres
+DATABASE_PASSWORD=postgres
+DATABASE_HOST=postgres
+DATABASE_PORT=5432
+DATABASE_NAME=postgres
+LOGLEVEL=INFO
+```
+
 ## Usage
 
 ```bash
