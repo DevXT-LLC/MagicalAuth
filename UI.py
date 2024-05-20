@@ -147,9 +147,15 @@ def log_out():
     set_cookie("email", "", 1)
     set_cookie("token", "", 1)
     st.session_state["token"] = ""
-    st.success("You have been logged out. <a href='?'>Click here to log back in.</a>")
+    st.success("You have been logged out. Redirecting to login page...")
     time.sleep(2)
-    streamlit_js_eval(js_expressions="window.location.href = '?';")
+    st.write(
+        streamlit_js_eval(
+            js_expressions="window.location.href = '?';",
+            want_output=True,
+            key="redirect",
+        )
+    )
     st.stop()
 
 
