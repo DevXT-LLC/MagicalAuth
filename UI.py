@@ -139,7 +139,7 @@ def get_user():
                     st.session_state["email"] = email
                     st.session_state["mfa_token"] = mfa_token
                     st.rerun()
-    return None
+    st.stop()
 
 
 def log_out():
@@ -152,8 +152,6 @@ def log_out():
 
 
 user = get_user()
-if user is None:
-    st.stop()
 
 ## The rest of the code for your app goes under here...
 st.title(app_name)
