@@ -37,13 +37,6 @@ def get_user():
         if st.query_params["token"] != "" and st.query_params["token"] is not None:
             set_cookie("token", st.query_params["token"], 1)
             token = st.query_params["token"]
-            st.write(
-                streamlit_js_eval(
-                    js_expressions="window.location.href = '/';",
-                    want_output=True,
-                    key="go_to_home",
-                )
-            )
     if token != "" and token is not None:
         user_request = requests.post(
             f"{auth_uri}/login",
@@ -164,15 +157,7 @@ def log_out_button():
             st.session_state["token"] = ""
             st.success("You have been logged out. Redirecting to login page...")
             time.sleep(2)
-            # Redirect to / to clear query params
-            st.write(
-                streamlit_js_eval(
-                    js_expressions="window.location.href = '/';",
-                    want_output=True,
-                    key="go_to_login",
-                )
-            )
-            st.stop()
+            st.rerun()
 
 
 user = get_user()
