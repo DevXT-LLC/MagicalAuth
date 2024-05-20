@@ -33,12 +33,17 @@ def get_user():
         if st.query_params["email"] != "" and st.query_params["email"] is not None:
             set_cookie("email", st.query_params["email"], 1)
             email = st.query_params["email"]
-            st.query_params["email"] = ""
     if "token" in st.query_params:
         if st.query_params["token"] != "" and st.query_params["token"] is not None:
             set_cookie("token", st.query_params["token"], 1)
             token = st.query_params["token"]
-            st.query_params["token"] = ""
+            st.write(
+                streamlit_js_eval(
+                    js_expressions="window.location.href = '/';",
+                    want_output=True,
+                    key="go_to_home",
+                )
+            )
     if token != "" and token is not None:
         user_request = requests.post(
             f"{auth_uri}/login",
