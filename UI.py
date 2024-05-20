@@ -18,6 +18,7 @@ st.set_page_config(
 
 
 def get_user():
+    global app_name
     base_uri = os.environ.get("MAGICALAUTH_SERVER", "http://localhost:12437")
     email = get_cookie("email")
     token = get_cookie("token")
@@ -155,9 +156,9 @@ def log_out():
 user = get_user()
 
 ## The rest of the code for your app goes under here...
-st.title(app_name)
 
-log_out_button = st.button("Log Out")
+log_out_button = st.button("Log Out") if get_cookie("token") != "" else False
+st.title(app_name)
 if log_out_button:
     log_out()
 
