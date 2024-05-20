@@ -148,6 +148,7 @@ def log_out():
     st.session_state["token"] = ""
     st.success("You have been logged out. <a href='?'>Click here to log back in.</a>")
     time.sleep(2)
+    streamlit_js_eval("window.location.href = '?';")
     st.stop()
 
 
