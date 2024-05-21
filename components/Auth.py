@@ -50,7 +50,7 @@ def get_user():
         mfa_token = st.session_state["mfa_token"]
         totp = pyotp.TOTP(mfa_token)
         otp_uri = totp.provisioning_uri(
-            name=st.session_state["email"], issuer_name="MagicalAuth"
+            name=st.session_state["email"], issuer_name=app_name
         )
         qr = qrcode.QRCode(
             version=1,
