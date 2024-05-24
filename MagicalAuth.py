@@ -1,13 +1,9 @@
-# uvicorn app:server --port 14374 --workers 4
-# streamlit run UI.py
-from DB import User, FailedLogins, get_session
-import os
-import pyotp
-import requests
-import base64
+from DB import NurseGPTUser as User, FailedLogins, get_session
+from fastapi import Header, HTTPException
+from Globals import getenv
+from datetime import datetime, timedelta
 from hashlib import md5
 from Crypto.Cipher import AES
-from datetime import datetime, timedelta
 from fastapi import HTTPException
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import (
@@ -18,17 +14,59 @@ from sendgrid.helpers.mail import (
     Disposition,
     Mail,
 )
+import pyotp
+import requests
+import base64
+import logging
+import jwt
+import os
 
+
+logging.basicConfig(
+    level=getenv("LOG_LEVEL"),
+    format=getenv("LOG_FORMAT"),
+)
 """
 Required environment variables:
 
-- SENDGRID_API_KEY: SendGrid API key.
-- SENDGRID_FROM_EMAIL: Default email address to send emails from.
-- ENCRYPTION_SECRET: Encryption key to encrypt and decrypt data.
-- MAGIC_LINK_URL: URL to send in the email for the user to click on.
-- REGISTRATION_WEBHOOK: URL to send a POST request to when a user registers.
-- ALLOWED_DOMAINS: Comma separated list of allowed domains for registration. Default is * for all domains.
+- SENDGRID_API_KEY: SendGrid API key
+- SENDGRID_FROM_EMAIL: Default email address to send emails from
+- ENCRYPTION_SECRET: Encryption key to encrypt and decrypt data
+- MAGIC_LINK_URL: URL to send in the email for the user to click on
+- REGISTRATION_WEBHOOK: URL to send a POST request to when a user registers
 """
+
+
+def verify_api_key(authorization: str = Header(None)):
+    ENCRYPTION_SECRET = getenv("ENCRYPTION_SECRET")
+    authorization = str(authorization).replace("Bearer ", "").replace("bearer ", "")
+    if ENCRYPTION_SECRET:
+        if authorization is None:
+            raise HTTPException(
+                status_code=401, detail="Authorization header is missing"
+            )
+        if authorization == ENCRYPTION_SECRET:
+            return "ADMIN"
+        try:
+            if authorization == ENCRYPTION_SECRET:
+                return "ADMIN"
+            if getenv("AUTH_PROVIDER") == "magicalauth":
+                ENCRYPTION_SECRET = (
+                    f'{ENCRYPTION_SECRET}{datetime.now().strftime("%Y%m%d")}'
+                )
+            token = jwt.decode(
+                jwt=authorization,
+                key=ENCRYPTION_SECRET,
+                algorithms=["HS256"],
+            )
+            db = get_session()
+            user = db.query(User).filter(User.id == token["sub"]).first()
+            db.close()
+            return user
+        except Exception as e:
+            raise HTTPException(status_code=401, detail="Invalid API Key")
+    else:
+        return authorization
 
 
 def send_email(
@@ -40,7 +78,7 @@ def send_email(
     attachment_file_name=None,
 ):
     message = Mail(
-        from_email=os.environ.get("SENDGRID_FROM_EMAIL"),
+        from_email=getenv("SENDGRID_FROM_EMAIL"),
         to_emails=email,
         subject=subject,
         html_content=body,
@@ -57,7 +95,12 @@ def send_email(
             Disposition("attachment"),
         )
         message.attachment = attachment
-    response = SendGridAPIClient(os.environ.get("SENDGRID_API_KEY")).send(message)
+
+    try:
+        response = SendGridAPIClient(getenv("SENDGRID_API_KEY")).send(message)
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=400, detail="Email could not be sent.")
     if response.status_code != 202:
         raise HTTPException(status_code=400, detail="Email could not be sent.")
     return None
@@ -109,13 +152,13 @@ def decrypt(passphrase, data):
 
 
 class MagicalAuth:
-    def __init__(self, email: str, token: str = None):
-        encryption_key = os.environ.get("ENCRYPTION_SECRET", "")
-        self.link = os.environ.get("MAGIC_LINK_URL", "https://localhost:8507/")
+    def __init__(self, token: str = None):
+        encryption_key = getenv("ENCRYPTION_SECRET")
+        self.link = getenv("MAGIC_LINK_URL")
         self.encryption_key = f'{encryption_key}{datetime.now().strftime("%Y%m%d")}'
-        self.email = email.lower()
         self.token = (
-            token.replace("%2B", "+")
+            str(token)
+            .replace("%2B", "+")
             .replace("%2F", "/")
             .replace("%3D", "=")
             .replace("%20", " ")
@@ -142,9 +185,30 @@ class MagicalAuth:
             .replace("%5E", "^")
             .replace("%60", "`")
             .replace("%7E", "~")
+            .replace("Bearer ", "")
+            .replace("bearer ", "")
             if token
             else None
         )
+        try:
+            # Decode jwt
+            decoded = jwt.decode(
+                jwt=token, key=self.encryption_key, algorithms=["HS256"]
+            )
+            self.email = decoded["email"]
+            self.token = token
+        except:
+            self.email = None
+            self.token = None
+
+    def user_exists(self, email: str = None):
+        self.email = email.lower()
+        session = get_session()
+        user = session.query(User).filter(User.email == self.email).first()
+        session.close()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        return True
 
     def add_failed_login(self, ip_address):
         session = get_session()
@@ -170,14 +234,22 @@ class MagicalAuth:
         session.close()
         return failed_logins
 
-    def send_magic_link(self, otp, ip_address):
+    def send_magic_link(self, email, otp, ip_address):
+        self.email = email.lower()
         session = get_session()
         user = session.query(User).filter(User.email == self.email).first()
         session.close()
         if user is None:
             raise HTTPException(status_code=404, detail="User not found")
-        self.token = encrypt(
-            passphrase=f"{self.encryption_key}{str(user.id)}", data=str(user.id)
+        self.token = jwt.encode(
+            {
+                "sub": str(user.id),
+                "email": self.email,
+                "admin": user.admin,
+                "exp": datetime.utcnow() + timedelta(hours=24),
+            },
+            self.encryption_key,
+            algorithm="HS256",
         )
         if not pyotp.TOTP(user.mfa_token).verify(otp):
             self.add_failed_login(ip_address=ip_address)
@@ -213,8 +285,8 @@ class MagicalAuth:
             .replace("`", "%60")
             .replace("~", "%7E")
         )
-        magic_link = f"{self.link}?email={self.email}&token={token}"
-        if os.environ.get("SENDGRID_API_KEY"):
+        magic_link = f"{self.link}?token={token}"
+        if getenv("SENDGRID_API_KEY"):
             send_email(
                 email=self.email,
                 subject="Magic Link",
@@ -233,35 +305,45 @@ class MagicalAuth:
         :return: User object
         """
         session = get_session()
-        user = session.query(User).filter(User.email == self.email).first()
-        session.close()
-        if user is None:
-            raise HTTPException(status_code=404, detail="User not found")
         failures = self.count_failed_logins()
         if failures >= 50:
             raise HTTPException(
                 status_code=429,
                 detail="Too many failed login attempts today. Please try again tomorrow.",
             )
-        user_id = decrypt(
-            passphrase=f"{self.encryption_key}{str(user.id)}", data=self.token
-        )
-        if str(user.id) == user_id:
+        try:
+            user_info = jwt.decode(
+                jwt=self.token, key=self.encryption_key, algorithms=["HS256"]
+            )
+        except:
+            self.add_failed_login(ip_address=ip_address)
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid login token. Please log out and try again.",
+            )
+        user_id = user_info["sub"]
+        user = session.query(User).filter(User.id == user_id).first()
+        session.close()
+        if user is None:
+            raise HTTPException(status_code=404, detail="User not found")
+        if str(user.id) == str(user_id):
             return user
         self.add_failed_login(ip_address=ip_address)
         raise HTTPException(
-            status_code=418,
+            status_code=401,
             detail="Invalid login token. Please log out and try again.",
         )
 
     def register(
         self,
+        email: str,
         first_name: str,
         last_name: str,
         company_name: str,
         job_title: str,
     ):
-        allowed_domains = os.environ.get("ALLOWED_DOMAINS", "*")
+        self.email = email
+        allowed_domains = getenv("ALLOWED_DOMAINS")
         if allowed_domains != "*":
             if "," in allowed_domains:
                 allowed_domains = allowed_domains.split(",")
@@ -293,13 +375,13 @@ class MagicalAuth:
         session.commit()
         session.close()
         # Send registration webhook out to third party application such as AGiXT to create a user there.
-        registration_webhook = os.environ.get("REGISTRATION_WEBHOOK", "")
+        registration_webhook = getenv("REGISTRATION_WEBHOOK")
         if registration_webhook:
             try:
                 requests.post(
                     registration_webhook,
                     json={"email": self.email},
-                    headers={"Authorization": os.environ.get("ENCRYPTION_SECRET", "")},
+                    headers={"Authorization": getenv("ENCRYPTION_SECRET")},
                 )
             except Exception as e:
                 pass

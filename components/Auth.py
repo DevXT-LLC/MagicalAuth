@@ -36,8 +36,8 @@ def get_user():
             token = st.query_params["token"]
     if token != "" and token is not None:
         user_request = requests.post(
-            f"{auth_uri}/login",
-            json={"email": email, "token": token},
+            f"{auth_uri}/v1/user",
+            headers={"Authorization": token},
         )
         if user_request.status_code == 200:
             user = user_request.json()
@@ -46,12 +46,9 @@ def get_user():
             set_cookie("email", "", 1)
             set_cookie("token", "", 1)
     st.title(app_name)
-    if "mfa_token" in st.session_state:
-        mfa_token = st.session_state["mfa_token"]
-        totp = pyotp.TOTP(mfa_token)
-        otp_uri = totp.provisioning_uri(
-            name=st.session_state["email"], issuer_name=app_name
-        )
+    if "otp_uri" in st.session_state:
+        otp_uri = st.session_state["otp_uri"]
+        mfa_token = str(otp_uri).split("secret=")[1].split("&")[0]
         qr = qrcode.QRCode(
             version=1,
             error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -77,12 +74,12 @@ def get_user():
                 otp = pyotp.TOTP(mfa_token).verify(mfa_confirm)
                 if otp:
                     _ = requests.post(
-                        f"{auth_uri}/send_magic_link",
+                        f"{auth_uri}/v1/login",
                         json={"email": st.session_state["email"], "token": mfa_confirm},
                     )
                     st.session_state["mfa_confirmed"] = True
-                    if "mfa_token" in st.session_state:
-                        del st.session_state["mfa_token"]
+                    if "otp_uri" in st.session_state:
+                        del st.session_state["otp_uri"]
                     st.rerun()
                 else:
                     st.write("Invalid MFA token. Please try again.")
@@ -96,7 +93,7 @@ def get_user():
                 login_button = st.form_submit_button("Login")
                 if login_button:
                     auth_response = requests.post(
-                        f"{auth_uri}/send_magic_link",
+                        f"{auth_uri}/v1/login",
                         json={"email": email, "token": otp},
                     )
                     if auth_response.status_code == 200:
@@ -123,7 +120,7 @@ def get_user():
                         st.write("Please fill out all fields.")
                         st.stop()
                     response = requests.post(
-                        f"{auth_uri}/register",
+                        f"{auth_uri}/v1/user",
                         json={
                             "email": email,
                             "first_name": first_name,
@@ -133,12 +130,12 @@ def get_user():
                         },
                     )
                     try:
-                        mfa_token = response.json()["mfa_token"]
+                        mfa_token = response.json()["otp_uri"]
                     except Exception as e:
                         st.write(response.json())
                         st.stop()
                     st.session_state["email"] = email
-                    st.session_state["mfa_token"] = mfa_token
+                    st.session_state["otp_uri"] = mfa_token
                     st.rerun()
     st.stop()
 

@@ -3,11 +3,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from endpoints import Auth
+from Globals import getenv
 import logging
 import os
 
 app = FastAPI(
-    title=os.environ.get("APP_NAME", "MagicalAuth"),
+    title=getenv("APP_NAME"),
     description="A magical authentication system.",
     version="0.0.1",
     docs_url="/",
@@ -20,7 +21,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 logging.basicConfig(
-    level=os.environ.get("LOGLEVEL", "INFO"),
+    level=getenv("LOGLEVEL"),
     format="%(asctime)s | %(levelname)s | %(message)s",
 )
 
