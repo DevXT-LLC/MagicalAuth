@@ -11,4 +11,4 @@ pycryptodome
 pyotp
 sendgrid
 qrcode
-jwt
+pyjwt
