@@ -10,7 +10,7 @@ services:
     volumes:
       - ./data:/var/lib/postgresql/data
   magicalauth:
-    image: ghcr.io/devxt-llc/magicalauth:dev
+    image: ghcr.io/devxt-llc/magicalauth:main
     init: true
     depends_on:
       - magicalauthdb
