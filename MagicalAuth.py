@@ -284,7 +284,7 @@ class MagicalAuth:
             .replace("~", "%7E")
         )
         magic_link = f"{self.link}?token={token}"
-        if getenv("SENDGRID_API_KEY"):
+        if getenv("SENDGRID_API_KEY") and getenv("SENDGRID_FROM_EMAIL"):
             send_email(
                 email=self.email,
                 subject="Magic Link",
