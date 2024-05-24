@@ -81,19 +81,10 @@ if __name__ == "__main__":
     time.sleep(10)
     print("Connecting to database engine...")
     Base.metadata.create_all(engine)
-    if getenv("MODE") == "development":
-        uvicorn.run(
-            "Server:app",
-            host="0.0.0.0",
-            port=12437,
-            log_level=getenv("LOG_LEVEL").lower(),
-            reload=True,
-        )
-    else:
-        uvicorn.run(
-            "Server:app",
-            host="0.0.0.0",
-            port=12437,
-            log_level=getenv("LOG_LEVEL").lower(),
-            workers=int(getenv("UVICORN_WORKERS")),
-        )
+    uvicorn.run(
+        "Server:app",
+        host="0.0.0.0",
+        port=12437,
+        log_level=getenv("LOG_LEVEL").lower(),
+        workers=int(getenv("UVICORN_WORKERS")),
+    )
