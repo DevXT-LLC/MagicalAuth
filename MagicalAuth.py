@@ -342,6 +342,8 @@ class MagicalAuth:
     ):
         self.email = email
         allowed_domains = getenv("ALLOWED_DOMAINS")
+        if allowed_domains is None or allowed_domains == "":
+            allowed_domains = "*"
         if allowed_domains != "*":
             if "," in allowed_domains:
                 allowed_domains = allowed_domains.split(",")
