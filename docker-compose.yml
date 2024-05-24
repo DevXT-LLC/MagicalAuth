@@ -34,3 +34,4 @@ services:
     restart: always
     ports:
       - 12437:12437
+      - 8519:8519
