@@ -23,3 +23,8 @@ class UserInfo(BaseModel):
 
 class Detail(BaseModel):
     detail: str
+
+
+class OTP(BaseModel):
+    email: str
+    token: str
