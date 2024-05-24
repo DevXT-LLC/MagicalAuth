@@ -39,6 +39,8 @@ Required environment variables:
 
 def verify_api_key(authorization: str = Header(None)):
     ENCRYPTION_SECRET = getenv("ENCRYPTION_SECRET")
+    if getenv("AUTH_PROVIDER") == "magicalauth":
+        ENCRYPTION_SECRET = f'{ENCRYPTION_SECRET}{datetime.now().strftime("%Y%m%d")}'
     authorization = str(authorization).replace("Bearer ", "").replace("bearer ", "")
     if ENCRYPTION_SECRET:
         if authorization is None:
@@ -50,10 +52,6 @@ def verify_api_key(authorization: str = Header(None)):
         try:
             if authorization == ENCRYPTION_SECRET:
                 return "ADMIN"
-            if getenv("AUTH_PROVIDER") == "magicalauth":
-                ENCRYPTION_SECRET = (
-                    f'{ENCRYPTION_SECRET}{datetime.now().strftime("%Y%m%d")}'
-                )
             token = jwt.decode(
                 jwt=authorization,
                 key=ENCRYPTION_SECRET,

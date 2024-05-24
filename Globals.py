@@ -11,6 +11,7 @@ def getenv(var_name: str):
         "ALLOWLIST": "*",
         "ENCRYPTION_SECRET": "n0ne",
         "APP_NAME": "Magical Auth",
+        "AUTH_PROVIDER": "magicalauth",
         "MAGIC_LINK_URL": "https://localhost:8507/",
         "LOG_LEVEL": "INFO",
         "LOG_FORMAT": "%(asctime)s | %(levelname)s | %(message)s",

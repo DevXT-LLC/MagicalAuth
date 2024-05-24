@@ -35,7 +35,8 @@ def get_user():
             set_cookie("token", st.query_params["token"], 1)
             token = st.query_params["token"]
     if token != "" and token is not None:
-        user_request = requests.post(
+        print(token)
+        user_request = requests.get(
             f"{auth_uri}/v1/user",
             headers={"Authorization": token},
         )
