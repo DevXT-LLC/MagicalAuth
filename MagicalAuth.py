@@ -1,4 +1,4 @@
-from DB import NurseGPTUser as User, FailedLogins, get_session
+from DB import User, FailedLogins, get_session
 from fastapi import Header, HTTPException
 from Globals import getenv
 from datetime import datetime, timedelta

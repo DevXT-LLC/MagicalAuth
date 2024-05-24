@@ -10,7 +10,7 @@ def getenv(var_name: str):
         "DATABASE_TYPE": "sqlite",
         "ALLOWLIST": "*",
         "ENCRYPTION_SECRET": "n0ne",
-        "APP_NAME": "NurseGPT",
+        "APP_NAME": "Magical Auth",
         "MAGIC_LINK_URL": "https://localhost:8507/",
         "LOG_LEVEL": "INFO",
         "LOG_FORMAT": "%(asctime)s | %(levelname)s | %(message)s",
