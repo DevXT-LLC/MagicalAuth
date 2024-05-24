@@ -8,7 +8,7 @@ def getenv(var_name: str):
     default_values = {
         "MODE": "production",
         "DATABASE_TYPE": "sqlite",
-        "ALLOWLIST": "*",
+        "ALLOWED_DOMAINS": "*",
         "ENCRYPTION_SECRET": "n0ne",
         "APP_NAME": "Magical Auth",
         "AUTH_PROVIDER": "magicalauth",
