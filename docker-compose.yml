@@ -1,4 +1,3 @@
-version: "3.7"
 services:
   magicalauthdb:
     image: postgres
@@ -11,7 +10,7 @@ services:
     volumes:
       - ./data:/var/lib/postgresql/data
   magicalauth:
-    image: ghcr.io/devxt-llc/magicalauth:main
+    image: ghcr.io/devxt-llc/magicalauth:dev
     init: true
     depends_on:
       - magicalauthdb

@@ -1,56 +1,46 @@
-import os
-import uuid
-import time
-import logging
 from sqlalchemy import (
+    Date,
     create_engine,
     Column,
-    Text,
-    String,
     Integer,
-    ForeignKey,
-    DateTime,
+    UUID,
     Boolean,
+    DateTime,
+    ForeignKey,
+    String,
+    func,
+    text,
 )
-from sqlalchemy.orm import sessionmaker, relationship, declarative_base
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.sql import text
-
-"""
-Required environment variables:
-
-- DATABASE_USER: Database username
-- DATABASE_PASSWORD: Database password
-- DATABASE_HOST: Database host
-- DATABASE_PORT: Database port
-- DATABASE_NAME: Database name
-- LOGLEVEL: Logging level
-"""
+from sqlalchemy.orm import declarative_base, relationship
+from Globals import getenv
+from sqlalchemy.orm import sessionmaker
+import logging
+import uuid
 
 logging.basicConfig(
-    level=os.environ.get("LOGLEVEL", "INFO"),
-    format="%(asctime)s | %(levelname)s | %(message)s",
+    level=getenv("LOG_LEVEL"),
+    format=getenv("LOG_FORMAT"),
 )
 
-DATABASE_USER = os.environ.get("DATABASE_USER", "postgres")
-DATABASE_PASSWORD = os.environ.get("DATABASE_PASSWORD", "postgres")
-DATABASE_HOST = os.environ.get("DATABASE_HOST", "localhost")
-DATABASE_PORT = os.environ.get("DATABASE_PORT", "5432")
-DATABASE_NAME = os.environ.get("DATABASE_NAME", "postgres")
-LOGIN_URI = f"{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}"
-DATABASE_URL = f"postgresql://{LOGIN_URI}"
 try:
-    engine = create_engine(DATABASE_URL, pool_size=40, max_overflow=-1)
+    DATABASE_TYPE = getenv("DATABASE_TYPE")
+    DATABASE_NAME = getenv("DATABASE_NAME")
+    if DATABASE_TYPE != "sqlite":
+        DATABASE_USER = getenv("DATABASE_USER")
+        DATABASE_PASSWORD = getenv("DATABASE_PASSWORD")
+        DATABASE_HOST = getenv("DATABASE_HOST")
+        DATABASE_PORT = getenv("DATABASE_PORT")
+        LOGIN_URI = f"{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}"
+        DATABASE_URI = f"postgresql://{LOGIN_URI}"
+    else:
+        DATABASE_URI = f"sqlite:///{DATABASE_NAME}.db"
+    engine = create_engine(DATABASE_URI)
+    Base = declarative_base()
+
 except Exception as e:
     logging.error(f"Error connecting to database: {e}")
-connection = engine.connect()
-Base = declarative_base()
-
-
-def get_session():
-    Session = sessionmaker(bind=engine, autoflush=False)
-    session = Session()
-    return session
+    engine = None
+    Base = None
 
 
 class User(Base):
@@ -61,10 +51,10 @@ class User(Base):
     last_name = Column(String, default="", nullable=True)
     company_name = Column(String, default="", nullable=True)
     job_title = Column(String, default="", nullable=True)
-    role = Column(String, default="user", nullable=True)
+    admin = Column(Boolean, default=False, nullable=False)
     mfa_token = Column(String, default="", nullable=True)
-    created_at = Column(DateTime, server_default=text("now()"))
-    updated_at = Column(DateTime, server_default=text("now()"), onupdate=text("now()"))
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
     is_active = Column(Boolean, default=True)
 
 
@@ -74,21 +64,36 @@ class FailedLogins(Base):
     user_id = Column(UUID(as_uuid=True), ForeignKey("user.id"))
     user = relationship("User")
     ip_address = Column(String, default="", nullable=True)
-    created_at = Column(DateTime, server_default=text("now()"))
+    created_at = Column(DateTime, server_default=func.now())
+
+
+def get_session():
+    Session = sessionmaker(bind=engine, autoflush=False)
+    session = Session()
+    return session
 
 
 if __name__ == "__main__":
     import uvicorn
+    import time
 
-    logging.info("Waiting 10 seconds for database(s) to initialize...")
-    logging.info("Connecting to database...")
+    print("Waiting 10 seconds for database(s) to initialize...")
     time.sleep(10)
+    print("Connecting to database engine...")
     Base.metadata.create_all(engine)
-    logging.info("Connected to database.")
-    uvicorn.run(
-        "Server:app",
-        host="0.0.0.0",
-        port=12437,
-        log_level=str(os.environ.get("LOGLEVEL", "INFO")).lower(),
-        workers=int(os.environ.get("UVICORN_WORKERS", 4)),
-    )
+    if getenv("MODE") == "development":
+        uvicorn.run(
+            "Server:app",
+            host="0.0.0.0",
+            port=12437,
+            log_level=getenv("LOG_LEVEL").lower(),
+            reload=True,
+        )
+    else:
+        uvicorn.run(
+            "Server:app",
+            host="0.0.0.0",
+            port=12437,
+            log_level=getenv("LOG_LEVEL").lower(),
+            workers=int(getenv("UVICORN_WORKERS")),
+        )
