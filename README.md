@@ -12,12 +12,14 @@ MagicalAuth is a simple but magical authentication system for Python application
 - `SENDGRID_API_KEY`: The API key for SendGrid. This is used to send the magic link email to the user.
 - `SENDGRID_FROM_EMAIL`: The email address that the magic link email will be sent from. This should be a verified email address in SendGrid.
 - `REGISTRATION_WEBHOOK`: The URL that the registration webhook will be sent to. This should be the URL of the application that will handle the registration webhook. It will send a POST request with a JSON body containing the user's email address.
-- `DATABASE_USER`: The username for the PostgreSQL database.
-- `DATABASE_PASSWORD`: The password for the PostgreSQL database.
-- `DATABASE_HOST`: The host for the PostgreSQL database.
-- `DATABASE_PORT`: The port for the PostgreSQL database.
-- `DATABASE_NAME`: The name of the PostgreSQL database.
-- `LOGLEVEL`: The log level for the application. This should be one of `DEBUG`, `INFO`, `WARNING`, `ERROR`, or `CRITICAL`.
+- `DATABASE_TYPE`: The type of database to use. This should be one of `sqlite`, or `postgresql`.
+- `DATABASE_USER`: The username for the database.
+- `DATABASE_PASSWORD`: The password for the database.
+- `DATABASE_HOST`: The host for the database.
+- `DATABASE_PORT`: The port for the database.
+- `DATABASE_NAME`: The name of the database.
+- `UVICORN_WORKERS`: The number of Uvicorn workers to use. This should be an integer.
+- `LOG_LEVEL`: The log level for the application. This should be one of `DEBUG`, `INFO`, `WARNING`, `ERROR`, or `CRITICAL`.
 
 ### Environment File Example
 
@@ -32,12 +34,14 @@ MAGIC_LINK_URL=http://localhost:8519
 SENDGRID_API_KEY=SG.x
 SENDGRID_FROM_EMAIL=your@email.com
 REGISTRATION_WEBHOOK=http://localhost:7437/api/user
+DATABASE_TYPE=postgres
 DATABASE_USER=postgres
 DATABASE_PASSWORD=postgres
 DATABASE_HOST=postgres
 DATABASE_PORT=5432
 DATABASE_NAME=postgres
-LOGLEVEL=INFO
+UVICORN_WORKERS=4
+LOG_LEVEL=INFO
 ```
 
 ## Usage
@@ -53,3 +57,32 @@ Access the FastAPI documentation at `http://localhost:12437` .
 See [UI.py](UI.py) for an example of how to use MagicalAuth in a Streamlit application. It runs with the FastAPI service in the Docker Compose setup.
 
 Access the Streamlit UI at `http://localhost:8519` .
+
+## Folder Structure Explanation
+
+- `.github/workflows`: Contains GitHub Actions workflows for CI/CD.
+  - `code_style_check.yml`: Runs a code style check when committing to the GitHub repository.
+  - `publish-docker-dev.yml`: Publishes the Docker image to the GitHub Container Registry when a new tag is pushed to the GitHub repository with the branch name or `dev` as the tag. This also runs tests from `tests.ipynb`.
+  - `publish-docker.yml`: Publishes the Docker image to the GitHub Container Registry when the main branch is updated. This also runs tests from `tests.ipynb`.
+  - `todos.yml`: Runs a TODO check when committing to the GitHub repository and creates GitHub issues for each TODO found if they do not already exist.
+- `.streamlit/config.toml`: Streamlit configuration file.
+- `components`: Contains Streamlit components used by the Streamlit UI.
+  - `Auth.py`: Contains the authentication component with `get_user` and `log_out_button` functions.
+- `data`: Contains the persisted database files. Clear contents of this folder to reset the database.
+- `endpoints`: Contains the FastAPI endpoints split by purpose.
+  - `Auth.py`: Contains the authentication endpoints.
+- `.dockerignore`: Specifies files and directories that Docker should ignore when building the image.
+- `.env.example`: An example of the `.env` file that should be used for configuration.
+- `.gitignore`: Specifies files and directories that Git should ignore when committing.
+- `DB.py`: Contains all the database models and initialization of the database. It includes seeding data to the database and running the server. Add more models to create additional database tables or modify the existing user table to add required user fields.
+- `docker-compose.yml`: The Docker Compose file used to run the server in its production mode within a Docker container.
+- `Dockerfile`: Defines the Docker container for the application.
+- `Globals.py`: Contains global variables and a `getenv` function to retrieve environment variables with default values defined within the function for the app.
+- `launch.sh`: Used by the Docker container to run the server after it finishes loading.
+- `MagicalAuth.py`: Contains the `MagicalAuth` class and functions for authentication.
+- `Models.py`: Contains the Pydantic models used by the FastAPI endpoints.
+- `README.md`: The file that you are currently reading.
+- `requirements.txt`: Contains the Python packages required by the application.
+- `Server.py`: The main FastAPI server file.
+- `tests.ipynb`: Contains test files for the application.
+- `UI.py`: Contains the Streamlit UI for the application.

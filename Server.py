@@ -21,8 +21,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 logging.basicConfig(
-    level=getenv("LOGLEVEL"),
-    format="%(asctime)s | %(levelname)s | %(message)s",
+    level=getenv("LOG_LEVEL"),
+    format=getenv("LOG_FORMAT"),
 )
 
 app.include_router(Auth.router)
