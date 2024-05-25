@@ -20,6 +20,6 @@ class Detail(BaseModel):
     detail: str
 
 
-class OTP(BaseModel):
+class Login(BaseModel):
     email: str
     token: str

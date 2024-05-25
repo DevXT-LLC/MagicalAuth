@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request, Header, Depends
-from Models import Detail, OTP, UserInfo, Register
+from Models import Detail, Login, UserInfo, Register
 from MagicalAuth import MagicalAuth, verify_api_key
 from Globals import getenv
 import pyotp
@@ -47,7 +47,7 @@ def login(
     response_model=Detail,
     summary="Login with email and OTP token",
 )
-def send_magic_link(request: Request, otp: OTP):
+def send_magic_link(request: Request, otp: Login):
     magic_link = MagicalAuth().send_magic_link(
         email=otp.email, otp=otp.token, ip_address=request.client.host
     )
