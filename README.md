@@ -2,6 +2,27 @@
 
 MagicalAuth is a simple but magical authentication system for Python applications. It is designed to be easy to use and easy to understand. It is also designed to be secure and reliable utilizing magic links and multi-factor authentication.
 
+## Project Purpose
+
+This repository serves as a boilerplate for building FastAPI applications with a secure authentication system. It provides a solid foundation for developers to kickstart their projects, saving time and effort in setting up the basic structure and authentication functionality.
+
+The main purpose of this project is to offer a template that includes essential components such as authentication, database integration, API endpoints, and a user interface. By leveraging this boilerplate code, developers can focus on building the core functionality of their applications while benefiting from the pre-built features and best practices.
+
+## Tech Stack
+
+This project utilizes the following technologies and frameworks:
+
+- **Python**: The primary programming language used for developing the application.
+- **FastAPI**: A modern and high-performance web framework for building APIs in Python. It offers automatic API documentation, request validation, and serialization.
+- **SQLAlchemy**: A powerful SQL toolkit and Object-Relational Mapping (ORM) library for Python. It simplifies database operations and provides a flexible way to interact with various databases.
+- **PostgreSQL**: A reliable and feature-rich open-source relational database management system. It serves as the primary database for storing application data.
+- **Streamlit**: A Python library for building interactive web applications quickly and easily. It is used to create the user interface for the application.
+- **GitHub**: A web-based platform for version control and collaboration. It hosts the project repository and provides features like issue tracking and pull requests.
+- **Docker**: A containerization platform that allows packaging the application and its dependencies into a portable container. It ensures a consistent environment across different machines and simplifies deployment.
+- **SendGrid**: An email delivery service used for sending magic link emails for authentication.
+
+By leveraging this tech stack, developers can build scalable, secure, and efficient applications while taking advantage of the latest tools and best practices in the Python ecosystem.
+
 ## Environment Variables
 
 - `APP_NAME`: The name of the application. This will be used in the magic link email to the user.
