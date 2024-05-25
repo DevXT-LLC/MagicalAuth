@@ -9,11 +9,6 @@ class Register(BaseModel):
     job_title: str
 
 
-class Login(BaseModel):
-    email: str
-    token: str
-
-
 class UserInfo(BaseModel):
     first_name: str
     last_name: str
