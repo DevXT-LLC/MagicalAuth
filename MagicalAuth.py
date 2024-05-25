@@ -1,4 +1,5 @@
 from DB import User, FailedLogins, get_session
+from Models import UserInfo, Register, Login
 from fastapi import Header, HTTPException
 from Globals import getenv
 from datetime import datetime, timedelta
@@ -232,13 +233,18 @@ class MagicalAuth:
         session.close()
         return failed_logins
 
-    def send_magic_link(self, email, otp, ip_address):
-        self.email = email.lower()
+    def send_magic_link(self, ip_address, login: Login):
+        self.email = login.email.lower()
         session = get_session()
         user = session.query(User).filter(User.email == self.email).first()
         session.close()
         if user is None:
             raise HTTPException(status_code=404, detail="User not found")
+        if not pyotp.TOTP(user.mfa_token).verify(login.token):
+            self.add_failed_login(ip_address=ip_address)
+            raise HTTPException(
+                status_code=401, detail="Invalid MFA token. Please try again."
+            )
         self.token = jwt.encode(
             {
                 "sub": str(user.id),
@@ -249,11 +255,6 @@ class MagicalAuth:
             self.encryption_key,
             algorithm="HS256",
         )
-        if not pyotp.TOTP(user.mfa_token).verify(otp):
-            self.add_failed_login(ip_address=ip_address)
-            raise HTTPException(
-                status_code=401, detail="Invalid MFA token. Please try again."
-            )
         token = (
             self.token.replace("+", "%2B")
             .replace("/", "%2F")
@@ -339,13 +340,10 @@ class MagicalAuth:
 
     def register(
         self,
-        email: str,
-        first_name: str,
-        last_name: str,
-        company_name: str,
-        job_title: str,
+        new_user: Register,
     ):
-        self.email = email
+        new_user.email = new_user.email.lower()
+        self.email = new_user.email
         allowed_domains = getenv("ALLOWED_DOMAINS")
         if allowed_domains is None or allowed_domains == "":
             allowed_domains = "*"
@@ -370,11 +368,7 @@ class MagicalAuth:
         mfa_token = pyotp.random_base32()
         user = User(
             mfa_token=mfa_token,
-            email=self.email,
-            first_name=first_name,
-            last_name=last_name,
-            company_name=company_name,
-            job_title=job_title,
+            **new_user.model_dump(),
         )
         session.add(user)
         session.commit()
@@ -394,24 +388,25 @@ class MagicalAuth:
         return mfa_token
 
     def update_user(self, **kwargs):
-        session = get_session()
-        user = session.query(User).filter(User.email == self.email).first()
+        user = verify_api_key(self.token)
         if user is None:
-            session.close()
             raise HTTPException(status_code=404, detail="User not found")
+        session = get_session()
+        user = session.query(User).filter(User.id == user.id).first()
+        allowed_keys = list(UserInfo.__annotations__.keys())
         for key, value in kwargs.items():
-            if key in ["first_name", "last_name", "company_name", "job_title"]:
+            if key in allowed_keys:
                 setattr(user, key, value)
         session.commit()
         session.close()
         return "User updated successfully"
 
     def delete_user(self):
-        session = get_session()
-        user = session.query(User).filter(User.email == self.email).first()
+        user = verify_api_key(self.token)
         if user is None:
-            session.close()
             raise HTTPException(status_code=404, detail="User not found")
+        session = get_session()
+        user = session.query(User).filter(User.id == user.id).first()
         user.is_active = False
         session.commit()
         session.close()

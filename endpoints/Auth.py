@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request, Header, Depends
-from Models import Detail, OTP, UserInfo, Register
+from Models import Detail, Login, UserInfo, Register
 from MagicalAuth import MagicalAuth, verify_api_key
 from Globals import getenv
 import pyotp
@@ -9,13 +9,7 @@ router = APIRouter()
 
 @router.post("/v1/user")
 def register(register: Register):
-    mfa_token = MagicalAuth().register(
-        email=register.email,
-        first_name=register.first_name,
-        last_name=register.last_name,
-        company_name=register.company_name,
-        job_title=register.job_title,
-    )
+    mfa_token = MagicalAuth().register(new_user=register)
     totp = pyotp.TOTP(mfa_token)
     otp_uri = totp.provisioning_uri(name=register.email, issuer_name=getenv("APP_NAME"))
     return {"otp_uri": otp_uri}
@@ -34,7 +28,7 @@ def get_user(email: str) -> bool:
     dependencies=[Depends(verify_api_key)],
     summary="Get user details",
 )
-def login(
+def log_in(
     request: Request,
     authorization: str = Header(None),
 ):
@@ -53,9 +47,9 @@ def login(
     response_model=Detail,
     summary="Login with email and OTP token",
 )
-def send_magic_link(request: Request, otp: OTP):
+def send_magic_link(request: Request, login: Login):
     magic_link = MagicalAuth().send_magic_link(
-        email=otp.email, otp=otp.token, ip_address=request.client.host
+        ip_address=request.client.host, login=login
     )
     return Detail(detail=magic_link)
 
