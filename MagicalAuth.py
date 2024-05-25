@@ -1,11 +1,11 @@
 from DB import User, FailedLogins, get_session
+from Models import UserInfo, Register, Login
 from fastapi import Header, HTTPException
 from Globals import getenv
 from datetime import datetime, timedelta
 from hashlib import md5
 from Crypto.Cipher import AES
 from fastapi import HTTPException
-from Models import UserInfo, Register
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import (
     Attachment,
@@ -233,14 +233,14 @@ class MagicalAuth:
         session.close()
         return failed_logins
 
-    def send_magic_link(self, email, otp, ip_address):
-        self.email = email.lower()
+    def send_magic_link(self, ip_address, login: Login):
+        self.email = login.email.lower()
         session = get_session()
         user = session.query(User).filter(User.email == self.email).first()
         session.close()
         if user is None:
             raise HTTPException(status_code=404, detail="User not found")
-        if not pyotp.TOTP(user.mfa_token).verify(otp):
+        if not pyotp.TOTP(user.mfa_token).verify(login.token):
             self.add_failed_login(ip_address=ip_address)
             raise HTTPException(
                 status_code=401, detail="Invalid MFA token. Please try again."

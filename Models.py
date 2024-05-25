@@ -1,6 +1,12 @@
 from pydantic import BaseModel
 
 
+# Auth user models
+class Login(BaseModel):
+    email: str
+    token: str
+
+
 class Register(BaseModel):
     email: str
     first_name: str
@@ -18,8 +24,3 @@ class UserInfo(BaseModel):
 
 class Detail(BaseModel):
     detail: str
-
-
-class Login(BaseModel):
-    email: str
-    token: str

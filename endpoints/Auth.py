@@ -28,7 +28,7 @@ def get_user(email: str) -> bool:
     dependencies=[Depends(verify_api_key)],
     summary="Get user details",
 )
-def login(
+def log_in(
     request: Request,
     authorization: str = Header(None),
 ):
@@ -47,9 +47,9 @@ def login(
     response_model=Detail,
     summary="Login with email and OTP token",
 )
-def send_magic_link(request: Request, otp: Login):
+def send_magic_link(request: Request, login: Login):
     magic_link = MagicalAuth().send_magic_link(
-        email=otp.email, otp=otp.token, ip_address=request.client.host
+        ip_address=request.client.host, login=login
     )
     return Detail(detail=magic_link)
 
