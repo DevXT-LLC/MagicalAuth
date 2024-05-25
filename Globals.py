@@ -7,7 +7,7 @@ load_dotenv()
 def getenv(var_name: str):
     default_values = {
         "MODE": "production",
-        "DATABASE_TYPE": "sqlite",
+        "DATABASE_TYPE": "postgres",
         "ALLOWED_DOMAINS": "*",
         "ENCRYPTION_SECRET": "n0ne",
         "APP_NAME": "Magical Auth",
@@ -17,7 +17,9 @@ def getenv(var_name: str):
         "LOG_FORMAT": "%(asctime)s | %(levelname)s | %(message)s",
         "UVICORN_WORKERS": 1,
         "DATABASE_NAME": (
-            "./test" if os.getenv("DATABASE_TYPE", "sqlite") == "sqlite" else "postgres"
+            "./test"
+            if os.getenv("DATABASE_TYPE", "postgres") == "sqlite"
+            else "postgres"
         ),
         "DATABASE_USER": "postgres",
         "DATABASE_PASSWORD": "postgres",
