@@ -107,3 +107,44 @@ Access the Streamlit UI at `http://localhost:8519` .
 - `Server.py`: The main FastAPI server file.
 - `tests.ipynb`: Contains test files for the application.
 - `UI.py`: Contains the Streamlit UI for the application.
+
+## Workflow
+
+```mermaid
+graph TD
+    A[User] -->|Registers| B(Register Endpoint)
+    B --> C{User Exists?}
+    C -->|Yes| D[Return 409 Conflict]
+    C -->|No| E[Create User]
+    E --> F[Generate MFA Token]
+    F --> G[Return OTP URI]
+    A -->|Logs In| H(Login Endpoint)
+    H --> I{User Exists?}
+    I -->|No| J[Return 404 Not Found]
+    I -->|Yes| K{MFA Token Valid?}
+    K -->|No| L[Add Failed Login]
+    L --> M[Return 401 Unauthorized]
+    K -->|Yes| N[Generate Magic Link]
+    N --> O{SendGrid Configured?}
+    O -->|Yes| P[Send Magic Link via Email]
+    O -->|No| Q[Return Magic Link]
+    A -->|Clicks Magic Link| R(User Endpoint - GET)
+    R --> S{Magic Link Valid?}
+    S -->|No| T[Add Failed Login]
+    T --> U[Return 401 Unauthorized]
+    S -->|Yes| V[Return User Details]
+    A -->|Updates User| W(User Endpoint - PUT)
+    W --> X{API Key Valid?}
+    X -->|No| Y[Return 401 Unauthorized]
+    X -->|Yes| Z{User Matches API Key?}
+    Z -->|No| AA[Return 403 Forbidden]
+    Z -->|Yes| AB[Update User Details]
+    AB --> AC[Return Success Message]
+    A -->|Deletes User| AD(User Endpoint - DELETE)
+    AD --> AE{API Key Valid?}
+    AE -->|No| AF[Return 401 Unauthorized]
+    AE -->|Yes| AG{User Matches API Key?}
+    AG -->|No| AH[Return 403 Forbidden]
+    AG -->|Yes| AI[Soft Delete User]
+    AI --> AJ[Return Success Message]
+```
