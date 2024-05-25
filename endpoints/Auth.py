@@ -9,13 +9,7 @@ router = APIRouter()
 
 @router.post("/v1/user")
 def register(register: Register):
-    mfa_token = MagicalAuth().register(
-        email=register.email,
-        first_name=register.first_name,
-        last_name=register.last_name,
-        company_name=register.company_name,
-        job_title=register.job_title,
-    )
+    mfa_token = MagicalAuth().register(new_user=register)
     totp = pyotp.TOTP(mfa_token)
     otp_uri = totp.provisioning_uri(name=register.email, issuer_name=getenv("APP_NAME"))
     return {"otp_uri": otp_uri}

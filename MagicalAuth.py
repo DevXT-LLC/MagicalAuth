@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from hashlib import md5
 from Crypto.Cipher import AES
 from fastapi import HTTPException
+from Models import UserInfo, Register
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import (
     Attachment,
@@ -339,13 +340,10 @@ class MagicalAuth:
 
     def register(
         self,
-        email: str,
-        first_name: str,
-        last_name: str,
-        company_name: str,
-        job_title: str,
+        new_user: Register,
     ):
-        self.email = email
+        new_user.email = new_user.email.lower()
+        self.email = new_user.email
         allowed_domains = getenv("ALLOWED_DOMAINS")
         if allowed_domains is None or allowed_domains == "":
             allowed_domains = "*"
@@ -370,11 +368,7 @@ class MagicalAuth:
         mfa_token = pyotp.random_base32()
         user = User(
             mfa_token=mfa_token,
-            email=self.email,
-            first_name=first_name,
-            last_name=last_name,
-            company_name=company_name,
-            job_title=job_title,
+            **new_user.model_dump(),
         )
         session.add(user)
         session.commit()
@@ -399,8 +393,9 @@ class MagicalAuth:
         if user is None:
             session.close()
             raise HTTPException(status_code=404, detail="User not found")
+        allowed_keys = list(UserInfo.__annotations__.keys())
         for key, value in kwargs.items():
-            if key in ["first_name", "last_name", "company_name", "job_title"]:
+            if key in allowed_keys:
                 setattr(user, key, value)
         session.commit()
         session.close()
