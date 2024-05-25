@@ -2,6 +2,22 @@
 
 MagicalAuth is a simple but magical authentication system for Python applications. It is designed to be easy to use and easy to understand. It is also designed to be secure and reliable utilizing magic links and multi-factor authentication.
 
+## Table of Contents
+
+- [MagicalAuth](#magicalauth)
+  - [Table of Contents](#table-of-contents)
+  - [Project Purpose](#project-purpose)
+  - [Tech Stack](#tech-stack)
+  - [Environment Variables](#environment-variables)
+  - [Getting Started](#getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Clone the repository](#clone-the-repository)
+    - [Environment File Setup](#environment-file-setup)
+    - [Run the application](#run-the-application)
+    - [Updating the application](#updating-the-application)
+  - [Folder Structure Explanation](#folder-structure-explanation)
+  - [Workflow](#workflow)
+
 ## Project Purpose
 
 This repository serves as a boilerplate for building FastAPI applications with a secure authentication system. It provides a solid foundation for developers to kickstart their projects, saving time and effort in setting up the basic structure and authentication functionality.
@@ -42,9 +58,25 @@ By leveraging this tech stack, developers can build scalable, secure, and effici
 - `UVICORN_WORKERS`: The number of Uvicorn workers to use. This should be an integer.
 - `LOG_LEVEL`: The log level for the application. This should be one of `DEBUG`, `INFO`, `WARNING`, `ERROR`, or `CRITICAL`.
 
-### Environment File Example
+## Getting Started
 
-Replace the values with your own values and save it as `.env` in the root directory of the project.
+### Prerequisites
+
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+
+### Clone the repository
+
+If you haven't already, clone the MagicalAuth repository to your local machine.
+
+```bash
+git clone https://github.com/DevXT-LLC/MagicalAuth
+cd MagicalAuth
+```
+
+### Environment File Setup
+
+Create a new file named `.env` in the root directory of the project and add the following environment variables. Replace the values with your own values before running the application.
 
 ```env
 APP_NAME=MagicalAuth
@@ -65,19 +97,20 @@ UVICORN_WORKERS=4
 LOG_LEVEL=INFO
 ```
 
-## Usage
+### Run the application
+
+```bash
+docker-compose up
+```
+
+Access the FastAPI documentation at `http://localhost:12437` .
+Access the Streamlit UI at `http://localhost:8519` .
+
+### Updating the application
 
 ```bash
 docker-compose down && docker-compose pull && docker-compose up
 ```
-
-Access the FastAPI documentation at `http://localhost:12437` .
-
-### Web User Interface
-
-See [UI.py](UI.py) for an example of how to use MagicalAuth in a Streamlit application. It runs with the FastAPI service in the Docker Compose setup.
-
-Access the Streamlit UI at `http://localhost:8519` .
 
 ## Folder Structure Explanation
 
@@ -106,7 +139,7 @@ Access the Streamlit UI at `http://localhost:8519` .
 - `requirements.txt`: Contains the Python packages required by the application.
 - `Server.py`: The main FastAPI server file.
 - `tests.ipynb`: Contains test files for the application.
-- `UI.py`: Contains the Streamlit UI for the application.
+- `UI.py`: Contains the Streamlit UI for the application. This provides an example of how to integrate MagicalAuth into a Streamlit application.
 
 ## Workflow
 
