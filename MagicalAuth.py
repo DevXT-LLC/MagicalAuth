@@ -407,9 +407,6 @@ class MagicalAuth:
             raise HTTPException(status_code=404, detail="User not found")
         session = get_session()
         user = session.query(User).filter(User.id == user.id).first()
-        if user is None:
-            session.close()
-            raise HTTPException(status_code=404, detail="User not found")
         user.is_active = False
         session.commit()
         session.close()
