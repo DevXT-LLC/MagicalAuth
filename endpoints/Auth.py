@@ -48,8 +48,13 @@ def log_in(
     summary="Login with email and OTP token",
 )
 def send_magic_link(request: Request, login: Login):
-    magic_link = MagicalAuth().send_magic_link(
-        ip_address=request.client.host, login=login
+    auth = MagicalAuth()
+    data = request.json()
+    referrer = None
+    if "referrer" in data:
+        referrer = data["referrer"]
+    magic_link = auth.send_magic_link(
+        ip_address=request.client.host, login=login, referrer=referrer
     )
     return Detail(detail=magic_link)
 

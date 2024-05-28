@@ -233,7 +233,7 @@ class MagicalAuth:
         session.close()
         return failed_logins
 
-    def send_magic_link(self, ip_address, login: Login):
+    def send_magic_link(self, ip_address, login: Login, referrer=None):
         self.email = login.email.lower()
         session = get_session()
         user = session.query(User).filter(User.email == self.email).first()
@@ -284,6 +284,8 @@ class MagicalAuth:
             .replace("`", "%60")
             .replace("~", "%7E")
         )
+        if referrer is not None:
+            self.link = referrer
         magic_link = f"{self.link}?token={token}"
         if (
             getenv("SENDGRID_API_KEY") != ""
