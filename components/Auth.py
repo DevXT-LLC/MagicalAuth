@@ -97,7 +97,7 @@ def get_user():
                         json={"email": email, "token": otp},
                     )
                     if auth_response.status_code == 200:
-                        st.success(auth_response.json()["message"])
+                        st.success(auth_response.json()["detail"])
                     else:
                         st.error(auth_response.json()["detail"])
         else:
