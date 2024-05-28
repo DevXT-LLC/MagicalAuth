@@ -47,9 +47,9 @@ def log_in(
     response_model=Detail,
     summary="Login with email and OTP token",
 )
-def send_magic_link(request: Request, login: Login):
+async def send_magic_link(request: Request, login: Login):
     auth = MagicalAuth()
-    data = request.json()
+    data = await request.json()
     referrer = None
     if "referrer" in data:
         referrer = data["referrer"]
