@@ -96,10 +96,22 @@ def get_user():
                         f"{auth_uri}/v1/login",
                         json={"email": email, "token": otp},
                     )
+                    res = (
+                        str(auth_response.json()["detail"])
+                        if "detail" in auth_response.json()
+                        else auth_response.json()
+                    )
                     if auth_response.status_code == 200:
-                        st.success(auth_response.json()["detail"])
+                        if res.startswith("http"):
+                            # Redirect to the login link
+                            st.markdown(
+                                f'<meta http-equiv="refresh" content="0;URL={res}">',
+                                unsafe_allow_html=True,
+                            )
+                        else:
+                            st.success(res)
                     else:
-                        st.error(auth_response.json()["detail"])
+                        st.error(res)
         else:
             with st.form("register_form"):
                 email = st.text_input("Email")
