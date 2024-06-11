@@ -381,7 +381,9 @@ class MagicalAuth:
             ).get_user_info()
         # Future SSO providers can be added here
         else:
-            raise HTTPException(status_code=400, detail="Invalid SSO provider.")
+            # If the provider is not found, use MagicalAuth to log in using the access_token
+            self.token = access_token
+            return self.login(ip_address=ip_address)
         if not user_data:
             logging.warning(f"Error on {provider.capitalize()}: {user_data}")
             raise HTTPException(
