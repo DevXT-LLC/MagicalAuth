@@ -9,7 +9,7 @@ def getenv(var_name: str):
         "MODE": "production",
         "DATABASE_TYPE": "postgres",
         "ALLOWED_DOMAINS": "*",
-        "ENCRYPTION_SECRET": "n0ne",
+        "ENCRYPTION_SECRET": "it-is-a-secret-to-everybody",
         "APP_NAME": "Magical Auth",
         "AUTH_PROVIDER": "magicalauth",
         "MAGIC_LINK_URL": "https://localhost:8507/",
@@ -23,9 +23,8 @@ def getenv(var_name: str):
         ),
         "DATABASE_USER": "postgres",
         "DATABASE_PASSWORD": "postgres",
-        "DATABASE_HOST": "notesdb",
+        "DATABASE_HOST": "magicalauthdb",
         "DATABASE_PORT": "5432",
-        "SELECTED_EHR": "None",
     }
-    default_value = default_values[var_name] if var_name in default_values else None
+    default_value = default_values[var_name] if var_name in default_values else ""
     return os.getenv(var_name, default_value)

@@ -2,6 +2,7 @@ from DB import User, FailedLogins, get_session
 from Models import UserInfo, Register, Login
 from fastapi import Header, HTTPException
 from Globals import getenv
+from GoogleSSO import GoogleSSO
 from datetime import datetime, timedelta
 from fastapi import HTTPException
 from sendgrid import SendGridAPIClient
@@ -184,7 +185,13 @@ class MagicalAuth:
         session.close()
         return failed_logins
 
-    def send_magic_link(self, ip_address, login: Login, referrer=None):
+    def send_magic_link(
+        self,
+        ip_address,
+        login: Login,
+        referrer=None,
+        send_link: bool = True,
+    ):
         self.email = login.email.lower()
         session = get_session()
         user = session.query(User).filter(User.email == self.email).first()
@@ -243,6 +250,7 @@ class MagicalAuth:
             and str(getenv("SENDGRID_API_KEY")).lower() != "none"
             and getenv("SENDGRID_FROM_EMAIL") != ""
             and str(getenv("SENDGRID_FROM_EMAIL")).lower() != "none"
+            and send_link
         ):
             send_email(
                 email=self.email,
@@ -364,3 +372,41 @@ class MagicalAuth:
         session.commit()
         session.close()
         return "User deleted successfully"
+
+    def google_auth(self, access_token, refresh_token, ip_address, referrer=None):
+        # Required scopes for Google SSO:
+        # https://www.googleapis.com/auth/gmail.send
+        # https://www.googleapis.com/auth/userinfo.profile
+        google_sso = GoogleSSO(
+            access_token=access_token,
+            refresh_token=refresh_token,
+        )
+        user_data = google_sso.get_user_info()
+        if not user_data:
+            raise HTTPException(
+                status_code=400, detail="Failed to get user data from Google."
+            )
+        if not self.user_exists(email=user_data["email"]):
+            register = Register(
+                email=user_data["email"],
+                first_name=user_data["first_name"] if "first_name" in user_data else "",
+                last_name=user_data["last_name"] if "last_name" in user_data else "",
+                company_name=(
+                    user_data["company_name"] if "company_name" in user_data else ""
+                ),
+                job_title=user_data["job_title"] if "job_title" in user_data else "",
+            )
+            mfa_token = self.register(new_user=register)
+        else:
+            session = get_session()
+            user = session.query(User).filter(User.email == user_data["email"]).first()
+            mfa_token = user.mfa_token
+        totp = pyotp.TOTP(mfa_token)
+        login = Login(email=user_data["email"], otp=totp.now())
+        # Will return the URL with the proper token
+        return self.send_magic_link(
+            ip_address=ip_address,
+            login=login,
+            referrer=referrer,
+            send_link=False,
+        )

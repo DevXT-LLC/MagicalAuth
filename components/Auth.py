@@ -6,6 +6,7 @@ import qrcode
 import requests
 import streamlit as st
 from streamlit_js_eval import get_cookie, set_cookie
+from streamlit_oauth import OAuth2Component
 
 """
 Required environment variables:
@@ -13,6 +14,53 @@ Required environment variables:
 - APP_NAME: Name of the application
 - MAGICALAUTH_SERVER: URL of the MagicalAuth server
 """
+
+
+def google_sso_button(redirect_uri):
+    client_id = os.environ.get("GOOGLE_CLIENT_ID", "")
+    client_secret = os.environ.get("GOOGLE_CLIENT_SECRET", "")
+    auth_uri = os.environ.get("MAGICALAUTH_SERVER", "http://localhost:12437")
+    if client_id == "" or client_secret == "":
+        return ""
+    oauth2 = OAuth2Component(
+        client_id=client_id,
+        client_secret=client_secret,
+        authorize_endpoint="https://accounts.google.com/o/oauth2/auth",
+        token_endpoint="https://oauth2.googleapis.com/token",
+    )
+    result = oauth2.authorize_button(
+        name="Continue with Google",
+        icon="https://www.google.com.tw/favicon.ico",
+        redirect_uri=redirect_uri,
+        scope="https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.profile",
+        key="google",
+        extras_params={"prompt": "consent", "access_type": "offline"},
+        use_container_width=True,
+        pkce="S256",
+    )
+    if result and "token" in result:
+        # Send google auth access_token and refresh_token to MagicalAuth
+        response = requests.post(
+            f"{auth_uri}/v1/google/login",
+            json={
+                "access_token": result["token"]["access_token"],
+                "refresh_token": result["token"]["refresh_token"],
+                "referrer": redirect_uri,
+            },
+        )
+        if response.status_code == 200:
+            res = response.json()
+            if "detail" in res:
+                if str(res["detail"]).startswith("http"):
+                    # Redirect to the login link
+                    st.markdown(
+                        f'<meta http-equiv="refresh" content="0;URL={res}">',
+                        unsafe_allow_html=True,
+                    )
+                else:
+                    st.success(res)
+        else:
+            st.error(response.json())
 
 
 def get_user():

@@ -1,5 +1,6 @@
 streamlit
 streamlit_js_eval
+streamlit_oauth
 fastapi
 uvicorn
 sqlalchemy
