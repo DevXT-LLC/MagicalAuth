@@ -16,10 +16,11 @@ Required environment variables:
 """
 
 
-def google_sso_button(redirect_uri):
+def google_sso_button():
     client_id = os.environ.get("GOOGLE_CLIENT_ID", "")
     client_secret = os.environ.get("GOOGLE_CLIENT_SECRET", "")
     auth_uri = os.environ.get("MAGICALAUTH_SERVER", "http://localhost:12437")
+    magic_link_uri = os.environ.get("MAGIC_LINK_URL", "http://localhost:8519")
     if client_id == "" or client_secret == "":
         return ""
     oauth2 = OAuth2Component(
@@ -30,8 +31,8 @@ def google_sso_button(redirect_uri):
     )
     result = oauth2.authorize_button(
         name="Continue with Google",
-        icon="https://www.google.com.tw/favicon.ico",
-        redirect_uri=redirect_uri,
+        icon="https://www.google.com/favicon.ico",
+        redirect_uri=magic_link_uri,
         scope="https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.profile",
         key="google",
         extras_params={"prompt": "consent", "access_type": "offline"},
@@ -45,20 +46,21 @@ def google_sso_button(redirect_uri):
             json={
                 "access_token": result["token"]["access_token"],
                 "refresh_token": result["token"]["refresh_token"],
-                "referrer": redirect_uri,
+                "referrer": magic_link_uri,
             },
         )
         if response.status_code == 200:
             res = response.json()
             if "detail" in res:
-                if str(res["detail"]).startswith("http"):
+                url = str(res["detail"])
+                if url.startswith("http"):
                     # Redirect to the login link
                     st.markdown(
-                        f'<meta http-equiv="refresh" content="0;URL={res}">',
+                        f'<meta http-equiv="refresh" content="0;URL={url}">',
                         unsafe_allow_html=True,
                     )
                 else:
-                    st.success(res)
+                    st.error(url)
         else:
             st.error(response.json())
 
@@ -140,7 +142,7 @@ def get_user():
                 otp = st.text_input("MFA Token")
                 login_button = st.form_submit_button("Login")
                 st.divider()
-                google_sso_button(redirect_uri=auth_uri)
+                google_sso_button()
                 if login_button:
                     auth_response = requests.post(
                         f"{auth_uri}/v1/login",
