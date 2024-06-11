@@ -96,7 +96,8 @@ def delete_user(
 async def google_login(request: Request):
     data = await request.json()
     auth = MagicalAuth()
-    magic_link = auth.google_auth(
+    magic_link = auth.sso(
+        provider="google",
         access_token=data["access_token"],
         refresh_token=data["refresh_token"],
         ip_address=request.client.host,

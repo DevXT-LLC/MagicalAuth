@@ -373,18 +373,20 @@ class MagicalAuth:
         session.close()
         return "User deleted successfully"
 
-    def google_auth(self, access_token, refresh_token, ip_address, referrer=None):
-        # Required scopes for Google SSO:
-        # https://www.googleapis.com/auth/gmail.send
-        # https://www.googleapis.com/auth/userinfo.profile
-        google_sso = GoogleSSO(
-            access_token=access_token,
-            refresh_token=refresh_token,
-        )
-        user_data = google_sso.get_user_info()
+    def sso(self, provider, access_token, refresh_token, ip_address, referrer=None):
+        if provider == "google":
+            user_data = GoogleSSO(
+                access_token=access_token,
+                refresh_token=refresh_token,
+            ).get_user_info()
+        # Future SSO providers can be added here
+        else:
+            raise HTTPException(status_code=400, detail="Invalid SSO provider.")
         if not user_data:
+            logging.warning(f"Error on {provider.capitalize()}: {user_data}")
             raise HTTPException(
-                status_code=400, detail="Failed to get user data from Google."
+                status_code=400,
+                detail=f"Failed to get user data from {provider.capitalize()}.",
             )
         if not self.user_exists(email=user_data["email"]):
             register = Register(

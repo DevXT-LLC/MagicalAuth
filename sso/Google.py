@@ -11,6 +11,15 @@ Required environment variables:
 - GOOGLE_CLIENT_SECRET: Google OAuth client secret
 
 Get the Google OAuth client ID and client secret from the Google Cloud Console.
+
+Required APIs:
+
+- People API
+- Gmail API
+
+Required scopes for Google SSO:
+- https://www.googleapis.com/auth/userinfo.profile
+- https://www.googleapis.com/auth/gmail.send
 """
 
 
