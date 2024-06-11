@@ -2,7 +2,7 @@ from DB import User, FailedLogins, get_session
 from Models import UserInfo, Register, Login
 from fastapi import Header, HTTPException
 from Globals import getenv
-from sso.GoogleSSO import GoogleSSO
+from sso.Google import GoogleSSO
 from datetime import datetime, timedelta
 from fastapi import HTTPException
 from sendgrid import SendGridAPIClient

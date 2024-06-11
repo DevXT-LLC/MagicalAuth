@@ -4,6 +4,15 @@ import requests
 from email.mime.text import MIMEText
 from Globals import getenv
 
+"""
+Required environment variables:
+
+- GOOGLE_CLIENT_ID: Google OAuth client ID
+- GOOGLE_CLIENT_SECRET: Google OAuth client secret
+
+Get the Google OAuth client ID and client secret from the Google Cloud Console.
+"""
+
 
 class GoogleSSO:
     def __init__(
