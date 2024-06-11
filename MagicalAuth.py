@@ -1,4 +1,4 @@
-from DB import User, FailedLogins, get_session
+from DB import User, FailedLogins, UserOAuth, OAuthProvider, get_session
 from Models import UserInfo, Register, Login
 from fastapi import Header, HTTPException
 from Globals import getenv
@@ -399,10 +399,36 @@ class MagicalAuth:
                 job_title=user_data["job_title"] if "job_title" in user_data else "",
             )
             mfa_token = self.register(new_user=register)
+            # Create the UserOAuth record
+            session = get_session()
+            user = session.query(User).filter(User.email == user_data["email"]).first()
+            provider = (
+                session.query(OAuthProvider)
+                .filter(OAuthProvider.name == provider)
+                .first()
+            )
+            if not provider:
+                provider = OAuthProvider(name=provider)
+                session.add(provider)
+            user_oauth = UserOAuth(
+                user_id=user.id,
+                provider_id=provider.id,
+                access_token=access_token,
+                refresh_token=refresh_token,
+            )
+            session.add(user_oauth)
         else:
             session = get_session()
             user = session.query(User).filter(User.email == user_data["email"]).first()
             mfa_token = user.mfa_token
+            user_oauth = (
+                session.query(UserOAuth).filter(UserOAuth.user_id == user.id).first()
+            )
+            if user_oauth:
+                user_oauth.access_token = access_token
+                user_oauth.refresh_token = refresh_token
+        session.commit()
+        session.close()
         totp = pyotp.TOTP(mfa_token)
         login = Login(email=user_data["email"], otp=totp.now())
         # Will return the URL with the proper token

@@ -67,7 +67,6 @@ class UserOAuth(Base):
     provider = relationship("OAuthProvider")
     access_token = Column(String, default="", nullable=False)
     refresh_token = Column(String, default="", nullable=False)
-    expires_at = Column(DateTime, default=func.now(), nullable=False)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
