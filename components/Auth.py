@@ -139,6 +139,8 @@ def get_user():
                 email = st.text_input("Email")
                 otp = st.text_input("MFA Token")
                 login_button = st.form_submit_button("Login")
+                st.divider()
+                google_sso_button(redirect_uri=auth_uri)
                 if login_button:
                     auth_response = requests.post(
                         f"{auth_uri}/v1/login",
