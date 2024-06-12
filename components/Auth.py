@@ -28,6 +28,8 @@ def google_sso_button():
     client_secret = getenv("GOOGLE_CLIENT_SECRET")
     auth_uri = getenv("MAGICALAUTH_SERVER")
     magic_link_uri = getenv("MAGIC_LINK_URL")
+    if magic_link_uri.endswith("/"):
+        magic_link_uri = magic_link_uri[:-1]
     logging.info(f"Client ID: {client_id}")
     logging.info(f"Client Secret: {client_secret}")
     logging.info(f"Auth URI: {auth_uri}")
