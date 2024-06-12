@@ -89,8 +89,7 @@ class GoogleSSO:
         if response.status_code == 401:
             self.access_token = self.get_new_token()
             response = requests.get(
-                "https://people.googleapis.com/v1/people/me",
-                params={"personFields": "emailAddresses,names,organizations"},
+                "https://people.googleapis.com/v1/people/me?personFields=names,emailAddresses,organizations",
                 headers={"Authorization": f"Bearer {self.access_token}"},
             )
         data = response.json()
