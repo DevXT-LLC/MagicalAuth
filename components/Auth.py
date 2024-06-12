@@ -67,9 +67,9 @@ def google_sso_button():
                 else:
                     st.error(url)
                     logging.error(f"Error with Google SSO: {url}")
-    else:
-        st.error(response.text)
-        logging.error(f"Error with Google SSO: {response.text}")
+        else:
+            st.error(response.text)
+            logging.error(f"Error with Google SSO: {response.text}")
 
 
 def get_user():
