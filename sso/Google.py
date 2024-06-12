@@ -28,6 +28,13 @@ Required scopes for Google SSO
 def get_google_access_token(code, redirect_uri=None):
     if not redirect_uri:
         redirect_uri = getenv("MAGIC_LINK_URL")
+    code = (
+        str(code)
+        .replace("%2F", "/")
+        .replace("%3D", "=")
+        .replace("%3F", "?")
+        .replace("%3D", "=")
+    )
     response = requests.post(
         "https://oauth2.googleapis.com/token",
         data={
@@ -35,7 +42,6 @@ def get_google_access_token(code, redirect_uri=None):
             "client_id": getenv("GOOGLE_CLIENT_ID"),
             "client_secret": getenv("GOOGLE_CLIENT_SECRET"),
             "redirect_uri": redirect_uri,
-            "scope": "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/gmail.send",
             "grant_type": "authorization_code",
         },
     )

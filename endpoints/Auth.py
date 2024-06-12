@@ -4,6 +4,7 @@ from MagicalAuth import MagicalAuth, verify_api_key
 from sso.Google import get_google_access_token
 from Globals import getenv
 import pyotp
+import logging
 
 router = APIRouter()
 
@@ -100,6 +101,7 @@ async def google_login(request: Request):
     access_token, refresh_token = get_google_access_token(
         code=data["code"], redirect_uri=data["referrer"]
     )
+    logging.info(f"data: {data}")
     if not access_token:
         raise HTTPException(
             status_code=400,
