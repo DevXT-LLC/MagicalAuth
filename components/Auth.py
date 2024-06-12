@@ -29,50 +29,46 @@ def google_sso_button():
     magic_link_uri = getenv("MAGIC_LINK_URL")
     if magic_link_uri.endswith("/"):
         magic_link_uri = magic_link_uri[:-1]
-    logging.info(f"Client ID: {client_id}")
-    logging.info(f"Auth URI: {auth_uri}")
-    logging.info(f"Magic Link URI: {magic_link_uri}")
     if client_id == "":
         return ""
     authorize_endpoint = "https://accounts.google.com/o/oauth2/auth"
     scopes = "https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.profile"
-    with st.form("google_sso_form"):
-        result = st.form_submit_button("Sign in with Google")
-        if result:
-            scopes = urllib.parse.quote(scopes)
-            magic_link_uri = urllib.parse.quote(magic_link_uri)
-            client_id = urllib.parse.quote(client_id)
-            new_uri = f"{authorize_endpoint}?client_id={client_id}&redirect_uri={magic_link_uri}&scope={scopes}&response_type=code&access_type=offline&prompt=consent"
-            # Redirect to Google SSO
-            st.markdown(
-                f'<meta http-equiv="refresh" content="0;URL={new_uri}">',
-                unsafe_allow_html=True,
-            )
-        if "code" in st.query_params:
-            response = requests.post(
-                f"{auth_uri}/v1/oauth2/google",
-                json={
-                    "code": st.query_params["code"],
-                    "referrer": magic_link_uri,
-                },
-            )
-            if response.status_code == 200:
-                res = response.json()
-                if "detail" in res:
-                    url = str(res["detail"])
-                    logging.info(url)
-                    if url.startswith("http"):
-                        # Redirect to the login link
-                        st.markdown(
-                            f'<meta http-equiv="refresh" content="0;URL={url}">',
-                            unsafe_allow_html=True,
-                        )
-                    else:
-                        st.error(url)
-                        logging.error(f"Error with Google SSO: {url}")
-            else:
-                st.error(response.text)
-                logging.error(f"Error with Google SSO: {response.text}")
+    result = st.button("Sign in with Google", key="google_sso_button")
+    if result:
+        scopes = urllib.parse.quote(scopes)
+        magic_link_uri = urllib.parse.quote(magic_link_uri)
+        client_id = urllib.parse.quote(client_id)
+        new_uri = f"{authorize_endpoint}?client_id={client_id}&redirect_uri={magic_link_uri}&scope={scopes}&response_type=code&access_type=offline&prompt=consent"
+        # Redirect to Google SSO
+        st.markdown(
+            f'<meta http-equiv="refresh" content="0;URL={new_uri}">',
+            unsafe_allow_html=True,
+        )
+    if "code" in st.query_params:
+        response = requests.post(
+            f"{auth_uri}/v1/oauth2/google",
+            json={
+                "code": st.query_params["code"],
+                "referrer": magic_link_uri,
+            },
+        )
+        if response.status_code == 200:
+            res = response.json()
+            if "detail" in res:
+                url = str(res["detail"])
+                logging.info(url)
+                if url.startswith("http"):
+                    # Redirect to the login link
+                    st.markdown(
+                        f'<meta http-equiv="refresh" content="0;URL={url}">',
+                        unsafe_allow_html=True,
+                    )
+                else:
+                    st.error(url)
+                    logging.error(f"Error with Google SSO: {url}")
+        else:
+            st.error(response.text)
+            logging.error(f"Error with Google SSO: {response.text}")
 
 
 def get_user():
