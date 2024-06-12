@@ -42,7 +42,7 @@ def google_sso_button():
     if result and "code" in result:
         # Send google auth access_token and refresh_token to MagicalAuth
         response = requests.post(
-            f"{auth_uri}/v1/google/login",
+            f"{auth_uri}/v1/oauth2/google",
             json={
                 "code": result["code"],
                 "referrer": magic_link_uri,
