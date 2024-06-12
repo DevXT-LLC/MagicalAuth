@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Header, Depends
+from fastapi import APIRouter, Request, Header, Depends, HTTPException
 from Models import Detail, Login, UserInfo, Register
 from MagicalAuth import MagicalAuth, verify_api_key
 from sso.Google import get_google_access_token
@@ -101,7 +101,10 @@ async def google_login(request: Request):
         code=data["code"], redirect_uri=data["referrer"]
     )
     if not access_token:
-        return Detail(detail="Invalid code"), 400
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid code",
+        )
     magic_link = auth.sso(
         provider="google",
         access_token=access_token,
