@@ -99,7 +99,7 @@ async def google_login(request: Request):
     magic_link = auth.sso(
         provider="google",
         access_token=data["access_token"],
-        refresh_token=data["refresh_token"],
+        refresh_token=data["refresh_token"] if "refresh_token" in data else None,
         ip_address=request.client.host,
         referrer=data["referrer"] if "referrer" in data else None,
     )

@@ -29,7 +29,7 @@ class GoogleSSO:
     def __init__(
         self,
         access_token,  # Comes from Google OAuth and stored in db
-        refresh_token,  # Comes from Google OAuth and stored in db
+        refresh_token=None,  # Comes from Google OAuth and stored in db
     ):
         self.refresh_token = refresh_token
         self.access_token = access_token

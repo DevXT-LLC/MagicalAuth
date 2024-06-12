@@ -373,7 +373,14 @@ class MagicalAuth:
         session.close()
         return "User deleted successfully"
 
-    def sso(self, provider, access_token, refresh_token, ip_address, referrer=None):
+    def sso(
+        self,
+        provider,
+        access_token,
+        ip_address,
+        refresh_token=None,
+        referrer=None,
+    ):
         if provider == "google":
             user_data = GoogleSSO(
                 access_token=access_token,
