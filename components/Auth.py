@@ -149,8 +149,7 @@ def get_user():
                 email = st.text_input("Email")
                 otp = st.text_input("MFA Token")
                 login_button = st.form_submit_button("Login")
-                st.divider()
-                google_sso_button()
+
                 if login_button:
                     auth_response = requests.post(
                         f"{auth_uri}/v1/login",
@@ -172,6 +171,8 @@ def get_user():
                             st.success(res)
                     else:
                         st.error(res)
+            st.divider()
+            google_sso_button()
         else:
             with st.form("register_form"):
                 email = st.text_input("Email")
