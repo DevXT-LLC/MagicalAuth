@@ -39,6 +39,7 @@ def google_sso_button():
         use_container_width=True,
         pkce="S256",
     )
+    print(result)
     if result and "code" in result:
         # Send google auth access_token and refresh_token to MagicalAuth
         response = requests.post(
