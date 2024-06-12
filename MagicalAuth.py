@@ -2,7 +2,7 @@ from DB import User, FailedLogins, UserOAuth, OAuthProvider, get_session
 from Models import UserInfo, Register, Login
 from fastapi import Header, HTTPException
 from Globals import getenv
-from sso.Google import GoogleSSO
+from sso.Google import GoogleSSO, get_google_access_token
 from datetime import datetime, timedelta
 from fastapi import HTTPException
 from sendgrid import SendGridAPIClient
@@ -376,16 +376,22 @@ class MagicalAuth:
     def sso(
         self,
         provider,
-        access_token,
+        code,
         ip_address,
-        refresh_token=None,
         referrer=None,
     ):
+        if not referrer:
+            referrer = getenv("MAGIC_LINK_URL")
         if provider == "google":
-            user_data = GoogleSSO(
+            access_token, refresh_token = get_google_access_token(
+                code=code, redirect_uri=referrer
+            )
+            google = GoogleSSO(
                 access_token=access_token,
                 refresh_token=refresh_token,
-            ).get_user_info()
+            )
+            user_data = google.user_info
+            self.email = user_data["email"]
         # Future SSO providers can be added here
         else:
             # If the provider is not found, use MagicalAuth to log in using the access_token

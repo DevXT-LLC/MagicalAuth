@@ -98,20 +98,11 @@ def delete_user(
 async def google_login(request: Request):
     data = await request.json()
     auth = MagicalAuth()
-    access_token, refresh_token = get_google_access_token(
-        code=data["code"], redirect_uri=data["referrer"]
-    )
     logging.info(f"data: {data}")
-    if not access_token:
-        raise HTTPException(
-            status_code=400,
-            detail="Invalid code",
-        )
     magic_link = auth.sso(
         provider="google",
-        access_token=access_token,
-        refresh_token=refresh_token,
+        code=data["code"],
         ip_address=request.client.host,
-        referrer=data["referrer"] if "referrer" in data else None,
+        referrer=data["referrer"] if "referrer" in data else getenv("MAGIC_LINK_URL"),
     )
     return Detail(detail=magic_link)

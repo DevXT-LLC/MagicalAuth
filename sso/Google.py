@@ -3,6 +3,7 @@ import json
 import requests
 import logging
 from email.mime.text import MIMEText
+from fastapi import HTTPException
 from Globals import getenv
 
 """
@@ -65,10 +66,13 @@ class GoogleSSO:
         self.access_token = access_token
         self.refresh_token = refresh_token
         if not self.access_token:
-            raise Exception("Invalid code")
+            raise HTTPException(
+                status_code=401,
+                detail="Google access token is required.",
+            )
         self.client_id = getenv("GOOGLE_CLIENT_ID")
         self.client_secret = getenv("GOOGLE_CLIENT_SECRET")
-        self.email_address = ""
+        self.user_info = self.get_user_info()
 
     def get_new_token(self):
         response = requests.post(
