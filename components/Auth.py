@@ -8,6 +8,12 @@ import logging
 import streamlit as st
 from streamlit_js_eval import get_cookie, set_cookie
 from streamlit_oauth import OAuth2Component
+from Globals import getenv
+
+logging.basicConfig(
+    level=getenv("LOG_LEVEL"),
+    format=getenv("LOG_FORMAT"),
+)
 
 """
 Required environment variables:
@@ -54,6 +60,7 @@ def google_sso_button():
             res = response.json()
             if "detail" in res:
                 url = str(res["detail"])
+                logging.info(url)
                 if url.startswith("http"):
                     # Redirect to the login link
                     st.markdown(
