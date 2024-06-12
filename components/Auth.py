@@ -40,6 +40,7 @@ def google_sso_button():
         client_id=client_id,
         client_secret=client_secret,
         authorize_endpoint="https://accounts.google.com/o/oauth2/auth",
+        token_endpoint="https://accounts.google.com/o/oauth2/token",
     )
     result = oauth2.authorize_button(
         name="Continue with Google",
