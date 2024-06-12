@@ -82,14 +82,15 @@ class GoogleSSO:
         return response.json()["access_token"]
 
     def get_user_info(self):
+        uri = "https://people.googleapis.com/v1/people/me?personFields=names,emailAddresses,organizations"
         response = requests.get(
-            "https://people.googleapis.com/v1/people/me",
+            uri,
             headers={"Authorization": f"Bearer {self.access_token}"},
         )
         if response.status_code == 401:
             self.access_token = self.get_new_token()
             response = requests.get(
-                "https://people.googleapis.com/v1/people/me?personFields=names,emailAddresses,organizations",
+                uri,
                 headers={"Authorization": f"Bearer {self.access_token}"},
             )
         data = response.json()
