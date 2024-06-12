@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Request, Header, Depends
 from Models import Detail, Login, UserInfo, Register
 from MagicalAuth import MagicalAuth, verify_api_key
+from sso.Google import get_google_access_token
 from Globals import getenv
 import pyotp
 
@@ -89,17 +90,22 @@ def delete_user(
 
 # Log in using Google SSO
 @router.post(
-    "/v1/google/login",
+    "/v1/oauth2/google",
     response_model=Detail,
     summary="Login using Google SSO",
 )
 async def google_login(request: Request):
     data = await request.json()
     auth = MagicalAuth()
+    access_token, refresh_token = get_google_access_token(
+        code=data["code"], redirect_uri=data["referrer"]
+    )
+    if not access_token:
+        return Detail(detail="Invalid code"), 400
     magic_link = auth.sso(
         provider="google",
-        access_token=data["access_token"],
-        refresh_token=data["refresh_token"] if "refresh_token" in data else None,
+        access_token=access_token,
+        refresh_token=refresh_token,
         ip_address=request.client.host,
         referrer=data["referrer"] if "referrer" in data else None,
     )

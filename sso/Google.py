@@ -25,14 +25,38 @@ Required scopes for Google SSO
 """
 
 
+def get_google_access_token(code, redirect_uri=None):
+    if not redirect_uri:
+        redirect_uri = getenv("MAGIC_LINK_URL")
+    response = requests.post(
+        "https://oauth2.googleapis.com/token",
+        data={
+            "code": code,
+            "client_id": getenv("GOOGLE_CLIENT_ID"),
+            "client_secret": getenv("GOOGLE_CLIENT_SECRET"),
+            "redirect_uri": redirect_uri,
+            "scope": "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/gmail.send",
+            "grant_type": "authorization_code",
+        },
+    )
+    if response.status_code != 200:
+        return None, None
+    data = response.json()
+    access_token = data["access_token"]
+    refresh_token = data["refresh_token"]
+    return access_token, refresh_token
+
+
 class GoogleSSO:
     def __init__(
         self,
-        access_token,  # Comes from Google OAuth and stored in db
-        refresh_token=None,  # Comes from Google OAuth and stored in db
+        access_token=None,
+        refresh_token=None,
     ):
-        self.refresh_token = refresh_token
         self.access_token = access_token
+        self.refresh_token = refresh_token
+        if not self.access_token:
+            raise Exception("Invalid code")
         self.client_id = getenv("GOOGLE_CLIENT_ID")
         self.client_secret = getenv("GOOGLE_CLIENT_SECRET")
         self.email_address = ""
