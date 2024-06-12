@@ -65,11 +65,6 @@ class GoogleSSO:
     ):
         self.access_token = access_token
         self.refresh_token = refresh_token
-        if not self.access_token:
-            raise HTTPException(
-                status_code=401,
-                detail="Google access token is required.",
-            )
         self.client_id = getenv("GOOGLE_CLIENT_ID")
         self.client_secret = getenv("GOOGLE_CLIENT_SECRET")
         self.user_info = self.get_user_info()

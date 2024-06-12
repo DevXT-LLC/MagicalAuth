@@ -391,7 +391,7 @@ class MagicalAuth:
                 refresh_token=refresh_token,
             )
             user_data = google.user_info
-            self.email = user_data["email"]
+            self.email = str(user_data["email"]).lower()
         # Future SSO providers can be added here
         else:
             # If the provider is not found, use MagicalAuth to log in using the access_token
@@ -403,16 +403,17 @@ class MagicalAuth:
                 status_code=400,
                 detail=f"Failed to get user data from {provider.capitalize()}.",
             )
-        if not self.user_exists(email=user_data["email"]):
+        session = get_session()
+        user = session.query(User).filter(User.email == self.email).first()
+        if not user:
             register = Register(
-                email=user_data["email"],
+                email=self.email,
                 first_name=user_data["first_name"] if "first_name" in user_data else "",
                 last_name=user_data["last_name"] if "last_name" in user_data else "",
             )
             mfa_token = self.register(new_user=register)
             # Create the UserOAuth record
-            session = get_session()
-            user = session.query(User).filter(User.email == user_data["email"]).first()
+            user = session.query(User).filter(User.email == self.email).first()
             provider = (
                 session.query(OAuthProvider)
                 .filter(OAuthProvider.name == provider)
@@ -429,8 +430,6 @@ class MagicalAuth:
             )
             session.add(user_oauth)
         else:
-            session = get_session()
-            user = session.query(User).filter(User.email == user_data["email"]).first()
             mfa_token = user.mfa_token
             user_oauth = (
                 session.query(UserOAuth).filter(UserOAuth.user_id == user.id).first()
@@ -441,7 +440,7 @@ class MagicalAuth:
         session.commit()
         session.close()
         totp = pyotp.TOTP(mfa_token)
-        login = Login(email=user_data["email"], otp=totp.now())
+        login = Login(email=self.email, otp=totp.now())
         # Will return the URL with the proper token
         return self.send_magic_link(
             ip_address=ip_address,
