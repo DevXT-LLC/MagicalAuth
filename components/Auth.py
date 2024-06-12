@@ -24,10 +24,14 @@ Required environment variables:
 
 
 def google_sso_button():
-    client_id = os.environ.get("GOOGLE_CLIENT_ID", "")
-    client_secret = os.environ.get("GOOGLE_CLIENT_SECRET", "")
-    auth_uri = os.environ.get("MAGICALAUTH_SERVER", "http://localhost:12437")
-    magic_link_uri = os.environ.get("MAGIC_LINK_URL", "http://localhost:8519")
+    client_id = getenv("GOOGLE_CLIENT_ID")
+    client_secret = getenv("GOOGLE_CLIENT_SECRET")
+    auth_uri = getenv("MAGICALAUTH_SERVER")
+    magic_link_uri = getenv("MAGIC_LINK_URL")
+    logging.info(f"Client ID: {client_id}")
+    logging.info(f"Client Secret: {client_secret}")
+    logging.info(f"Auth URI: {auth_uri}")
+    logging.info(f"Magic Link URI: {magic_link_uri}")
     if client_id == "" or client_secret == "":
         return ""
     oauth2 = OAuth2Component(
