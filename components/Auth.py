@@ -49,7 +49,7 @@ def google_sso_button():
         use_container_width=True,
         pkce=None,
     )
-    logging.info(result)
+    logging.info(f"Result: {result}")
     if result and "code" in result:
         # Send google auth access_token and refresh_token to MagicalAuth
         response = requests.post(
@@ -72,8 +72,10 @@ def google_sso_button():
                     )
                 else:
                     st.error(url)
+                    logging.error(f"Error with Google SSO: {url}")
         else:
-            st.error(response.json())
+            st.error(response.text)
+            logging.error(f"Error with Google SSO: {response.text}")
 
 
 def get_user():
