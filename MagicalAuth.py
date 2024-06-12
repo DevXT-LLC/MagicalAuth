@@ -402,10 +402,6 @@ class MagicalAuth:
                 email=user_data["email"],
                 first_name=user_data["first_name"] if "first_name" in user_data else "",
                 last_name=user_data["last_name"] if "last_name" in user_data else "",
-                company_name=(
-                    user_data["company_name"] if "company_name" in user_data else ""
-                ),
-                job_title=user_data["job_title"] if "job_title" in user_data else "",
             )
             mfa_token = self.register(new_user=register)
             # Create the UserOAuth record

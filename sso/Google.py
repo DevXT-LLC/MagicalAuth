@@ -22,7 +22,6 @@ then add the `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` environment variables
 Required scopes for Google SSO
 
 - https://www.googleapis.com/auth/userinfo.profile
-https://www.googleapis.com/auth/user.organization.read
 - https://www.googleapis.com/auth/userinfo.email
 - https://www.googleapis.com/auth/gmail.send
 """
@@ -84,7 +83,7 @@ class GoogleSSO:
         return response.json()["access_token"]
 
     def get_user_info(self):
-        uri = "https://people.googleapis.com/v1/people/me?personFields=names,emailAddresses,organizations"
+        uri = "https://people.googleapis.com/v1/people/me?personFields=names,emailAddresses"
         response = requests.get(
             uri,
             headers={"Authorization": f"Bearer {self.access_token}"},
@@ -99,16 +98,11 @@ class GoogleSSO:
         logging.info(f"Google user info: {data}")
         first_name = data["names"][0]["givenName"]
         last_name = data["names"][0]["familyName"]
+        email = data["emailAddresses"][0]["value"]
         return {
-            "email": data["emailAddresses"][0]["value"],
+            "email": email,
             "first_name": first_name,
             "last_name": last_name,
-            "company_name": (
-                data["organizations"][0]["name"] if "organizations" in data else ""
-            ),
-            "job_title": (
-                data["organizations"][0]["title"] if "organizations" in data else ""
-            ),
         }
 
     def send_email(self, to, subject, message_text):
