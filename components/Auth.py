@@ -32,7 +32,7 @@ def google_sso_button():
     if client_id == "":
         return ""
     authorize_endpoint = "https://accounts.google.com/o/oauth2/auth"
-    scopes = "https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
+    scopes = "https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/user.organization.read"
     result = st.button("Sign in with Google", key="google_sso_button")
     if result:
         scopes = urllib.parse.quote(scopes)

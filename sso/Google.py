@@ -22,6 +22,7 @@ then add the `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` environment variables
 Required scopes for Google SSO
 
 - https://www.googleapis.com/auth/userinfo.profile
+https://www.googleapis.com/auth/user.organization.read
 - https://www.googleapis.com/auth/userinfo.email
 - https://www.googleapis.com/auth/gmail.send
 """
