@@ -1,6 +1,7 @@
 import base64
 import json
 import requests
+import logging
 from email.mime.text import MIMEText
 from Globals import getenv
 
@@ -36,8 +37,8 @@ def get_google_access_token(code, redirect_uri=None):
         .replace("%3D", "=")
     )
     response = requests.post(
-        "https://oauth2.googleapis.com/token",
-        data={
+        f"https://accounts.google.com/o/oauth2/token",
+        params={
             "code": code,
             "client_id": getenv("GOOGLE_CLIENT_ID"),
             "client_secret": getenv("GOOGLE_CLIENT_SECRET"),
@@ -46,6 +47,7 @@ def get_google_access_token(code, redirect_uri=None):
         },
     )
     if response.status_code != 200:
+        logging.error(f"Error getting Google access token: {response.text}")
         return None, None
     data = response.json()
     access_token = data["access_token"]

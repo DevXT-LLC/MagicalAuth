@@ -4,6 +4,7 @@ import time
 import pyotp
 import qrcode
 import requests
+import logging
 import streamlit as st
 from streamlit_js_eval import get_cookie, set_cookie
 from streamlit_oauth import OAuth2Component
@@ -39,7 +40,7 @@ def google_sso_button():
         use_container_width=True,
         pkce="S256",
     )
-    print(result)
+    logging.info(result)
     if result and "code" in result:
         # Send google auth access_token and refresh_token to MagicalAuth
         response = requests.post(
