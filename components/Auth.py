@@ -38,7 +38,7 @@ def google_sso_button():
         key="google",
         extras_params={"prompt": "consent", "access_type": "offline"},
         use_container_width=True,
-        pkce="S256",
+        pkce=None,
     )
     logging.info(result)
     if result and "code" in result:
