@@ -39,8 +39,10 @@ def google_sso_button():
     with st.form("google_sso_form"):
         result = st.form_submit_button("Sign in with Google")
         if result:
+            scopes = urllib.parse.quote(scopes)
+            magic_link_uri = urllib.parse.quote(magic_link_uri)
+            client_id = urllib.parse.quote(client_id)
             new_uri = f"{authorize_endpoint}?client_id={client_id}&redirect_uri={magic_link_uri}&scope={scopes}&response_type=code&access_type=offline&prompt=consent"
-            new_uri = urllib.parse.quote(new_uri)
             # Redirect to Google SSO
             st.markdown(
                 f'<meta http-equiv="refresh" content="0;URL={new_uri}">',
