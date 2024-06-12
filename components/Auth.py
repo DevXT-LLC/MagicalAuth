@@ -25,16 +25,16 @@ Required environment variables:
 
 def google_sso_button():
     client_id = getenv("GOOGLE_CLIENT_ID")
+    if client_id == "":
+        return ""
     auth_uri = getenv("MAGICALAUTH_SERVER")
     magic_link_uri = getenv("MAGIC_LINK_URL")
     if magic_link_uri.endswith("/"):
         magic_link_uri = magic_link_uri[:-1]
-    if client_id == "":
-        return ""
     authorize_endpoint = "https://accounts.google.com/o/oauth2/auth"
     scopes = "https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
     result = st.button("Sign in with Google", key="google_sso_button")
-    if result:
+    if result and "code" not in st.query_params:
         scopes = urllib.parse.quote(scopes)
         magic_link_uri = urllib.parse.quote(magic_link_uri)
         client_id = urllib.parse.quote(client_id)
@@ -52,20 +52,19 @@ def google_sso_button():
                 "referrer": magic_link_uri,
             },
         )
-        if response.status_code == 200:
-            res = response.json()
-            if "detail" in res:
-                url = str(res["detail"])
-                logging.info(url)
-                if url.startswith("http"):
-                    # Redirect to the login link
-                    st.markdown(
-                        f'<meta http-equiv="refresh" content="0;URL={url}">',
-                        unsafe_allow_html=True,
-                    )
-                else:
-                    st.error(url)
-                    logging.error(f"Error with Google SSO: {url}")
+        res = response.json()
+        if "detail" in res:
+            details = res["detail"]
+            logging.info(f"Google SSO: {details}")
+            if details.startswith("http"):
+                # Redirect to the login link
+                st.markdown(
+                    f'<meta http-equiv="refresh" content="0;URL={details}">',
+                    unsafe_allow_html=True,
+                )
+            else:
+                st.error(details)
+                logging.error(f"Error with Google SSO: {details}")
         else:
             st.error(response.text)
             logging.error(f"Error with Google SSO: {response.text}")
