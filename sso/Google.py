@@ -93,6 +93,7 @@ class GoogleSSO:
                 headers={"Authorization": f"Bearer {self.access_token}"},
             )
         data = response.json()
+        logging.info(f"Google user info: {data}")
         return {
             "email": data["emailAddresses"][0]["value"],
             "first_name": data["names"][0]["givenName"],
