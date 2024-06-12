@@ -7,8 +7,8 @@ import requests
 import logging
 import streamlit as st
 from streamlit_js_eval import get_cookie, set_cookie
-from streamlit_oauth import OAuth2Component
 from Globals import getenv
+import urllib.parse
 
 logging.basicConfig(
     level=getenv("LOG_LEVEL"),
@@ -25,40 +25,31 @@ Required environment variables:
 
 def google_sso_button():
     client_id = getenv("GOOGLE_CLIENT_ID")
-    client_secret = getenv("GOOGLE_CLIENT_SECRET")
     auth_uri = getenv("MAGICALAUTH_SERVER")
     magic_link_uri = getenv("MAGIC_LINK_URL")
     if magic_link_uri.endswith("/"):
         magic_link_uri = magic_link_uri[:-1]
     logging.info(f"Client ID: {client_id}")
-    logging.info(f"Client Secret: {client_secret}")
     logging.info(f"Auth URI: {auth_uri}")
     logging.info(f"Magic Link URI: {magic_link_uri}")
-    if client_id == "" or client_secret == "":
+    if client_id == "":
         return ""
-    oauth2 = OAuth2Component(
-        client_id=client_id,
-        client_secret=client_secret,
-        authorize_endpoint="https://accounts.google.com/o/oauth2/auth",
-        token_endpoint="https://accounts.google.com/o/oauth2/token",
-    )
-    result = oauth2.authorize_button(
-        name="Continue with Google",
-        icon="https://www.google.com/favicon.ico",
-        redirect_uri=magic_link_uri,
-        scope="https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.profile",
-        key="google",
-        extras_params={"prompt": "consent", "access_type": "offline"},
-        use_container_width=True,
-        pkce=None,
-    )
-    logging.info(f"Result: {result}")
-    if result and "code" in result:
-        # Send google auth access_token and refresh_token to MagicalAuth
+    authorize_endpoint = "https://accounts.google.com/o/oauth2/auth"
+    scopes = "https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.profile"
+    result = st.button("Sign in with Google", key="google_sso")
+    if result:
+        new_uri = f"{authorize_endpoint}?client_id={client_id}&redirect_uri={magic_link_uri}&scope={scopes}&response_type=code&access_type=offline&prompt=consent"
+        new_uri = urllib.parse.quote(new_uri)
+        # Redirect to Google SSO
+        st.markdown(
+            f'<meta http-equiv="refresh" content="0;URL={new_uri}">',
+            unsafe_allow_html=True,
+        )
+    if "code" in st.query_params:
         response = requests.post(
             f"{auth_uri}/v1/oauth2/google",
             json={
-                "code": result["code"],
+                "code": st.query_params["code"],
                 "referrer": magic_link_uri,
             },
         )
@@ -76,9 +67,9 @@ def google_sso_button():
                 else:
                     st.error(url)
                     logging.error(f"Error with Google SSO: {url}")
-        else:
-            st.error(response.text)
-            logging.error(f"Error with Google SSO: {response.text}")
+    else:
+        st.error(response.text)
+        logging.error(f"Error with Google SSO: {response.text}")
 
 
 def get_user():
