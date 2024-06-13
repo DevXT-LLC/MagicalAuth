@@ -60,16 +60,16 @@ def google_sso_button():
                 },
             )
             if response.status_code == 200:
-                url = response.json()["detail"]
+                url = str(response.json()["detail"])
                 token = url.split("token=")[1]
-                st.session_state["token"] = token
+                st.query_params["token"] = token
 
 
 def get_user():
     app_name = os.environ.get("APP_NAME", "Magical Auth")
     auth_uri = os.environ.get("MAGICALAUTH_SERVER", "http://localhost:12437")
-    email = get_cookie("email", str(time.time()))
-    token = get_cookie("token", str(time.time()))
+    email = get_cookie("email")
+    token = get_cookie("token")
     if "mfa_confirmed" in st.session_state:
         st.title(app_name)
         st.success("MFA token confirmed! Please check your email for the login link.")
@@ -78,7 +78,7 @@ def get_user():
         st.stop()
     if "email" in st.query_params:
         if st.query_params["email"] != "" and st.query_params["email"] is not None:
-            set_cookie("email", st.query_params["email"], 1, str(time.time()))
+            set_cookie("email", st.query_params["email"], 1)
             email = st.query_params["email"]
     if "token" in st.query_params:
         if (
@@ -86,7 +86,7 @@ def get_user():
             and st.query_params["token"] is not None
             and st.query_params["token"] != "None"
         ):
-            set_cookie("token", st.query_params["token"], 1, str(time.time()))
+            set_cookie("token", st.query_params["token"], 1)
             token = st.query_params["token"]
     if token != "" and token is not None and token != "None":
         user_request = requests.get(
@@ -97,8 +97,8 @@ def get_user():
             user = user_request.json()
             return user
         else:
-            set_cookie("email", "", 1, str(time.time()))
-            set_cookie("token", "", 1, str(time.time()))
+            set_cookie("email", "", 1)
+            set_cookie("token", "", 1)
     st.title(app_name)
     if "otp_uri" in st.session_state:
         otp_uri = st.session_state["otp_uri"]
