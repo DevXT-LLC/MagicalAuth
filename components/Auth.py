@@ -100,6 +100,7 @@ def google_sso_button():
                             st.session_state["oauth2_redirect_url"] = new_uri
                             st.session_state["oauth2_token_completed"] = True
                             st.session_state["oauth2_token_requested"] = False
+                            st.write("State updated. Rerunning...")  # Debug message
                             st.experimental_rerun()  # Rerun to apply the state change and redirect
                         else:
                             st.session_state["oauth2_token_requested"] = False
