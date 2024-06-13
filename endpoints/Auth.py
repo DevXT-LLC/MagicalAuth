@@ -89,17 +89,16 @@ def delete_user(
     return Detail(detail="User deleted successfully.")
 
 
-# Log in using Google SSO
 @router.post(
-    "/v1/oauth2/google",
+    "/v1/oauth2/{provider}",
     response_model=Detail,
-    summary="Login using Google SSO",
+    summary="Login using OAuth2 provider",
 )
-async def google_login(request: Request):
+async def oauth_login(request: Request, provider: str):
     data = await request.json()
     auth = MagicalAuth()
     magic_link = auth.sso(
-        provider="google",
+        provider=provider.lower(),
         code=data["code"],
         ip_address=request.client.host,
         referrer=data["referrer"] if "referrer" in data else getenv("MAGIC_LINK_URL"),

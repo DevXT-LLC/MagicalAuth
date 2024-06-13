@@ -3,6 +3,7 @@ from Models import UserInfo, Register, Login
 from fastapi import Header, HTTPException
 from Globals import getenv
 from sso.Google import GoogleSSO, get_google_access_token
+from sso.Microsoft import MicrosoftSSO, get_microsoft_access_token
 from datetime import datetime, timedelta
 from fastapi import HTTPException
 from sendgrid import SendGridAPIClient
@@ -397,6 +398,21 @@ class MagicalAuth:
             )
             user_data = google.user_info
             self.email = str(user_data["email"]).lower()
+        elif provider == "microsoft":
+            access_token, refresh_token = get_microsoft_access_token(
+                code=code, redirect_uri=referrer
+            )
+            if not access_token:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Failed to get access token from Microsoft SSO.",
+                )
+            microsoft = MicrosoftSSO(
+                access_token=access_token,
+                refresh_token=refresh_token,
+            )
+            user_data = microsoft.user_info
+            self.email = str(user_data["email"]).lower()
         # Future SSO providers can be added here
         else:
             # If the provider is not found, use MagicalAuth to log in using the access_token
@@ -446,7 +462,6 @@ class MagicalAuth:
         session.close()
         totp = pyotp.TOTP(mfa_token)
         login = Login(email=self.email, token=totp.now())
-        # Will return the URL with the proper token
         return self.send_magic_link(
             ip_address=ip_address,
             login=login,
