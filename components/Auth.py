@@ -52,29 +52,30 @@ def google_sso_button():
         st.query_params["state"] = ""
         st.query_params["authuser"] = ""
         st.query_params["prompt"] = ""
-        response = requests.post(
-            f"{auth_uri}/v1/oauth2/google",
-            json={
-                "code": code,
-                "referrer": magic_link_uri,
-            },
-        )
-        res = response.json()
-        if "detail" in res:
-            details = res["detail"]
-            logging.info(f"Google SSO: {details}")
-            if details.startswith("http"):
-                # Redirect to the login link
-                st.markdown(
-                    f'<meta http-equiv="refresh" content="0;URL={details}">',
-                    unsafe_allow_html=True,
-                )
+        if code != "":
+            response = requests.post(
+                f"{auth_uri}/v1/oauth2/google",
+                json={
+                    "code": code,
+                    "referrer": magic_link_uri,
+                },
+            )
+            res = response.json()
+            if "detail" in res:
+                details = res["detail"]
+                logging.info(f"Google SSO: {details}")
+                if details.startswith("http"):
+                    # Redirect to the login link
+                    st.markdown(
+                        f'<meta http-equiv="refresh" content="0;URL={details}">',
+                        unsafe_allow_html=True,
+                    )
+                else:
+                    st.error(details)
+                    logging.error(f"Error with Google SSO: {details}")
             else:
-                st.error(details)
-                logging.error(f"Error with Google SSO: {details}")
-        else:
-            st.error(response.text)
-            logging.error(f"Error with Google SSO: {response.text}")
+                st.error(response.text)
+                logging.error(f"Error with Google SSO: {response.text}")
 
 
 def get_user():

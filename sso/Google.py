@@ -70,6 +70,11 @@ class GoogleSSO:
         self.user_info = self.get_user_info()
 
     def get_new_token(self):
+        if not self.refresh_token:
+            raise HTTPException(
+                status_code=401,
+                detail="Refresh token is required to get a new access token.",
+            )
         response = requests.post(
             "https://oauth2.googleapis.com/token",
             data={
