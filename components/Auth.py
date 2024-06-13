@@ -46,7 +46,8 @@ def google_sso_button():
         )
     if "code" in st.query_params:
         if st.query_params["code"] != "":
-            code = st.query_params["code"]
+            code = str(st.query_params["code"])
+            logging.info(f"Saving code: {code}")
             # save the code in the cookie
             set_cookie("code", code, 1, "set_code_cookie")
             # Clear code from URL
@@ -62,6 +63,7 @@ def google_sso_button():
     # Get cookie of "code", if it exists
     code = get_cookie("code", "get_code_cookie")
     if code != "" and code is not None:
+        logging.info(f"Referencing code: {code}")
         response = requests.post(
             f"{auth_uri}/v1/oauth2/google",
             json={
@@ -72,7 +74,7 @@ def google_sso_button():
         res = response.json()
         if "detail" in res:
             details = res["detail"]
-            logging.info(f"Google SSO: {details}")
+            logging.info(f"Google SSO Detail: {details}")
             if str(details).startswith("http"):
                 set_cookie("code", "", 1, "clear_code_cookie")
                 # Go to the login link

@@ -12,7 +12,7 @@ def getenv(var_name: str):
         "ENCRYPTION_SECRET": "it-is-a-secret-to-everybody",
         "APP_NAME": "Magical Auth",
         "AUTH_PROVIDER": "magicalauth",
-        "MAGIC_LINK_URL": "https://localhost:8507/",
+        "MAGIC_LINK_URL": "https://localhost:8519",
         "LOG_LEVEL": "INFO",
         "LOG_FORMAT": "%(asctime)s | %(levelname)s | %(message)s",
         "UVICORN_WORKERS": 1,
