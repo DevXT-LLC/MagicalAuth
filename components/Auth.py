@@ -50,37 +50,38 @@ def google_sso_button():
             )
             st.stop()
     if "code" in st.query_params:
-        if st.query_params["code"] != "":
+        if st.query_params["code"] != "" and st.query_params["code"] is not None:
             if isinstance(st.query_params["code"], list):
                 code = str(st.query_params["code"][0])
             else:
                 code = str(st.query_params["code"])
-            response = requests.post(
-                f"{auth_uri}/v1/oauth2/google",
-                json={
-                    "code": code,
-                    "referrer": magic_link_uri,
-                },
-            )
-            res = response.json()
-            if "detail" in res:
-                details = str(res["detail"])
-                if details.startswith("http"):
-                    token = details.split("token=")[1]
-                    set_cookie("token", token, 1, "google_sso_token")
-                    # Redirect to the login link
-                    st.markdown(
-                        f'<meta http-equiv="refresh" content="0;URL={details}">',
-                        unsafe_allow_html=True,
-                    )
-                    time.sleep(0.5)
-                    st.stop()
+            if code != "":
+                response = requests.post(
+                    f"{auth_uri}/v1/oauth2/google",
+                    json={
+                        "code": code,
+                        "referrer": magic_link_uri,
+                    },
+                )
+                res = response.json()
+                if "detail" in res:
+                    details = str(res["detail"])
+                    if details.startswith("http"):
+                        token = details.split("token=")[1]
+                        set_cookie("token", token, 1, "google_sso_token")
+                        # Redirect to the login link
+                        st.markdown(
+                            f'<meta http-equiv="refresh" content="0;URL={details}">',
+                            unsafe_allow_html=True,
+                        )
+                        time.sleep(0.5)
+                        st.stop()
+                    else:
+                        st.error(details)
+                        logging.error(f"Error with Google SSO: {details}")
                 else:
-                    st.error(details)
-                    logging.error(f"Error with Google SSO: {details}")
-            else:
-                st.error(response.text)
-                logging.error(f"Error with Google SSO: {response.text}")
+                    st.error(response.text)
+                    logging.error(f"Error with Google SSO: {response.text}")
 
 
 def get_user():
