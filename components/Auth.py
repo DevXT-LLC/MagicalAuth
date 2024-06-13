@@ -85,9 +85,7 @@ def google_sso_button():
         else:
             st.error(magic_link)
             logging.error(f"Error with Google SSO: {magic_link}")
-    else:
-        st.error(response.text)
-        logging.error(f"Error with Google SSO: {response.text}")
+            st.stop()
 
 
 def get_user():
