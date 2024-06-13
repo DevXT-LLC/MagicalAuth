@@ -70,11 +70,6 @@ class GoogleSSO:
         self.user_info = self.get_user_info()
 
     def get_new_token(self):
-        if not self.refresh_token:
-            raise HTTPException(
-                status_code=401,
-                detail="Refresh token is required to get a new access token.",
-            )
         response = requests.post(
             "https://oauth2.googleapis.com/token",
             data={
@@ -84,6 +79,7 @@ class GoogleSSO:
                 "grant_type": "refresh_token",
             },
         )
+        logging.info(f"Google refresh token response: {response.text}")
         return response.json()["access_token"]
 
     def get_user_info(self):
@@ -99,6 +95,7 @@ class GoogleSSO:
                 headers={"Authorization": f"Bearer {self.access_token}"},
             )
         data = response.json()
+        logging.info(f"Google user info: {data}")
         first_name = data["names"][0]["givenName"]
         last_name = data["names"][0]["familyName"]
         email = data["emailAddresses"][0]["value"]

@@ -386,6 +386,13 @@ class MagicalAuth:
             access_token, refresh_token = get_google_access_token(
                 code=code, redirect_uri=referrer
             )
+            logging.info(f"Google SSO access token: {access_token}")
+            logging.info(f"Google SSO refresh token: {refresh_token}")
+            if not access_token:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Failed to get access token from Google SSO.",
+                )
             google = GoogleSSO(
                 access_token=access_token,
                 refresh_token=refresh_token,
