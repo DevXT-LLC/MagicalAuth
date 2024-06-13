@@ -61,10 +61,7 @@ def google_sso_button():
                 st.session_state["oauth2_token_requested"] = False
                 st.session_state["oauth2_token_completed"] = False
 
-            if (
-                not st.session_state["oauth2_token_requested"]
-                and not st.session_state["oauth2_token_completed"]
-            ):
+            if not st.session_state["oauth2_token_requested"]:
                 st.session_state["oauth2_token_requested"] = True
                 response = requests.post(
                     f"{auth_uri}/v1/oauth2/google",
@@ -79,8 +76,7 @@ def google_sso_button():
                         set_cookie("email", data["email"], 1)
                         set_cookie("token", data["token"], 1)
                         st.session_state["oauth2_token_completed"] = True
-                        st.session_state["oauth2_token_requested"] = False
-                        st.rerun()  # Rerun to update the state and redirect
+                        st.rerun()  # Rerun to apply the state change and redirect
                 else:
                     st.session_state["oauth2_token_requested"] = False
                     st.error(response.json()["detail"])
