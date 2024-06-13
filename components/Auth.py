@@ -51,17 +51,18 @@ def google_sso_button():
             unsafe_allow_html=True,
         )
     else:
-        response = requests.post(
-            f"{auth_uri}/v1/oauth2/google",
-            json={
-                "code": code,
-                "referrer": magic_link_uri,
-            },
-        )
-        if response.status_code == 200:
-            url = response.json()["detail"]
-            token = url.split("token=")[1]
-            return token
+        if code != "":
+            response = requests.post(
+                f"{auth_uri}/v1/oauth2/google",
+                json={
+                    "code": code,
+                    "referrer": magic_link_uri,
+                },
+            )
+            if response.status_code == 200:
+                url = response.json()["detail"]
+                token = url.split("token=")[1]
+                return token
 
 
 def get_user():
