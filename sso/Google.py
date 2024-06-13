@@ -79,7 +79,6 @@ class GoogleSSO:
                 "grant_type": "refresh_token",
             },
         )
-        logging.info(f"Google refresh token response: {response.text}")
         return response.json()["access_token"]
 
     def get_user_info(self):
@@ -95,7 +94,6 @@ class GoogleSSO:
                 headers={"Authorization": f"Bearer {self.access_token}"},
             )
         data = response.json()
-        logging.info(f"Google user info: {data}")
         first_name = data["names"][0]["givenName"]
         last_name = data["names"][0]["familyName"]
         email = data["emailAddresses"][0]["value"]

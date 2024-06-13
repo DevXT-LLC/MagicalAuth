@@ -84,7 +84,6 @@ def get_user():
                 else:
                     st.error(data)
                     st.stop()
-    token = get_cookie("token")
     if "mfa_confirmed" in st.session_state:
         st.title(app_name)
         st.success("MFA token confirmed! Please check your email for the login link.")
@@ -98,7 +97,10 @@ def get_user():
             and st.query_params["token"] != "None"
         ):
             set_cookie("token", st.query_params["token"], 1)
-            token = st.query_params["token"]
+            token = str(st.query_params["token"])
+            st.query_params["token"] = ""
+    else:
+        token = get_cookie("token")
     if token != "" and token is not None and token != "None":
         user_request = requests.get(
             f"{auth_uri}/v1/user",
