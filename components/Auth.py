@@ -48,6 +48,7 @@ def google_sso_button():
                 f'<meta http-equiv="refresh" content="0;URL={new_uri}">',
                 unsafe_allow_html=True,
             )
+            st.stop()
     if "code" in st.query_params:
         if st.query_params["code"] != "":
             if isinstance(st.query_params["code"], list):
@@ -65,9 +66,15 @@ def google_sso_button():
             if "detail" in res:
                 details = str(res["detail"])
                 if details.startswith("http"):
-                    token = details.split("?token=")[1]
+                    token = details.split("token=")[1]
                     set_cookie("token", token, 1, "google_sso_token")
-                    st.rerun()
+                    # Redirect to the login link
+                    st.markdown(
+                        f'<meta http-equiv="refresh" content="0;URL={details}">',
+                        unsafe_allow_html=True,
+                    )
+                    time.sleep(0.5)
+                    st.stop()
                 else:
                     st.error(details)
                     logging.error(f"Error with Google SSO: {details}")
