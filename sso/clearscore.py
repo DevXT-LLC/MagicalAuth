@@ -136,7 +136,7 @@ class ClearScoreSSO:
         return response.json()
 
 
-def clear_score_sso(code, redirect_uri=None) -> ClearScoreSSO:
+def clearscore_sso(code, redirect_uri=None) -> ClearScoreSSO:
     if not redirect_uri:
         redirect_uri = getenv("MAGIC_LINK_URL")
     code = (

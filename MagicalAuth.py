@@ -2,9 +2,7 @@ from DB import User, FailedLogins, UserOAuth, OAuthProvider, get_session
 from Models import UserInfo, Register, Login
 from fastapi import Header, HTTPException
 from Globals import getenv
-from sso.google import google_sso
-from sso.microsoft import microsoft_sso
-from sso.github import github_sso
+from OAuth2Providers import get_sso_provider
 from datetime import datetime, timedelta
 from fastapi import HTTPException
 from sendgrid import SendGridAPIClient
@@ -385,44 +383,22 @@ class MagicalAuth:
         if not referrer:
             referrer = getenv("MAGIC_LINK_URL")
         provider = str(provider).lower()
-        if provider == "google":
-            google = google_sso(code=code, redirect_uri=referrer)
-            if not google.access_token:
-                raise HTTPException(
-                    status_code=400,
-                    detail="Failed to get access token from Google SSO.",
-                )
-            user_data = google.user_info
-            access_token = google.access_token
-            refresh_token = google.refresh_token
-            self.email = str(user_data["email"]).lower()
-        elif provider == "microsoft":
-            microsoft = microsoft_sso(code=code, redirect_uri=referrer)
-            if not microsoft.access_token:
-                raise HTTPException(
-                    status_code=400,
-                    detail="Failed to get access token from Microsoft SSO.",
-                )
-            user_data = microsoft.user_info
-            access_token = microsoft.access_token
-            refresh_token = microsoft.refresh_token
-            self.email = str(user_data["email"]).lower()
-        elif provider == "github":
-            github = github_sso(code=code, redirect_uri=referrer)
-            if not github.access_token:
-                raise HTTPException(
-                    status_code=400,
-                    detail="Failed to get access token from GitHub SSO.",
-                )
-            user_data = github.user_info
-            access_token = github.access_token
-            refresh_token = github.refresh_token
-            self.email = str(user_data["email"]).lower()
-        # Future SSO providers can be added here
-        else:
-            # If the provider is not found, use MagicalAuth to log in using the access_token
-            self.token = access_token
-            return self.login(ip_address=ip_address)
+        sso_data = None
+        sso_data = get_sso_provider(code=code, redirect_uri=referrer)
+        if not sso_data:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Failed to get user data from {provider.capitalize()}.",
+            )
+        if not sso_data.access_token:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Failed to get access token from {provider.capitalize()}.",
+            )
+        user_data = sso_data.user_info
+        access_token = sso_data.access_token
+        refresh_token = sso_data.refresh_token
+        self.email = str(user_data["email"]).lower()
         if not user_data:
             logging.warning(f"Error on {provider.capitalize()}: {user_data}")
             raise HTTPException(

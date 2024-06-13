@@ -125,7 +125,7 @@ class IntelSSO:
         return response.json()
 
 
-def intel_sso(code, redirect_uri=None) -> IntelSSO:
+def intel_cloud_services_sso(code, redirect_uri=None) -> IntelSSO:
     if not redirect_uri:
         redirect_uri = getenv("MAGIC_LINK_URL")
     code = (

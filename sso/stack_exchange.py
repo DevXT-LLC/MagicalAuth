@@ -85,7 +85,7 @@ class StackExchangeSSO:
             )
 
 
-def stackexchange_sso(code, redirect_uri=None) -> StackExchangeSSO:
+def stack_exchange_sso(code, redirect_uri=None) -> StackExchangeSSO:
     if not redirect_uri:
         redirect_uri = getenv("MAGIC_LINK_URL")
     code = (

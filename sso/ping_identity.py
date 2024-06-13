@@ -125,7 +125,7 @@ class PingIdentitySSO:
         return response.json()
 
 
-def pingidentity_sso(code, redirect_uri=None) -> PingIdentitySSO:
+def ping_identity_sso(code, redirect_uri=None) -> PingIdentitySSO:
     if not redirect_uri:
         redirect_uri = getenv("MAGIC_LINK_URL")
     code = (

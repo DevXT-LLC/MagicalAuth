@@ -106,7 +106,7 @@ class WeiboSSO:
         return response.json()
 
 
-def weibo_sso(code, redirect_uri=None) -> WeiboSSO:
+def sina_weibo_sso(code, redirect_uri=None) -> WeiboSSO:
     if not redirect_uri:
         redirect_uri = getenv("MAGIC_LINK_URL")
     code = (

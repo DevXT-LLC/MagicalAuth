@@ -76,7 +76,7 @@ class CloudFoundrySSO:
         )
 
 
-def cloudfoundry_sso(code, redirect_uri=None) -> CloudFoundrySSO:
+def cloud_foundry_sso(code, redirect_uri=None) -> CloudFoundrySSO:
     if not redirect_uri:
         redirect_uri = getenv("MAGIC_LINK_URL")
     code = (

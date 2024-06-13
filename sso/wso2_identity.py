@@ -111,7 +111,7 @@ class WSO2SSO:
         return response.json()
 
 
-def wso2_sso(code, redirect_uri=None) -> WSO2SSO:
+def wso2_identity_sso(code, redirect_uri=None) -> WSO2SSO:
     if not redirect_uri:
         redirect_uri = getenv("MAGIC_LINK_URL")
     code = (

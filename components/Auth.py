@@ -9,6 +9,7 @@ import streamlit as st
 from streamlit_js_eval import get_cookie, set_cookie
 from Globals import getenv
 import urllib.parse
+import importlib
 
 logging.basicConfig(
     level=getenv("LOG_LEVEL"),
@@ -23,6 +24,51 @@ Required environment variables:
 - MAGIC_LINK_URL: URL of the application
 - GOOGLE_CLIENT_ID: Google OAuth client ID if using Google SSO
 """
+
+
+def sso_button(provider: str, auth_uri: str, scopes: list = []):
+    client_id = getenv(f"{provider.upper()}_CLIENT_ID")
+    if client_id == "":
+        return ""
+    code = st.query_params.get("code", "")
+    if isinstance(code, list):
+        code = str(code[0])
+    else:
+        code = str(code)
+    if code == "None" or code is None:
+        code = ""
+    if code == "" and "token" not in st.query_params:
+        magic_link_uri = getenv("MAGIC_LINK_URL")
+        if magic_link_uri.endswith("/"):
+            magic_link_uri = magic_link_uri[:-1]
+        magic_link_uri = f"{magic_link_uri}/{provider}"
+        magic_link_uri_encoded = urllib.parse.quote(magic_link_uri)
+        client_id_encoded = urllib.parse.quote(client_id)
+        sso_uri = ""
+        scopes = urllib.parse.quote(" ".join(scopes))
+        sso_uri = f"{auth_uri}?client_id={client_id_encoded}&redirect_uri={magic_link_uri_encoded}&scope={scopes}&response_type=code&access_type=offline&prompt=consent"
+        if sso_uri != "":
+            with st.form(f"{provider}_sso_form"):
+                if st.form_submit_button(
+                    f"Sign in with {provider.capitalize()}", use_container_width=True
+                ):
+                    st.markdown(
+                        f'<meta http-equiv="refresh" content="0;URL={sso_uri}">',
+                        unsafe_allow_html=True,
+                    )
+                    st.stop()
+
+
+def sso_buttons():
+    # For each page in pages that ends in .py, create a button
+    for page in os.listdir("./pages"):
+        if page.endswith(".py"):
+            provider = page.split(".py")[0].upper()
+            # from {provider} import scopes, auth_uri
+            module = importlib.import_module(f"pages.{provider}")
+            scopes = module.scopes()
+            auth_uri = module.auth_uri()
+            sso_button(provider, auth_uri, scopes)
 
 
 def google_sso_button():
@@ -242,9 +288,7 @@ def get_user():
                             st.success(res)
                     else:
                         st.error(res)
-            google_sso_button()
-            microsoft_sso_button()
-            github_sso_button()
+            sso_buttons()
         else:
             with st.form("register_form"):
                 email = st.text_input("Email")
