@@ -56,13 +56,22 @@ def google_sso_button():
                     unsafe_allow_html=True,
                 )
     else:
+        st.write(f"Code received: {code}")  # Debug message
         if code != "":
             if "oauth2_token_requested" not in st.session_state:
                 st.session_state["oauth2_token_requested"] = False
                 st.session_state["oauth2_token_completed"] = False
 
+            st.write(
+                f"Requested: {st.session_state['oauth2_token_requested']}"
+            )  # Debug message
+            st.write(
+                f"Completed: {st.session_state['oauth2_token_completed']}"
+            )  # Debug message
+
             if not st.session_state["oauth2_token_requested"]:
                 st.session_state["oauth2_token_requested"] = True
+                st.write("Making request to backend...")  # Debug message
                 response = requests.post(
                     f"{auth_uri}/v1/oauth2/google",
                     json={
@@ -70,6 +79,10 @@ def google_sso_button():
                         "referrer": magic_link_uri,
                     },
                 )
+                st.session_state["oauth2_token_requested"] = (
+                    False  # Reset requested state after response
+                )
+
                 if response.status_code == 200:
                     data = response.json()
                     if "token" in data:
@@ -78,7 +91,6 @@ def google_sso_button():
                         st.session_state["oauth2_token_completed"] = True
                         st.rerun()  # Rerun to apply the state change and redirect
                 else:
-                    st.session_state["oauth2_token_requested"] = False
                     st.error(response.json()["detail"])
                     st.stop()
             elif st.session_state["oauth2_token_completed"]:
@@ -86,6 +98,7 @@ def google_sso_button():
                     f'<meta http-equiv="refresh" content="0;URL={magic_link_uri}?email={st.query_params.get("email", "")}&token={st.query_params.get("token", "")}">',
                     unsafe_allow_html=True,
                 )
+                st.stop()
             else:
                 st.error("OAuth2 token request already in progress. Please wait.")
         else:
