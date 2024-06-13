@@ -24,6 +24,7 @@ Required scopes for Yandex OAuth
 - mail.send
 """
 
+
 class YandexSSO:
     def __init__(
         self,
@@ -110,6 +111,7 @@ class YandexSSO:
                 data=json.dumps(email_data),
             )
         return response.json()
+
 
 def yandex_sso(code, redirect_uri=None) -> YandexSSO:
     if not redirect_uri:

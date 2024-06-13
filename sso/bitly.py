@@ -15,6 +15,7 @@ Required scopes for Bitly OAuth
 - `bitly:read`, `bitly:write`
 """
 
+
 class Bitly:
     def __init__(
         self,
@@ -57,8 +58,12 @@ class Bitly:
 
         if response.status_code != 200:
             logging.error(f"Error shortening URL with Bitly: {response.text}")
-            raise HTTPException(status_code=response.status_code, detail="Error shortening URL with Bitly")
+            raise HTTPException(
+                status_code=response.status_code,
+                detail="Error shortening URL with Bitly",
+            )
         return response.json()["link"]
+
 
 def bitly_sso(code, redirect_uri=None) -> Bitly:
     if not redirect_uri:

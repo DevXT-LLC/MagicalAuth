@@ -22,6 +22,7 @@ Required scopes for Deutsche Telekom SSO:
 - t-online-email --> Access to email services
 """
 
+
 class DeutscheTelekomSSO:
     def __init__(
         self,

@@ -1,5 +1,3 @@
-import base64
-import json
 import requests
 import logging
 from fastapi import HTTPException
@@ -16,6 +14,7 @@ Required APIs
 Follow the API documentation: https://platform.fatsecret.com/api/
 Add the `FATSECRET_CLIENT_ID` and `FATSECRET_CLIENT_SECRET` environment variables to your `.env` file.
 """
+
 
 class FatSecretSSO:
     def __init__(
@@ -57,7 +56,9 @@ class FatSecretSSO:
             data = response.json()
             first_name = data.get("profile", {}).get("firstName", "")
             last_name = data.get("profile", {}).get("lastName", "")
-            email = data.get("profile", {}).get("email", "")  # Assuming FatSecret provides email
+            email = data.get("profile", {}).get(
+                "email", ""
+            )  # Assuming FatSecret provides email
             return {
                 "email": email,
                 "first_name": first_name,
@@ -68,6 +69,7 @@ class FatSecretSSO:
                 status_code=400,
                 detail="Error getting user info from FatSecret",
             )
+
 
 def fatsecret_sso(code, redirect_uri=None) -> FatSecretSSO:
     if not redirect_uri:

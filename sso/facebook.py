@@ -22,6 +22,7 @@ Required scopes for Facebook OAuth
 - pages_messaging (for sending messages, if applicable)
 """
 
+
 class FacebookSSO:
     def __init__(
         self,
@@ -123,5 +124,7 @@ def facebook_sso(code, redirect_uri=None) -> FacebookSSO:
         return None, None
     data = response.json()
     access_token = data["access_token"]
-    refresh_token = access_token  # For simplicity, assigning access_token to refresh_token
+    refresh_token = (
+        access_token  # For simplicity, assigning access_token to refresh_token
+    )
     return FacebookSSO(access_token=access_token, refresh_token=refresh_token)

@@ -1,8 +1,5 @@
-import base64
-import json
 import requests
 import logging
-from email.mime.text import MIMEText
 from fastapi import HTTPException
 from Globals import getenv
 
@@ -21,6 +18,7 @@ Required scopes for Pixiv OAuth
 
 - pixiv.scope.profile.read
 """
+
 
 class PixivSSO:
     def __init__(
@@ -81,6 +79,7 @@ class PixivSSO:
 
     def send_email(self, to, subject, message_text):
         raise NotImplementedError("Pixiv does not support sending messages")
+
 
 def pixiv_sso(code, redirect_uri=None) -> PixivSSO:
     if not redirect_uri:

@@ -1,4 +1,3 @@
-import json
 import requests
 import logging
 from fastapi import HTTPException
@@ -20,6 +19,7 @@ Required scopes for Foursquare OAuth:
 - No specific scope is needed for basic user info, as Foursquare uses a userless access approach for its APIs.
 """
 
+
 class FoursquareSSO:
     def __init__(
         self,
@@ -32,7 +32,9 @@ class FoursquareSSO:
 
     def get_new_token(self, existing_refresh_token):
         # Foursquare does not use a refresh token mechanism, re-authentication might be needed
-        raise NotImplementedError("Foursquare does not implement a refresh token mechanism")
+        raise NotImplementedError(
+            "Foursquare does not implement a refresh token mechanism"
+        )
 
     def get_user_info(self):
         uri = "https://api.foursquare.com/v2/users/self"
@@ -40,7 +42,7 @@ class FoursquareSSO:
             uri,
             params={
                 "oauth_token": self.access_token,
-                "v": "20230410"  # Versioning date that Foursquare expects, can be current date
+                "v": "20230410",  # Versioning date that Foursquare expects, can be current date
             },
         )
         if response.status_code == 401:
@@ -50,7 +52,7 @@ class FoursquareSSO:
             )
         try:
             data = response.json()
-            user = data['response']['user']
+            user = data["response"]["user"]
             first_name = user["firstName"]
             last_name = user.get("lastName", "")  # lastName may be optional
             email = user["contact"]["email"]
@@ -64,6 +66,7 @@ class FoursquareSSO:
                 status_code=400,
                 detail="Error getting user info from Foursquare",
             )
+
 
 def foursquare_sso(code, redirect_uri=None) -> FoursquareSSO:
     if not redirect_uri:

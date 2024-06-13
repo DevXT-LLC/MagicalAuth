@@ -1,8 +1,5 @@
-import base64
-import json
 import requests
 import logging
-from email.mime.text import MIMEText
 from fastapi import HTTPException
 from Globals import getenv
 
@@ -43,9 +40,7 @@ class DiscordSSO:
                 "refresh_token": self.refresh_token,
                 "grant_type": "refresh_token",
             },
-            headers={
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
         )
         return response.json()["access_token"]
 
@@ -100,9 +95,7 @@ def discord_sso(code, redirect_uri=None) -> DiscordSSO:
             "grant_type": "authorization_code",
             "redirect_uri": redirect_uri,
         },
-        headers={
-            'Content-Type': 'application/x-www-form-urlencoded'
-        }
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
     if response.status_code != 200:
         logging.error(f"Error getting Discord access token: {response.text}")

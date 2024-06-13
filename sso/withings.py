@@ -1,5 +1,3 @@
-import base64
-import json
 import requests
 import logging
 from fastapi import HTTPException
@@ -82,8 +80,7 @@ class WithingsSSO:
 
     def send_email(self, to, subject, message_text):
         raise HTTPException(
-            status_code=501,
-            detail="Withings API does not support sending email"
+            status_code=501, detail="Withings API does not support sending email"
         )
 
 

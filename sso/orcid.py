@@ -1,5 +1,3 @@
-import base64
-import json
 import requests
 import logging
 from fastapi import HTTPException
@@ -63,7 +61,11 @@ class ORCIDSSO:
             data = response.json()
             first_name = data["person"]["name"]["given-names"]["value"]
             last_name = data["person"]["name"]["family-name"]["value"]
-            email = data["person"]["emails"]["email"][0]["email"] if data["person"]["emails"]["email"] else None
+            email = (
+                data["person"]["emails"]["email"][0]["email"]
+                if data["person"]["emails"]["email"]
+                else None
+            )
             return {
                 "email": email,
                 "first_name": first_name,

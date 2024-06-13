@@ -17,9 +17,10 @@ Required APIs:
 Ensure you have the necessary Jive API enabled.
 
 Required scopes for Jive OAuth:
-These scopes will need to be accurate according to Jive’s API documentation.
+These scopes will need to be accurate according to Jiveï¿½s API documentation.
 
 """
+
 
 class JiveSSO:
     def __init__(
@@ -121,15 +122,11 @@ class JiveSSO:
             )
         return response.json()
 
+
 def jive_sso(code, redirect_uri=None) -> JiveSSO:
     if not redirect_uri:
         redirect_uri = getenv("MAGIC_LINK_URL")
-    code = (
-        str(code)
-        .replace("%2F", "/")
-        .replace("%3D", "=")
-        .replace("%3F", "?")
-    )
+    code = str(code).replace("%2F", "/").replace("%3D", "=").replace("%3F", "?")
     response = requests.post(
         "https://example.jive.com/oauth2/token",
         data={

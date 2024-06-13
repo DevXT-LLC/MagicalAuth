@@ -1,7 +1,8 @@
 import requests
 import json
 import logging
-from email.mime.text import MIMEText
+import base64
+import uuid
 from fastapi import HTTPException
 from Globals import getenv
 

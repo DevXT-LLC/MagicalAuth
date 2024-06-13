@@ -79,7 +79,9 @@ class AutodeskSSO:
             )
 
     def send_email(self, to, subject, message_text):
-        raise NotImplementedError("Autodesk API does not support sending emails via OAuth tokens")
+        raise NotImplementedError(
+            "Autodesk API does not support sending emails via OAuth tokens"
+        )
 
         if not self.email_address:
             user_info = self.get_user_info()

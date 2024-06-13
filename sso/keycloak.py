@@ -1,8 +1,5 @@
-import base64
-import json
 import requests
 import logging
-from email.mime.text import MIMEText
 from fastapi import HTTPException
 from Globals import getenv
 
@@ -25,6 +22,7 @@ Required scopes for Keycloak SSO:
 - email
 - profile
 """
+
 
 class KeycloakSSO:
     def __init__(
@@ -79,6 +77,7 @@ class KeycloakSSO:
                 status_code=400,
                 detail="Error getting user info from Keycloak",
             )
+
 
 def keycloak_sso(code, redirect_uri=None) -> KeycloakSSO:
     if not redirect_uri:

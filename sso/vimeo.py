@@ -1,4 +1,4 @@
-import base64
+import os
 import json
 import requests
 import logging
@@ -22,6 +22,7 @@ Required scopes for Vimeo OAuth
 - private
 - video_files
 """
+
 
 class VimeoSSO:
     def __init__(
@@ -83,14 +84,16 @@ class VimeoSSO:
                 "Authorization": f"Bearer {self.access_token}",
                 "Content-Type": "application/json",
             },
-            data=json.dumps({
-                "upload": {
-                    "approach": "tus",
-                    "size": str(os.path.getsize(video_file_path))
-                },
-                "name": video_title,
-                "description": video_description,
-            })
+            data=json.dumps(
+                {
+                    "upload": {
+                        "approach": "tus",
+                        "size": str(os.path.getsize(video_file_path)),
+                    },
+                    "name": video_title,
+                    "description": video_description,
+                }
+            ),
         )
         if response.status_code == 401:
             self.access_token = self.get_new_token()
@@ -100,14 +103,16 @@ class VimeoSSO:
                     "Authorization": f"Bearer {self.access_token}",
                     "Content-Type": "application/json",
                 },
-                data=json.dumps({
-                    "upload": {
-                        "approach": "tus",
-                        "size": str(os.path.getsize(video_file_path))
-                    },
-                    "name": video_title,
-                    "description": video_description,
-                })
+                data=json.dumps(
+                    {
+                        "upload": {
+                            "approach": "tus",
+                            "size": str(os.path.getsize(video_file_path)),
+                        },
+                        "name": video_title,
+                        "description": video_description,
+                    }
+                ),
             )
         if response.status_code != 200:
             raise HTTPException(
@@ -116,13 +121,18 @@ class VimeoSSO:
             )
         upload_link = response.json()["upload"]["upload_link"]
         with open(video_file_path, "rb") as video_file:
-            tus_response = requests.patch(upload_link, data=video_file, headers={"Content-Type": "application/offset+octet-stream"})
+            tus_response = requests.patch(
+                upload_link,
+                data=video_file,
+                headers={"Content-Type": "application/offset+octet-stream"},
+            )
             if tus_response.status_code != 204:
                 raise HTTPException(
                     status_code=tus_response.status_code,
                     detail=f"Error uploading video to Vimeo using upload link: {tus_response.text}",
                 )
         return response.json()
+
 
 def vimeo_sso(code, redirect_uri=None) -> VimeoSSO:
     if not redirect_uri:

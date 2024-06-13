@@ -1,8 +1,5 @@
-import base64
-import json
 import requests
 import logging
-from email.mime.text import MIMEText
 from fastapi import HTTPException
 from Globals import getenv
 
@@ -18,6 +15,7 @@ Required APIs and Scopes:
 - User Info API
 """
 
+
 class CloudFoundrySSO:
     def __init__(
         self,
@@ -29,7 +27,7 @@ class CloudFoundrySSO:
         self.client_id = getenv("CF_CLIENT_ID")
         self.client_secret = getenv("CF_CLIENT_SECRET")
         self.user_info = self.get_user_info()
-        
+
     def get_new_token(self):
         response = requests.post(
             "https://login.system.example.com/oauth/token",  # Update with your CF OAuth token URL
@@ -73,7 +71,10 @@ class CloudFoundrySSO:
     def send_email(self, to, subject, message_text):
         # Assuming you have a CF service for sending emails; use relevant API
         # This part is highly dependent on what services you use in Cloud Foundry
-        raise NotImplementedError("Email sending not supported for Cloud Foundry SSO yet.")
+        raise NotImplementedError(
+            "Email sending not supported for Cloud Foundry SSO yet."
+        )
+
 
 def cloudfoundry_sso(code, redirect_uri=None) -> CloudFoundrySSO:
     if not redirect_uri:
@@ -102,4 +103,3 @@ def cloudfoundry_sso(code, redirect_uri=None) -> CloudFoundrySSO:
     access_token = data["access_token"]
     refresh_token = data["refresh_token"]
     return CloudFoundrySSO(access_token=access_token, refresh_token=refresh_token)
-

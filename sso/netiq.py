@@ -25,6 +25,7 @@ Required scopes for NetIQ OAuth
 - user.info
 """
 
+
 class NetIQSSO:
     def __init__(
         self,

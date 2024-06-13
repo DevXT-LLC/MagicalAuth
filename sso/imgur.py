@@ -1,5 +1,4 @@
 import base64
-import json
 import requests
 import logging
 from fastapi import HTTPException
@@ -83,16 +82,16 @@ class ImgurSSO:
             )
 
     def upload_image(self, image_path, title=None, description=None):
-        with open(image_path, 'rb') as image_file:
+        with open(image_path, "rb") as image_file:
             image_data = base64.b64encode(image_file.read()).decode()
         payload = {
-            'image': image_data,
-            'type': 'base64',
+            "image": image_data,
+            "type": "base64",
         }
         if title:
-            payload['title'] = title
+            payload["title"] = title
         if description:
-            payload['description'] = description
+            payload["description"] = description
         response = requests.post(
             "https://api.imgur.com/3/image",
             headers={

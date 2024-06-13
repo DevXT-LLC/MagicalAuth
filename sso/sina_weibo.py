@@ -1,8 +1,5 @@
-import base64
-import json
 import requests
 import logging
-from email.mime.text import MIMEText
 from fastapi import HTTPException
 from Globals import getenv
 
@@ -63,15 +60,17 @@ class WeiboSSO:
         try:
             uid_response = response.json()
             uid = uid_response["uid"]
-            
+
             uri_info = f"https://api.weibo.com/2/users/show.json?uid={uid}"
             response = requests.get(
                 uri_info,
                 params={"access_token": self.access_token},
             )
             data = response.json()
-            
-            email = data.get("email", None)  # Assuming you have permissions to email scope
+
+            email = data.get(
+                "email", None
+            )  # Assuming you have permissions to email scope
             first_name = data["name"]
             last_name = ""  # Weibo does not provide a separate field for last name
             return {
@@ -91,12 +90,12 @@ class WeiboSSO:
             "access_token": self.access_token,
             "status": status,
         }
-        
+
         response = requests.post(
             uri,
             data=data,
         )
-        
+
         if response.status_code == 401:
             self.access_token = self.get_new_token()
             data["access_token"] = self.access_token

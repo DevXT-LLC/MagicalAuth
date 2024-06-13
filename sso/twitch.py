@@ -1,4 +1,3 @@
-import json
 import requests
 import logging
 from fastapi import HTTPException
@@ -67,7 +66,7 @@ class TwitchSSO:
             return {
                 "email": email,
                 "first_name": first_name,
-                "last_name": '',  # Twitch API does not provide surname in user info
+                "last_name": "",  # Twitch API does not provide surname in user info
             }
         except Exception as e:
             raise HTTPException(

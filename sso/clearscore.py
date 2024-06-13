@@ -22,6 +22,7 @@ Assumed Required scopes for ClearScore OAuth and email capabilities:
 - email.send
 """
 
+
 class ClearScoreSSO:
     def __init__(
         self,

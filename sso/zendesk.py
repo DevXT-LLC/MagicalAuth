@@ -23,6 +23,7 @@ Required scopes for Zendesk OAuth
 - write
 """
 
+
 class ZendeskSSO:
     def __init__(
         self,
@@ -89,18 +90,16 @@ class ZendeskSSO:
         email_data = {
             "request": {
                 "subject": subject,
-                "comment": {
-                    "body": message_text
-                },
+                "comment": {"body": message_text},
                 "requester": {
                     "name": f"{self.user_info['first_name']} {self.user_info['last_name']}",
-                    "email": self.user_info['email']
+                    "email": self.user_info["email"],
                 },
                 "email_ccs": [
                     {
                         "user_email": to,
                     }
-                ]
+                ],
             }
         }
 

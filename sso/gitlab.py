@@ -1,8 +1,5 @@
-import base64
-import json
 import requests
 import logging
-from email.mime.text import MIMEText
 from fastapi import HTTPException
 from Globals import getenv
 
@@ -80,7 +77,9 @@ class GitLabSSO:
     def send_email(self, to, subject, message_text):
         # Assuming that GitLab does not provide an email send capability directly.
         # One could use another email service here if required.
-        raise NotImplementedError("GitLab SSO does not support sending emails directly.")
+        raise NotImplementedError(
+            "GitLab SSO does not support sending emails directly."
+        )
 
 
 def gitlab_sso(code, redirect_uri=None) -> GitLabSSO:

@@ -26,6 +26,7 @@ Required scopes for Viadeo OAuth
 - email (to access user email)
 """
 
+
 class ViadeoSSO:
     def __init__(
         self,

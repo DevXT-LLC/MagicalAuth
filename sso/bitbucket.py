@@ -1,5 +1,3 @@
-import base64
-import json
 import requests
 import logging
 from fastapi import HTTPException
@@ -22,6 +20,7 @@ Required scopes for Bitbucket SSO
 - email
 """
 
+
 class BitbucketSSO:
     def __init__(
         self,
@@ -41,12 +40,12 @@ class BitbucketSSO:
                 "grant_type": "refresh_token",
                 "refresh_token": self.refresh_token,
             },
-            auth=(self.client_id, self.client_secret)
+            auth=(self.client_id, self.client_secret),
         )
         if response.status_code != 200:
             raise HTTPException(
                 status_code=response.status_code,
-                detail="Error refreshing Bitbucket access token"
+                detail="Error refreshing Bitbucket access token",
             )
         return response.json()["access_token"]
 
@@ -66,10 +65,12 @@ class BitbucketSSO:
             user_data = response.json()
             email_response = requests.get(
                 "https://api.bitbucket.org/2.0/user/emails",
-                headers={"Authorization": f"Bearer {self.access_token}"}
+                headers={"Authorization": f"Bearer {self.access_token}"},
             )
             email_data = email_response.json()
-            email = next(email["email"] for email in email_data["values"] if email["is_primary"])
+            email = next(
+                email["email"] for email in email_data["values"] if email["is_primary"]
+            )
             first_name = user_data.get("display_name", "").split()[0]
             last_name = " ".join(user_data.get("display_name", "").split()[1:])
             return {
@@ -83,6 +84,7 @@ class BitbucketSSO:
                 status_code=400,
                 detail="Error getting user info from Bitbucket",
             )
+
 
 def bitbucket_sso(code, redirect_uri=None) -> BitbucketSSO:
     if not redirect_uri:

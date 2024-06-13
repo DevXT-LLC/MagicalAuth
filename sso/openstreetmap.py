@@ -1,4 +1,3 @@
-import json
 import requests
 import logging
 from fastapi import HTTPException
@@ -59,7 +58,7 @@ class OpenStreetMapSSO:
             )
         try:
             data = ET.fromstring(response.content)
-            user_info = data.find('user')
+            user_info = data.find("user")
             if user_info is None:
                 raise HTTPException(
                     status_code=400,

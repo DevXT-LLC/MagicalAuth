@@ -1,5 +1,3 @@
-import base64
-import json
 import requests
 import logging
 from fastapi import HTTPException
@@ -21,6 +19,7 @@ Required scopes for Instagram OAuth
 - user_profile
 - user_media
 """
+
 
 class InstagramSSO:
     def __init__(
@@ -44,8 +43,11 @@ class InstagramSSO:
         )
         if response.status_code != 200:
             logging.error(f"Error refreshing Instagram access token: {response.text}")
-            raise HTTPException(status_code=response.status_code, detail="Error refreshing Instagram access token")
-        
+            raise HTTPException(
+                status_code=response.status_code,
+                detail="Error refreshing Instagram access token",
+            )
+
         return response.json()["access_token"]
 
     def get_user_info(self):
@@ -75,6 +77,7 @@ class InstagramSSO:
             response = requests.post(uri)
         return response.json()
 
+
 def instagram_sso(code, redirect_uri=None) -> InstagramSSO:
     if not redirect_uri:
         redirect_uri = getenv("MAGIC_LINK_URL")
@@ -97,8 +100,11 @@ def instagram_sso(code, redirect_uri=None) -> InstagramSSO:
     )
     if response.status_code != 200:
         logging.error(f"Error getting Instagram access token: {response.text}")
-        raise HTTPException(status_code=response.status_code, detail="Error getting Instagram access token")
-    
+        raise HTTPException(
+            status_code=response.status_code,
+            detail="Error getting Instagram access token",
+        )
+
     data = response.json()
     access_token = data["access_token"]
     refresh_token = "Not applicable for Instagram"  # Instagram tokens last 60 days and refresh automatically every time a user interacts with the app

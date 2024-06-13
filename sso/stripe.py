@@ -1,5 +1,3 @@
-import base64
-import json
 import requests
 import logging
 from fastapi import HTTPException
@@ -15,6 +13,7 @@ Required scopes for Stripe SSO
 
 - read_write
 """
+
 
 class StripeSSO:
     def __init__(
@@ -68,6 +67,7 @@ class StripeSSO:
 
     def send_email(self, to, subject, message_text):
         raise NotImplementedError("Stripe does not support sending email directly.")
+
 
 def stripe_sso(code, redirect_uri=None) -> StripeSSO:
     if not redirect_uri:

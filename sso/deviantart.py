@@ -20,6 +20,7 @@ Required OAuth scopes for deviantART
 - send_message
 """
 
+
 class DeviantArtSSO:
     def __init__(
         self,
@@ -60,7 +61,9 @@ class DeviantArtSSO:
             data = response.json()
             first_name = data.get("username", "Unknown")
             last_name = ""
-            email = data.get("usericon", "Unknown")  # deviantART doesn't provide email, using user icon as unique identifier.
+            email = data.get(
+                "usericon", "Unknown"
+            )  # deviantART doesn't provide email, using user icon as unique identifier.
             return {
                 "email": email,
                 "first_name": first_name,

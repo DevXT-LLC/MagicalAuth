@@ -46,7 +46,7 @@ class YahooSSO:
                 "refresh_token": self.refresh_token,
                 "grant_type": "refresh_token",
             },
-            headers={"Content-Type": "application/x-www-form-urlencoded"}
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
         )
         return response.json()["access_token"]
 
@@ -88,9 +88,7 @@ class YahooSSO:
         message["subject"] = subject
         raw = base64.urlsafe_b64encode(message.as_bytes())
         raw = raw.decode()
-        email_data = {
-            "raw": raw
-        }
+        email_data = {"raw": raw}
         response = requests.post(
             "https://api.login.yahoo.com/ws/mail/v3/send",
             headers={
@@ -131,7 +129,7 @@ def yahoo_sso(code, redirect_uri=None) -> YahooSSO:
             "grant_type": "authorization_code",
             "redirect_uri": redirect_uri,
         },
-        headers={"Content-Type": "application/x-www-form-urlencoded"}
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
     if response.status_code != 200:
         logging.error(f"Error getting Yahoo access token: {response.text}")

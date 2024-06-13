@@ -1,8 +1,5 @@
-import base64
-import json
 import requests
 import logging
-from email.mime.text import MIMEText
 from fastapi import HTTPException
 from Globals import getenv
 
@@ -24,6 +21,7 @@ Required scopes for LinkedIn OAuth
 - w_member_social
 """
 
+
 class LinkedInSSO:
     def __init__(
         self,
@@ -35,7 +33,7 @@ class LinkedInSSO:
         self.client_id = getenv("LINKEDIN_CLIENT_ID")
         self.client_secret = getenv("LINKEDIN_CLIENT_SECRET")
         self.user_info = self.get_user_info()
-    
+
     def get_new_token(self):
         response = requests.post(
             "https://www.linkedin.com/oauth/v2/accessToken",
@@ -52,17 +50,17 @@ class LinkedInSSO:
     def get_user_info(self):
         profile_url = "https://api.linkedin.com/v2/me"
         email_url = "https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))"
-        
+
         profile_response = requests.get(
             profile_url,
             headers={"Authorization": f"Bearer {self.access_token}"},
         )
-        
+
         email_response = requests.get(
             email_url,
             headers={"Authorization": f"Bearer {self.access_token}"},
         )
-        
+
         if profile_response.status_code == 401 or email_response.status_code == 401:
             self.access_token = self.get_new_token()
             profile_response = requests.get(
@@ -95,6 +93,7 @@ class LinkedInSSO:
         # LinkedIn API does not support sending emails directly
         raise NotImplementedError("LinkedIn API does not support sending emails")
 
+
 def linkedin_sso(code, redirect_uri=None) -> LinkedInSSO:
     if not redirect_uri:
         redirect_uri = getenv("MAGIC_LINK_URL")
@@ -114,7 +113,7 @@ def linkedin_sso(code, redirect_uri=None) -> LinkedInSSO:
             "client_id": getenv("LINKEDIN_CLIENT_ID"),
             "client_secret": getenv("LINKEDIN_CLIENT_SECRET"),
         },
-        headers={"Content-Type": "application/x-www-form-urlencoded"}
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
     if response.status_code != 200:
         logging.error(f"Error getting LinkedIn access token: {response.text}")

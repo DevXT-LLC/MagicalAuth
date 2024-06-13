@@ -1,4 +1,3 @@
-import base64
 import json
 import requests
 import logging
@@ -62,7 +61,7 @@ class StravaSSO:
             data = response.json()
             first_name = data["firstname"]
             last_name = data["lastname"]
-            email = data.get("email") # Strava API doesn't return email by default
+            email = data.get("email")  # Strava API doesn't return email by default
             return {
                 "first_name": first_name,
                 "last_name": last_name,
@@ -74,9 +73,11 @@ class StravaSSO:
                 detail="Error getting user info from Strava",
             )
 
-    def create_activity(self, name, activity_type, start_date, elapsed_time, description=None):
+    def create_activity(
+        self, name, activity_type, start_date, elapsed_time, description=None
+    ):
         """Create an activity on Strava.
-        
+
         :param name: The name of the activity.
         :param activity_type: Type of activity (e.g., "Run", "Ride").
         :param start_date: ISO 8601 formatted date-time when the activity took place.
@@ -93,10 +94,10 @@ class StravaSSO:
             "start_date_local": start_date,
             "elapsed_time": elapsed_time,
         }
-        
+
         if description:
             activity_data["description"] = description
-            
+
         response = requests.post(
             "https://www.strava.com/api/v3/activities",
             headers={

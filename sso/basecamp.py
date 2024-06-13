@@ -1,9 +1,6 @@
-import base64
-import json
 import requests
 import logging
 from fastapi import HTTPException
-from email.mime.text import MIMEText
 from Globals import getenv
 
 """
@@ -26,12 +23,7 @@ Follow the links to ensure you have the APIs enabled and add the
 
 
 class BasecampSSO:
-    def __init__(
-        self,
-        access_token=None,
-        refresh_token=None,
-        account_id=None
-    ):
+    def __init__(self, access_token=None, refresh_token=None, account_id=None):
         self.access_token = access_token
         self.refresh_token = refresh_token
         self.client_id = getenv("BASECAMP_CLIENT_ID")
@@ -110,5 +102,6 @@ def basecamp_sso(code, redirect_uri=None) -> BasecampSSO:
     access_token = data["access_token"]
     refresh_token = data["refresh_token"]
     account_id = data["accounts"][0]["id"]
-    return BasecampSSO(access_token=access_token, refresh_token=refresh_token, account_id=account_id)
-
+    return BasecampSSO(
+        access_token=access_token, refresh_token=refresh_token, account_id=account_id
+    )

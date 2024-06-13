@@ -1,8 +1,5 @@
-import base64
-import json
 import requests
 import logging
-from email.mime.text import MIMEText
 from fastapi import HTTPException
 from Globals import getenv
 
@@ -102,9 +99,7 @@ def xero_sso(code, redirect_uri=None) -> XeroSSO:
             "grant_type": "authorization_code",
             "redirect_uri": redirect_uri,
         },
-        headers={
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
     if response.status_code != 200:
         logging.error(f"Error getting Xero access token: {response.text}")

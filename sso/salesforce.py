@@ -1,8 +1,5 @@
-import base64
-import json
 import requests
 import logging
-from email.mime.text import MIMEText
 from fastapi import HTTPException
 from Globals import getenv
 
@@ -23,6 +20,7 @@ Required scopes for Salesforce OAuth
 - full
 - email
 """
+
 
 class SalesforceSSO:
     def __init__(
@@ -81,7 +79,10 @@ class SalesforceSSO:
     def send_email(self, to, subject, message_text):
         # Salesforce does not have a direct email sending API in the same way Google and Microsoft do.
         # This will need to be implemented according to the specific Salesforce instance and setup.
-        raise NotImplementedError("Send email functionality is dependent on the Salesforce instance configuration.")
+        raise NotImplementedError(
+            "Send email functionality is dependent on the Salesforce instance configuration."
+        )
+
 
 def salesforce_sso(code, redirect_uri=None) -> SalesforceSSO:
     if not redirect_uri:
@@ -110,4 +111,8 @@ def salesforce_sso(code, redirect_uri=None) -> SalesforceSSO:
     access_token = data["access_token"]
     refresh_token = data["refresh_token"]
     instance_url = data["instance_url"]
-    return SalesforceSSO(access_token=access_token, refresh_token=refresh_token, instance_url=instance_url)
+    return SalesforceSSO(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        instance_url=instance_url,
+    )

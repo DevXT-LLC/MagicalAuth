@@ -1,5 +1,3 @@
-import base64
-import json
 import requests
 import logging
 from fastapi import HTTPException
@@ -19,6 +17,7 @@ Required scopes for Yelp OAuth
 
 - business 
 """
+
 
 class YelpSSO:
     def __init__(self, access_token=None, refresh_token=None):
@@ -41,7 +40,10 @@ class YelpSSO:
         response_data = response.json()
         if response.status_code != 200:
             logging.error(f"Error refreshing Yelp access token: {response_data}")
-            raise HTTPException(status_code=response.status_code, detail="Error refreshing Yelp access token.")
+            raise HTTPException(
+                status_code=response.status_code,
+                detail="Error refreshing Yelp access token.",
+            )
         return response_data["access_token"]
 
     def get_user_info(self):
@@ -98,7 +100,9 @@ def yelp_sso(code, redirect_uri=None) -> YelpSSO:
     )
     if response.status_code != 200:
         logging.error(f"Error getting Yelp access token: {response.text}")
-        raise HTTPException(status_code=response.status_code, detail="Error getting Yelp access token.")
+        raise HTTPException(
+            status_code=response.status_code, detail="Error getting Yelp access token."
+        )
     data = response.json()
     access_token = data["access_token"]
     refresh_token = data["refresh_token"]

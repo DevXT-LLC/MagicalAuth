@@ -1,8 +1,5 @@
-import base64
-import json
 import requests
 import logging
-from email.mime.text import MIMEText
 from fastapi import HTTPException
 from Globals import getenv
 
@@ -22,6 +19,7 @@ Required scopes for Apple SSO
 - name
 - email
 """
+
 
 class AppleSSO:
     def __init__(
@@ -53,8 +51,8 @@ class AppleSSO:
         try:
             # Placeholder: Requires custom logic to handle user info retrieval from the initial login response.
             # Capture name and email from initial response or authenticate/authorize endpoint.
-            first_name = "First"   # replace with actual logic
-            last_name = "Last"     # replace with actual logic
+            first_name = "First"  # replace with actual logic
+            last_name = "Last"  # replace with actual logic
             email = "email@example.com"  # replace with actual logic
             return {
                 "email": email,
@@ -70,7 +68,9 @@ class AppleSSO:
     def send_email(self, to, subject, message_text):
         # Note: Apple does not provide an email sending service in their APIs.
         # Placeholder: Functionality should be implemented using SMTP or another email service.
-        raise NotImplementedError("Apple OAuth does not support sending emails directly via API")
+        raise NotImplementedError(
+            "Apple OAuth does not support sending emails directly via API"
+        )
 
 
 def apple_sso(code, redirect_uri=None) -> AppleSSO:

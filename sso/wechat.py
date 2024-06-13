@@ -1,4 +1,3 @@
-import json
 import requests
 import logging
 from fastapi import HTTPException
@@ -14,6 +13,7 @@ Required scopes for WeChat SSO:
 
 - snsapi_userinfo
 """
+
 
 class WeChatSSO:
     def __init__(
@@ -73,6 +73,7 @@ class WeChatSSO:
                 status_code=400,
                 detail="Error getting user info from WeChat",
             )
+
 
 def wechat_sso(code, redirect_uri=None) -> WeChatSSO:
     if not redirect_uri:

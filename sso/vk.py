@@ -1,4 +1,3 @@
-import json
 import requests
 import logging
 from fastapi import HTTPException
@@ -85,4 +84,3 @@ def vk_sso(code, redirect_uri=None) -> VKSSO:
     user_id = data["user_id"]
     email = data.get("email", "Not provided")
     return VKSSO(access_token=access_token, user_id=user_id, email=email)
-

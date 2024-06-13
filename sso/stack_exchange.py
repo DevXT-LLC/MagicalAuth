@@ -1,4 +1,3 @@
-import json
 import requests
 import logging
 from fastapi import HTTPException
@@ -22,6 +21,7 @@ Required scopes for Stack Exchange OAuth
 - private_info
 - write_access
 """
+
 
 class StackExchangeSSO:
     def __init__(
@@ -55,8 +55,8 @@ class StackExchangeSSO:
             params={
                 "access_token": self.access_token,
                 "key": self.key,
-                "site": "stackoverflow"
-            }
+                "site": "stackoverflow",
+            },
         )
         if response.status_code == 401:
             self.access_token = self.get_new_token()
@@ -65,13 +65,15 @@ class StackExchangeSSO:
                 params={
                     "access_token": self.access_token,
                     "key": self.key,
-                    "site": "stackoverflow"
-                }
+                    "site": "stackoverflow",
+                },
             )
         try:
             data = response.json()["items"][0]
             display_name = data["display_name"]
-            email = data["email"]  # Note: Stack Exchange does not provide email directly
+            email = data[
+                "email"
+            ]  # Note: Stack Exchange does not provide email directly
             return {
                 "display_name": display_name,
                 "email": email,
@@ -81,6 +83,7 @@ class StackExchangeSSO:
                 status_code=400,
                 detail="Error getting user info from Stack Exchange",
             )
+
 
 def stackexchange_sso(code, redirect_uri=None) -> StackExchangeSSO:
     if not redirect_uri:

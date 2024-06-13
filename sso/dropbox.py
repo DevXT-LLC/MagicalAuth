@@ -1,4 +1,3 @@
-import base64
 import json
 import requests
 import logging
@@ -105,8 +104,7 @@ class DropboxSSO:
                 data=json.dumps(data),
             )
         if response.status_code != 200:
-            logging.error(
-                f"Error listing files from Dropbox: {response.text}")
+            logging.error(f"Error listing files from Dropbox: {response.text}")
             raise HTTPException(
                 status_code=response.status_code,
                 detail="Error listing files from Dropbox",

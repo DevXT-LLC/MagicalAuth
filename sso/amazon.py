@@ -21,6 +21,7 @@ Required scopes for AWS OAuth
 - profile
 """
 
+
 class AmazonSSO:
     def __init__(
         self,

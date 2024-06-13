@@ -89,13 +89,9 @@ class WSO2SSO:
         message["subject"] = subject
         raw = base64.urlsafe_b64encode(message.as_bytes())
         raw = raw.decode()
-        email_data = {
-            "subject": subject,
-            "body": message_text,
-            "recipient": to
-        }
+        email_data = {"subject": subject, "body": message_text, "recipient": to}
         response = requests.post(
-            "https://<your-wso2-server>/email/send", # Assuming WSO2 has a custom email sending endpoint
+            "https://<your-wso2-server>/email/send",  # Assuming WSO2 has a custom email sending endpoint
             headers={
                 "Authorization": f"Bearer {self.access_token}",
                 "Content-Type": "application/json",

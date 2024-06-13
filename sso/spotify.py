@@ -1,5 +1,4 @@
 import base64
-import json
 import requests
 import logging
 from email.mime.text import MIMEText
@@ -107,9 +106,7 @@ def spotify_sso(code, redirect_uri=None) -> SpotifySSO:
             "grant_type": "authorization_code",
             "redirect_uri": redirect_uri,
         },
-        headers={
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
     if response.status_code != 200:
         logging.error(f"Error getting Spotify access token: {response.text}")

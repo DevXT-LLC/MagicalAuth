@@ -25,6 +25,7 @@ Required scopes for XING SSO
 - https://api.xing.com/v1/authorize
 """
 
+
 class XingSSO:
     def __init__(
         self,
@@ -62,7 +63,7 @@ class XingSSO:
             )
         try:
             data = response.json()
-            user_profile = data['users'][0]
+            user_profile = data["users"][0]
             first_name = user_profile["first_name"]
             last_name = user_profile["last_name"]
             email = user_profile["active_email"]
@@ -123,6 +124,7 @@ class XingSSO:
                 data=json.dumps(email_data),
             )
         return response.json()
+
 
 def xing_sso(code, redirect_uri=None) -> XingSSO:
     if not redirect_uri:

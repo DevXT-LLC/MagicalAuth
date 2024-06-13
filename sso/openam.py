@@ -1,8 +1,5 @@
-import base64
-import json
 import requests
 import logging
-from email.mime.text import MIMEText
 from fastapi import HTTPException
 from Globals import getenv
 
@@ -74,7 +71,10 @@ class OpenAMSSO:
             )
 
     def send_email(self, to, subject, message_text):
-        raise NotImplementedError("OpenAM SSO does not support sending emails by default")
+        raise NotImplementedError(
+            "OpenAM SSO does not support sending emails by default"
+        )
+
 
 def openam_sso(code, redirect_uri=None) -> OpenAMSSO:
     if not redirect_uri:
