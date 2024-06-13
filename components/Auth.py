@@ -57,7 +57,7 @@ def google_sso_button():
             st.query_params["prompt"] = ""
     # Get cookie of "code", if it exists
     code = get_cookie("code", "get_code_cookie")
-    if code != "":
+    if code != "" and code is not None:
         response = requests.post(
             f"{auth_uri}/v1/oauth2/google",
             json={
