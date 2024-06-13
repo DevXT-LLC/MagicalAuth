@@ -47,6 +47,14 @@ def google_sso_button():
         st.session_state["oauth2_token_requested"] = False
         st.session_state["oauth2_token_completed"] = False
 
+    st.write(f"Code received: {code}")  # Debug message
+    st.write(
+        f"Requested: {st.session_state['oauth2_token_requested']}"
+    )  # Debug message
+    st.write(
+        f"Completed: {st.session_state['oauth2_token_completed']}"
+    )  # Debug message
+
     if code == "" and "token" not in st.query_params:
         scopes = urllib.parse.quote(
             "https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
@@ -63,14 +71,6 @@ def google_sso_button():
                 )
     else:
         if code != "":
-            st.write(f"Code received: {code}")  # Debug message
-            st.write(
-                f"Requested: {st.session_state['oauth2_token_requested']}"
-            )  # Debug message
-            st.write(
-                f"Completed: {st.session_state['oauth2_token_completed']}"
-            )  # Debug message
-
             if (
                 not st.session_state["oauth2_token_requested"]
                 and not st.session_state["oauth2_token_completed"]
@@ -84,9 +84,6 @@ def google_sso_button():
                         "referrer": magic_link_uri,
                     },
                 )
-                st.session_state["oauth2_token_requested"] = (
-                    False  # Reset requested state after response
-                )
 
                 if response.status_code == 200:
                     data = response.json()
@@ -94,8 +91,10 @@ def google_sso_button():
                         set_cookie("email", data["email"], 1)
                         set_cookie("token", data["token"], 1)
                         st.session_state["oauth2_token_completed"] = True
-                        st.experimental_rerun()  # Rerun to apply the state change and redirect
+                        st.session_state["oauth2_token_requested"] = False
+                        st.rerun()  # Rerun to apply the state change and redirect
                 else:
+                    st.session_state["oauth2_token_requested"] = False
                     st.error(response.json()["detail"])
                     st.stop()
             elif st.session_state["oauth2_token_completed"]:
