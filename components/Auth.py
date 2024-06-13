@@ -9,9 +9,6 @@ import streamlit as st
 from streamlit_js_eval import get_cookie, set_cookie
 from Globals import getenv
 import urllib.parse
-import threading
-
-lock = threading.Lock()
 
 logging.basicConfig(
     level=getenv("LOG_LEVEL"),
@@ -44,36 +41,19 @@ def google_sso_button():
     if code == "None" or code is None:
         code = ""
 
-    # Use cookies to persist state
-    oauth2_token_requested = get_cookie(
-        "oauth2_token_requested", "getCookie_oauth2_token_requested"
-    )
-    oauth2_token_completed = get_cookie(
-        "oauth2_token_completed", "getCookie_oauth2_token_completed"
-    )
-    oauth2_redirect_url = get_cookie(
-        "oauth2_redirect_url", "getCookie_oauth2_redirect_url"
-    )
-
-    if oauth2_token_requested is None:
-        oauth2_token_requested = "False"
-        set_cookie(
-            "oauth2_token_requested", "False", 1, "setCookie_oauth2_token_requested"
-        )
-
-    if oauth2_token_completed is None:
-        oauth2_token_completed = "False"
-        set_cookie(
-            "oauth2_token_completed", "False", 1, "setCookie_oauth2_token_completed"
-        )
-
-    if oauth2_redirect_url is None:
-        oauth2_redirect_url = ""
-        set_cookie("oauth2_redirect_url", "", 1, "setCookie_oauth2_redirect_url")
+    # Initialize session states if not already present
+    if "oauth2_token_requested" not in st.session_state:
+        st.session_state["oauth2_token_requested"] = False
+        st.session_state["oauth2_token_completed"] = False
+        st.session_state["oauth2_redirect_url"] = ""
 
     st.write(f"Code received: {code}")  # Debug message
-    st.write(f"Requested (cookie): {oauth2_token_requested}")  # Debug message
-    st.write(f"Completed (cookie): {oauth2_token_completed}")  # Debug message
+    st.write(
+        f"Requested: {st.session_state['oauth2_token_requested']}"
+    )  # Debug message
+    st.write(
+        f"Completed: {st.session_state['oauth2_token_completed']}"
+    )  # Debug message
 
     if code == "" and "token" not in st.query_params:
         scopes = urllib.parse.quote(
@@ -90,84 +70,44 @@ def google_sso_button():
                     unsafe_allow_html=True,
                 )
     else:
-        if code != "" and oauth2_token_requested == "False":
-            with lock:
-                if (
-                    get_cookie(
-                        "oauth2_token_requested",
-                        "getCookie_oauth2_token_requested_check",
-                    )
-                    == "False"
-                ):
-                    set_cookie(
-                        "oauth2_token_requested",
-                        "True",
-                        1,
-                        "setCookie_oauth2_token_requested_update",
-                    )
-                    st.write("Making request to backend...")  # Debug message
-                    response = requests.post(
-                        f"{auth_uri}/v1/oauth2/google",
-                        json={
-                            "code": code,
-                            "referrer": magic_link_uri,
-                        },
-                    )
+        if code != "" and not st.session_state["oauth2_token_requested"]:
+            st.session_state["oauth2_token_requested"] = True
+            st.write("Making request to backend...")  # Debug message
+            response = requests.post(
+                f"{auth_uri}/v1/oauth2/google",
+                json={
+                    "code": code,
+                    "referrer": magic_link_uri,
+                },
+            )
 
+            st.write(f"Response status: {response.status_code}")  # Debug message
+            st.write(f"Response content: {response.json()}")  # Debug message
+
+            if response.status_code == 200:
+                data = response.json()
+                if "detail" in data:
+                    new_uri = data["detail"]
+                    st.write(f"Redirecting to: {new_uri}")  # Debug message
+                    st.session_state["oauth2_redirect_url"] = new_uri
+                    st.session_state["oauth2_token_completed"] = True
+                    st.session_state["oauth2_token_requested"] = False
+                    # Use JavaScript to redirect immediately
                     st.write(
-                        f"Response status: {response.status_code}"
-                    )  # Debug message
-                    st.write(f"Response content: {response.json()}")  # Debug message
-
-                    if response.status_code == 200:
-                        data = response.json()
-                        if "detail" in data:
-                            new_uri = data["detail"]
-                            st.write(f"Redirecting to: {new_uri}")  # Debug message
-                            set_cookie(
-                                "oauth2_redirect_url",
-                                new_uri,
-                                1,
-                                "setCookie_oauth2_redirect_url_update",
-                            )
-                            set_cookie(
-                                "oauth2_token_completed",
-                                "True",
-                                1,
-                                "setCookie_oauth2_token_completed_update",
-                            )
-                            set_cookie(
-                                "oauth2_token_requested",
-                                "False",
-                                1,
-                                "setCookie_oauth2_token_requested_reset",
-                            )
-                            # Use JavaScript to redirect immediately
-                            st.write(
-                                f'<script>window.location.href = "{new_uri}";</script>',
-                                unsafe_allow_html=True,
-                            )
-                            st.stop()
-                        else:
-                            set_cookie(
-                                "oauth2_token_requested",
-                                "False",
-                                1,
-                                "setCookie_oauth2_token_requested_error",
-                            )
-                            st.error("Unexpected response structure from backend.")
-                            st.stop()
-                    else:
-                        set_cookie(
-                            "oauth2_token_requested",
-                            "False",
-                            1,
-                            "setCookie_oauth2_token_requested_error_400",
-                        )
-                        st.error(response.json()["detail"])
-                        st.stop()
-        elif oauth2_token_completed == "True":
-            new_uri = oauth2_redirect_url
+                        f'<script>window.location.href = "{new_uri}";</script>',
+                        unsafe_allow_html=True,
+                    )
+                    st.stop()
+                else:
+                    st.session_state["oauth2_token_requested"] = False
+                    st.error("Unexpected response structure from backend.")
+                    st.stop()
+            else:
+                st.session_state["oauth2_token_requested"] = False
+                st.error(response.json()["detail"])
+                st.stop()
+        elif st.session_state["oauth2_token_completed"]:
+            new_uri = st.session_state["oauth2_redirect_url"]
             st.write(f"Redirecting to stored URL: {new_uri}")  # Debug message
             st.write(
                 f'<script>window.location.href = "{new_uri}";</script>',
