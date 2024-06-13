@@ -69,7 +69,7 @@ def microsoft_sso_button():
         code = ""
     if code == "" and "token" not in st.query_params:
         scopes = urllib.parse.quote(
-            "https://graph.microsoft.com/User.Read https://graph.microsoft.com/Mail.Send"
+            "https://graph.microsoft.com/User.Read https://graph.microsoft.com/Mail.Send https://graph.microsoft.com/Calendars.ReadWrite.Shared"
         )
         magic_link_uri = getenv("MAGIC_LINK_URL")
         if magic_link_uri.endswith("/"):

@@ -143,7 +143,7 @@ def microsoft_sso(code, redirect_uri=None) -> MicrosoftSSO:
             "code": code,
             "grant_type": "authorization_code",
             "redirect_uri": redirect_uri,
-            "scope": "https://graph.microsoft.com/User.Read https://graph.microsoft.com/Mail.Send",
+            "scope": "https://graph.microsoft.com/User.Read https://graph.microsoft.com/Mail.Send https://graph.microsoft.com/Calendars.ReadWrite.Shared",
         },
     )
     if response.status_code != 200:
@@ -151,5 +151,5 @@ def microsoft_sso(code, redirect_uri=None) -> MicrosoftSSO:
         return None, None
     data = response.json()
     access_token = data["access_token"]
-    refresh_token = data["refresh_token"]
+    refresh_token = data["refresh_token"] if "refresh_token" in data else "Not provided"
     return MicrosoftSSO(access_token=access_token, refresh_token=refresh_token)
