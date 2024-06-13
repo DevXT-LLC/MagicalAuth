@@ -80,11 +80,7 @@ def google_sso_button():
                         set_cookie("token", data["token"], 1)
                         st.session_state["oauth2_token_completed"] = True
                         st.session_state["oauth2_token_requested"] = False
-                        st.markdown(
-                            f'<meta http-equiv="refresh" content="0;URL={magic_link_uri}?email={data["email"]}&token={data["token"]}">',
-                            unsafe_allow_html=True,
-                        )
-                        st.stop()  # Stop execution after redirection
+                        st.rerun()  # Rerun to update the state and redirect
                 else:
                     st.session_state["oauth2_token_requested"] = False
                     st.error(response.json()["detail"])
