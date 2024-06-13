@@ -36,7 +36,7 @@ def google_sso_button():
         code = str(code[0])
     else:
         code = str(code)
-    if code == "None":
+    if code == "None" or code == None:
         code = ""
     if code == "" and "token" not in st.query_params:
         scopes = urllib.parse.quote(
@@ -46,10 +46,12 @@ def google_sso_button():
         client_id = urllib.parse.quote(client_id)
         google_sso_uri = f"https://accounts.google.com/o/oauth2/auth?client_id={client_id}&redirect_uri={magic_link_uri}&scope={scopes}&response_type=code&access_type=offline&prompt=consent"
         # Link to google sso
-        st.markdown(
-            f'<a href="{google_sso_uri}" target="_blank">Sign in with Google</a>',
-            unsafe_allow_html=True,
-        )
+        with st.form("google_sso_form"):
+            if st.form_submit_button("Sign in with Google", use_container_width=True):
+                st.markdown(
+                    f'<meta http-equiv="refresh" content="0;URL={google_sso_uri}">',
+                    unsafe_allow_html=True,
+                )
     else:
         if code != "":
             response = requests.post(
