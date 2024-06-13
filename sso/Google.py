@@ -93,15 +93,21 @@ class GoogleSSO:
                 uri,
                 headers={"Authorization": f"Bearer {self.access_token}"},
             )
-        data = response.json()
-        first_name = data["names"][0]["givenName"]
-        last_name = data["names"][0]["familyName"]
-        email = data["emailAddresses"][0]["value"]
-        return {
-            "email": email,
-            "first_name": first_name,
-            "last_name": last_name,
-        }
+        try:
+            data = response.json()
+            first_name = data["names"][0]["givenName"]
+            last_name = data["names"][0]["familyName"]
+            email = data["emailAddresses"][0]["value"]
+            return {
+                "email": email,
+                "first_name": first_name,
+                "last_name": last_name,
+            }
+        except:
+            raise HTTPException(
+                status_code=400,
+                detail="Error getting user info from Google",
+            )
 
     def send_email(self, to, subject, message_text):
         if not self.email_address:
