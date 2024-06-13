@@ -97,10 +97,11 @@ def get_user():
             and st.query_params["token"] != "None"
         ):
             set_cookie("token", st.query_params["token"], 1)
-            token = str(st.query_params["token"])
+            st.session_state["token"] = str(st.query_params["token"])
             st.query_params["token"] = ""
     else:
-        token = get_cookie("token")
+        st.session_state["token"] = get_cookie("token")
+    token = st.session_state["token"] if "token" in st.session_state else ""
     if token != "" and token is not None and token != "None":
         user_request = requests.get(
             f"{auth_uri}/v1/user",
