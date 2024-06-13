@@ -69,7 +69,6 @@ def google_sso_button():
                     if details.startswith("http"):
                         token = details.split("token=")[1]
                         st.query_params["token"] = token
-                        st.rerun()
                     else:
                         st.error(details)
                         logging.error(f"Error with Google SSO: {details}")
