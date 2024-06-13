@@ -87,6 +87,11 @@ def google_sso_button():
                         },
                     )
 
+                    st.write(
+                        f"Response status: {response.status_code}"
+                    )  # Debug message
+                    st.write(f"Response content: {response.json()}")  # Debug message
+
                     if response.status_code == 200:
                         data = response.json()
                         if "detail" in data:
