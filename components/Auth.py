@@ -37,12 +37,12 @@ def google_sso_button():
     if "code" not in st.query_params:
         result = st.button("Sign in with Google", key="google_sso_button")
         if result:
-            authorize_endpoint = "https://accounts.google.com/o/oauth2/auth"
-            scopes = "https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
-            scopes = urllib.parse.quote(scopes)
+            scopes = urllib.parse.quote(
+                "https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
+            )
             magic_link_uri = urllib.parse.quote(magic_link_uri)
             client_id = urllib.parse.quote(client_id)
-            new_uri = f"{authorize_endpoint}?client_id={client_id}&redirect_uri={magic_link_uri}&scope={scopes}&response_type=code&access_type=offline&prompt=consent"
+            new_uri = f"https://accounts.google.com/o/oauth2/auth?client_id={client_id}&redirect_uri={magic_link_uri}&scope={scopes}&response_type=code&access_type=offline&prompt=consent"
             # Redirect to Google SSO
             st.markdown(
                 f'<meta http-equiv="refresh" content="0;URL={new_uri}">',
@@ -69,7 +69,12 @@ def google_sso_button():
                     token = details.split("?token=")[1]
                     set_cookie("token", token, 1, "google_sso_token")
                     # Redirect to the login link
-                    st.experimental_rerun()
+                    time.sleep(0.2)
+                    st.markdown(
+                        f'<meta http-equiv="refresh" content="0;URL={details}">',
+                        unsafe_allow_html=True,
+                    )
+                    st.stop()
                 else:
                     st.error(details)
                     logging.error(f"Error with Google SSO: {details}")
