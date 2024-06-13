@@ -45,10 +45,13 @@ def google_sso_button():
             unsafe_allow_html=True,
         )
     if "code" in st.query_params:
+        code = st.query_params["code"]
+        # Clear code from URL
+        st.query_params["code"] = ""
         response = requests.post(
             f"{auth_uri}/v1/oauth2/google",
             json={
-                "code": st.query_params["code"],
+                "code": code,
                 "referrer": magic_link_uri,
             },
         )
