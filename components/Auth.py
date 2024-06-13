@@ -31,10 +31,12 @@ def google_sso_button():
     magic_link_uri = getenv("MAGIC_LINK_URL")
     if magic_link_uri.endswith("/"):
         magic_link_uri = magic_link_uri[:-1]
-    if "code" in st.query_params:
-        if st.query_params["code"] == "":
-            del st.query_params["code"]
-    if "code" not in st.query_params and "magic_link" not in st.session_state:
+    code = st.query_params["code"] if "code" in st.query_params else ""
+    if isinstance(st.query_params["code"], list):
+        code = str(st.query_params["code"][0])
+    else:
+        code = str(st.query_params["code"])
+    if code == "" and "token" not in st.query_params:
         result = st.button("Sign in with Google", key="google_sso_button")
         if result:
             scopes = urllib.parse.quote(
@@ -49,43 +51,17 @@ def google_sso_button():
                 unsafe_allow_html=True,
             )
             st.stop()
-    if "code" in st.query_params and "magic_link" not in st.session_state:
-        if st.query_params["code"] != "" and st.query_params["code"] is not None:
-            if isinstance(st.query_params["code"], list):
-                code = str(st.query_params["code"][0])
-            else:
-                code = str(st.query_params["code"])
-            if code != "":
-                response = requests.post(
-                    f"{auth_uri}/v1/oauth2/google",
-                    json={
-                        "code": code,
-                        "referrer": magic_link_uri,
-                    },
-                )
-                st.session_state["magic_link"] = response.json()["detail"]
-    if "magic_link" in st.session_state:
-        magic_link = str(st.session_state["magic_link"])
-        if magic_link.startswith("http"):
-            token = magic_link.split("token=")[1]
+    else:
+        response = requests.post(
+            f"{auth_uri}/v1/oauth2/google",
+            json={
+                "code": code,
+                "referrer": magic_link_uri,
+            },
+        )
+        if response.status_code == 200:
+            token = response.json()["detail"].split("token=")[1]
             st.query_params["token"] = token
-            user_request = requests.get(
-                f"{auth_uri}/v1/user",
-                headers={"Authorization": token},
-            )
-            if user_request.status_code == 200:
-                user = user_request.json()
-                set_cookie("email", user["email"], 1)
-                set_cookie("token", token, 1)
-                st.success("Login successful! Redirecting to the app...")
-                st.markdown(
-                    f'<meta http-equiv="refresh" content="2;URL=/">',
-                    unsafe_allow_html=True,
-                )
-        else:
-            st.error(magic_link)
-            logging.error(f"Error with Google SSO: {magic_link}")
-            st.stop()
 
 
 def get_user():
