@@ -2,9 +2,9 @@ from DB import User, FailedLogins, UserOAuth, OAuthProvider, get_session
 from Models import UserInfo, Register, Login
 from fastapi import Header, HTTPException
 from Globals import getenv
-from sso.Google import google_sso
-from sso.Microsoft import microsoft_sso
-from sso.GitHub import github_sso
+from sso.google import google_sso
+from sso.microsoft import microsoft_sso
+from sso.github import github_sso
 from datetime import datetime, timedelta
 from fastapi import HTTPException
 from sendgrid import SendGridAPIClient
