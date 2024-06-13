@@ -48,13 +48,7 @@ def google_sso_button():
     if "code" in st.query_params:
         if st.query_params["code"] != "":
             code = str(st.query_params["code"])
-            logging.info(f"Saving code: {code}")
-            st.query_params["code"] = ""
-            st.query_params["scope"] = ""
-            st.query_params["state"] = ""
-            st.query_params["authuser"] = ""
-            st.query_params["prompt"] = ""
-            logging.info(f"Referencing code: {code}")
+            logging.info(f"Setting code: {code}")
             response = requests.post(
                 f"{auth_uri}/v1/oauth2/google",
                 json={
@@ -64,9 +58,10 @@ def google_sso_button():
             )
             res = response.json()
             if "detail" in res:
-                details = res["detail"]
+                details = str(res["detail"])
                 logging.info(f"Google SSO Detail: {details}")
-                if str(details).startswith("http"):
+                if details.startswith("http"):
+                    logging.info(f"Redirecting to: {details}")
                     # Go to the login link
                     st.markdown(
                         f'<meta http-equiv="refresh" content="0;URL={details}">',
