@@ -44,47 +44,41 @@ def google_sso_button():
             f'<meta http-equiv="refresh" content="0;URL={new_uri}">',
             unsafe_allow_html=True,
         )
+        st.stop()
     if "code" in st.query_params:
         if st.query_params["code"] != "":
             code = str(st.query_params["code"])
             logging.info(f"Saving code: {code}")
-            # save the code in the cookie
-            set_cookie("code", code, 1, "set_code_cookie")
-            # Clear code from URL
             st.query_params["code"] = ""
             st.query_params["scope"] = ""
             st.query_params["state"] = ""
             st.query_params["authuser"] = ""
             st.query_params["prompt"] = ""
-            st.rerun()
-    # Get cookie of "code", if it exists
-    code = get_cookie("code", "get_code_cookie")
-    if code != "" and code is not None:
-        logging.info(f"Referencing code: {code}")
-        response = requests.post(
-            f"{auth_uri}/v1/oauth2/google",
-            json={
-                "code": code,
-                "referrer": magic_link_uri,
-            },
-        )
-        res = response.json()
-        if "detail" in res:
-            details = res["detail"]
-            logging.info(f"Google SSO Detail: {details}")
-            if str(details).startswith("http"):
-                set_cookie("code", "", 1, "clear_code_cookie")
-                # Go to the login link
-                st.markdown(
-                    f'<meta http-equiv="refresh" content="0;URL={details}">',
-                    unsafe_allow_html=True,
-                )
+            logging.info(f"Referencing code: {code}")
+            response = requests.post(
+                f"{auth_uri}/v1/oauth2/google",
+                json={
+                    "code": code,
+                    "referrer": magic_link_uri,
+                },
+            )
+            res = response.json()
+            if "detail" in res:
+                details = res["detail"]
+                logging.info(f"Google SSO Detail: {details}")
+                if str(details).startswith("http"):
+                    # Go to the login link
+                    st.markdown(
+                        f'<meta http-equiv="refresh" content="0;URL={details}">',
+                        unsafe_allow_html=True,
+                    )
+                    st.stop()
+                else:
+                    st.error(details)
+                    logging.error(f"Error with Google SSO: {details}")
             else:
-                st.error(details)
-                logging.error(f"Error with Google SSO: {details}")
-        else:
-            st.error(response.text)
-            logging.error(f"Error with Google SSO: {response.text}")
+                st.error(response.text)
+                logging.error(f"Error with Google SSO: {response.text}")
 
 
 def get_user():
