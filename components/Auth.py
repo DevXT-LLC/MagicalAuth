@@ -65,43 +65,37 @@ def google_sso_button():
                 not st.session_state["oauth2_token_requested"]
                 and not st.session_state["oauth2_token_completed"]
             ):
-                with lock:
-                    if (
-                        not st.session_state["oauth2_token_requested"]
-                        and not st.session_state["oauth2_token_completed"]
-                    ):
-                        st.session_state["oauth2_token_requested"] = True
-                        response = requests.post(
-                            f"{auth_uri}/v1/oauth2/google",
-                            json={
-                                "code": code,
-                                "referrer": magic_link_uri,
-                            },
+                st.session_state["oauth2_token_requested"] = True
+                response = requests.post(
+                    f"{auth_uri}/v1/oauth2/google",
+                    json={
+                        "code": code,
+                        "referrer": magic_link_uri,
+                    },
+                )
+                if response.status_code == 200:
+                    data = response.json()
+                    if "token" in data:
+                        set_cookie("email", data["email"], 1)
+                        set_cookie("token", data["token"], 1)
+                        st.session_state["oauth2_token_completed"] = True
+                        st.session_state["oauth2_token_requested"] = False
+                        st.markdown(
+                            f'<meta http-equiv="refresh" content="0;URL={magic_link_uri}?email={data["email"]}&token={data["token"]}">',
+                            unsafe_allow_html=True,
                         )
-                        if response.status_code == 200:
-                            data = response.json()
-                            if "token" in data:
-                                set_cookie("email", data["email"], 1)
-                                set_cookie("token", data["token"], 1)
-                                st.session_state["oauth2_token_completed"] = True
-                                st.markdown(
-                                    f'<meta http-equiv="refresh" content="0;URL={magic_link_uri}?email={data["email"]}&token={data["token"]}">',
-                                    unsafe_allow_html=True,
-                                )
-                                st.stop()  # Stop execution after redirection
-                        else:
-                            st.session_state["oauth2_token_requested"] = False
-                            st.error(response.json()["detail"])
-                            st.stop()
-            else:
-                if st.session_state["oauth2_token_completed"]:
-                    # If already completed, do the redirection
-                    st.markdown(
-                        f'<meta http-equiv="refresh" content="0;URL={magic_link_uri}?email={st.query_params["email"]}&token={st.query_params["token"]}">',
-                        unsafe_allow_html=True,
-                    )
+                        st.stop()  # Stop execution after redirection
                 else:
-                    st.error("OAuth2 token request already in progress. Please wait.")
+                    st.session_state["oauth2_token_requested"] = False
+                    st.error(response.json()["detail"])
+                    st.stop()
+            elif st.session_state["oauth2_token_completed"]:
+                st.markdown(
+                    f'<meta http-equiv="refresh" content="0;URL={magic_link_uri}?email={st.query_params.get("email", "")}&token={st.query_params.get("token", "")}">',
+                    unsafe_allow_html=True,
+                )
+            else:
+                st.error("OAuth2 token request already in progress. Please wait.")
         else:
             st.error("Invalid Google SSO code.")
     st.stop()
