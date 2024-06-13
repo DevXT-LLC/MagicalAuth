@@ -330,3 +330,10 @@ def sso_redirect(provider: str):
                 else:
                     st.error(data)
                     st.stop()
+    if "token" in st.query_params:
+        if (
+            st.query_params["token"] != ""
+            and st.query_params["token"] is not None
+            and st.query_params["token"] != "None"
+        ):
+            get_user()
