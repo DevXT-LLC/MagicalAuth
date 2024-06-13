@@ -78,7 +78,7 @@ def google_sso_button():
             if not st.session_state["oauth2_token_requested"]:
                 st.session_state["oauth2_token_requested"] = True
                 st.write("Making request to backend...")  # Debug message
-
+                time.sleep(1)
                 response = requests.post(
                     f"{auth_uri}/v1/oauth2/google",
                     json={
@@ -99,7 +99,7 @@ def google_sso_button():
                         st.session_state["oauth2_token_completed"] = True
                         st.session_state["oauth2_token_requested"] = False
                         st.write(
-                            f'<script>window.location.href = "{new_uri}";</script>',
+                            f'<meta http-equiv="refresh" content="0;URL={new_uri}">',
                             unsafe_allow_html=True,
                         )
                         st.stop()
@@ -115,7 +115,7 @@ def google_sso_button():
                 new_uri = st.session_state["oauth2_redirect_url"]
                 st.write(f"Redirecting to stored URL: {new_uri}")  # Debug message
                 st.write(
-                    f'<script>window.location.href = "{new_uri}";</script>',
+                    f'<meta http-equiv="refresh" content="0;URL={new_uri}">',
                     unsafe_allow_html=True,
                 )
                 st.stop()
