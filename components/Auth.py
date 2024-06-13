@@ -45,18 +45,24 @@ def google_sso_button():
             unsafe_allow_html=True,
         )
     if "code" in st.query_params:
-        code = st.query_params["code"]
-        # Clear code from URL
-        st.query_params["code"] = ""
-        st.query_params["scope"] = ""
-        st.query_params["state"] = ""
-        st.query_params["authuser"] = ""
-        st.query_params["prompt"] = ""
-        if code != "":
+        if st.query_params["code"] != "":
+            st.session_state["code"] = st.query_params["code"]
+            # save the code in the cookie
+            set_cookie("code", st.session_state["code"], 1, "set_code_cookie")
+            # Clear code from URL
+            st.query_params["code"] = ""
+            st.query_params["scope"] = ""
+            st.query_params["state"] = ""
+            st.query_params["authuser"] = ""
+            st.query_params["prompt"] = ""
+    # Get cookie of "code", if it exists
+    code = get_cookie("code", "get_code_cookie")
+    if code != "":
+        if st.session_state["code"] != "":
             response = requests.post(
                 f"{auth_uri}/v1/oauth2/google",
                 json={
-                    "code": code,
+                    "code": st.session_state["code"],
                     "referrer": magic_link_uri,
                 },
             )
@@ -65,11 +71,12 @@ def google_sso_button():
                 details = res["detail"]
                 logging.info(f"Google SSO: {details}")
                 if str(details).startswith("http"):
-                    # Token is in the url ?token= to end of url
-                    token = str(details).split("?token=")[1]
-                    set_cookie("token", token, 1, "google_sso_token")
-                    # Redirect to the login link
-                    st.rerun()
+                    set_cookie("code", "", 1, "clear_code_cookie")
+                    # Go to the login link
+                    st.markdown(
+                        f'<meta http-equiv="refresh" content="0;URL={details}">',
+                        unsafe_allow_html=True,
+                    )
                 else:
                     st.error(details)
                     logging.error(f"Error with Google SSO: {details}")
@@ -176,7 +183,6 @@ def get_user():
                             st.success(res)
                     else:
                         st.error(res)
-            st.divider()
             google_sso_button()
         else:
             with st.form("register_form"):
