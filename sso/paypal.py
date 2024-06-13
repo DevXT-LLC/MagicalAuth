@@ -23,6 +23,7 @@ Required scopes for PayPal OAuth:
 - openid
 """
 
+
 class PayPalSSO:
     def __init__(
         self,
@@ -36,7 +37,9 @@ class PayPalSSO:
         self.user_info = self.get_user_info()
 
     def get_new_token(self):
-        token = base64.b64encode(f"{self.client_id}:{self.client_secret}".encode()).decode()
+        token = base64.b64encode(
+            f"{self.client_id}:{self.client_secret}".encode()
+        ).decode()
         response = requests.post(
             "https://api.paypal.com/v1/oauth2/token",
             headers={
@@ -83,7 +86,7 @@ class PayPalSSO:
                 detail=f"Error getting user info from PayPal: {str(e)}",
             )
 
-    def send_payment(self, recipient_email, amount, currency='USD'):
+    def send_payment(self, recipient_email, amount, currency="USD"):
         """This is an extra method for sending payment in PayPal."""
         payment_data = {
             "sender_batch_header": {
@@ -127,10 +130,13 @@ class PayPalSSO:
 def paypal_sso(code, redirect_uri=None) -> PayPalSSO:
     if not redirect_uri:
         redirect_uri = getenv("MAGIC_LINK_URL")
+    token = base64.b64encode(
+        f"{getenv('PAYPAL_CLIENT_ID')}:{getenv('PAYPAL_CLIENT_SECRET')}".encode()
+    ).decode()
     response = requests.post(
         "https://api.paypal.com/v1/oauth2/token",
         headers={
-            "Authorization": f"Basic {base64.b64encode(f'{getenv('PAYPAL_CLIENT_ID')}:{getenv('PAYPAL_CLIENT_SECRET')}'.encode()).decode()}",
+            "Authorization": f"Basic {token}",
             "Content-Type": "application/x-www-form-urlencoded",
         },
         data={

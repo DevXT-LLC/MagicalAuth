@@ -42,7 +42,9 @@ class FitbitSSO:
         self.user_info = self.get_user_info()
 
     def get_new_token(self):
-        decoded_token = base64.b64encode(f"{self.client_id}:{self.client_secret}".encode()).decode()
+        decoded_token = base64.b64encode(
+            f"{self.client_id}:{self.client_secret}".encode()
+        ).decode()
         response = requests.post(
             "https://api.fitbit.com/oauth2/token",
             headers={
@@ -81,7 +83,9 @@ class FitbitSSO:
             data = response.json()
             first_name = data["user"]["firstName"]
             last_name = data["user"]["lastName"]
-            email = data["user"]["fullName"]  # Note: Fitbit may not provide email directly
+            email = data["user"][
+                "fullName"
+            ]  # Note: Fitbit may not provide email directly
             return {
                 "email": email,
                 "first_name": first_name,
@@ -114,13 +118,17 @@ class FitbitSSO:
             )
         return response.json()
 
+
 def fitbit_sso(code, redirect_uri=None) -> FitbitSSO:
     if not redirect_uri:
         redirect_uri = getenv("MAGIC_LINK_URL")
+    token = base64.b64encode(
+        f"{getenv('FITBIT_CLIENT_ID')}:{getenv('FITBIT_CLIENT_SECRET')}".encode()
+    ).decode()
     response = requests.post(
         "https://api.fitbit.com/oauth2/token",
         headers={
-            "Authorization": f"Basic {base64.b64encode(f'{getenv('FITBIT_CLIENT_ID')}:{getenv('FITBIT_CLIENT_SECRET')}'.encode()).decode()}",
+            "Authorization": f"Basic {token}",
             "Content-Type": "application/x-www-form-urlencoded",
         },
         data={
