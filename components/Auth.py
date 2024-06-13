@@ -48,6 +48,10 @@ def google_sso_button():
         code = st.query_params["code"]
         # Clear code from URL
         st.query_params["code"] = ""
+        st.query_params["scope"] = ""
+        st.query_params["state"] = ""
+        st.query_params["authuser"] = ""
+        st.query_params["prompt"] = ""
         response = requests.post(
             f"{auth_uri}/v1/oauth2/google",
             json={
