@@ -173,7 +173,7 @@ def get_user():
                 and google_token != "None"
             ):
                 st.query_params["token"] = google_token
-                return get_user()
+                st.rerun()
         else:
             with st.form("register_form"):
                 email = st.text_input("Email")
