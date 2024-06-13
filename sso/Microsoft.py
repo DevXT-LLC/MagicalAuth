@@ -137,12 +137,13 @@ def microsoft_sso(code, redirect_uri=None) -> MicrosoftSSO:
     )
     response = requests.post(
         f"https://login.microsoftonline.com/common/oauth2/v2.0/token",
-        params={
-            "code": code,
+        data={
             "client_id": getenv("MICROSOFT_CLIENT_ID"),
             "client_secret": getenv("MICROSOFT_CLIENT_SECRET"),
-            "redirect_uri": redirect_uri,
+            "code": code,
             "grant_type": "authorization_code",
+            "redirect_uri": redirect_uri,
+            "scope": "https://graph.microsoft.com/User.Read https://graph.microsoft.com/Mail.Send",
         },
     )
     if response.status_code != 200:
