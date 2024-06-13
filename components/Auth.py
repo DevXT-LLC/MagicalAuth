@@ -62,7 +62,7 @@ def google_sso_button():
             if response.status_code == 200:
                 url = response.json()["detail"]
                 token = url.split("token=")[1]
-                return token
+                st.session_state["token"] = token
 
 
 def get_user():
@@ -166,14 +166,7 @@ def get_user():
                             st.success(res)
                     else:
                         st.error(res)
-            google_token = google_sso_button()
-            if (
-                google_token != ""
-                and google_token is not None
-                and google_token != "None"
-            ):
-                st.query_params["token"] = google_token
-                st.rerun()
+            google_sso_button()
         else:
             with st.form("register_form"):
                 email = st.text_input("Email")
