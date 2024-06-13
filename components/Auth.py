@@ -31,23 +31,30 @@ def google_sso_button():
     magic_link_uri = getenv("MAGIC_LINK_URL")
     if magic_link_uri.endswith("/"):
         magic_link_uri = magic_link_uri[:-1]
-    authorize_endpoint = "https://accounts.google.com/o/oauth2/auth"
-    scopes = "https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
-    result = st.button("Sign in with Google", key="google_sso_button")
-    if result and "code" not in st.query_params:
-        scopes = urllib.parse.quote(scopes)
-        magic_link_uri = urllib.parse.quote(magic_link_uri)
-        client_id = urllib.parse.quote(client_id)
-        new_uri = f"{authorize_endpoint}?client_id={client_id}&redirect_uri={magic_link_uri}&scope={scopes}&response_type=code&access_type=offline&prompt=consent"
-        # Redirect to Google SSO
-        st.markdown(
-            f'<meta http-equiv="refresh" content="0;URL={new_uri}">',
-            unsafe_allow_html=True,
-        )
-        st.stop()
+    if "code" in st.query_params:
+        if st.query_params["code"] == "":
+            del st.query_params["code"]
+    if "code" not in st.query_params:
+        result = st.button("Sign in with Google", key="google_sso_button")
+        if result:
+            scopes = urllib.parse.quote(scopes)
+            magic_link_uri = urllib.parse.quote(magic_link_uri)
+            client_id = urllib.parse.quote(client_id)
+            authorize_endpoint = "https://accounts.google.com/o/oauth2/auth"
+            scopes = "https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
+            new_uri = f"{authorize_endpoint}?client_id={client_id}&redirect_uri={magic_link_uri}&scope={scopes}&response_type=code&access_type=offline&prompt=consent"
+            # Redirect to Google SSO
+            st.markdown(
+                f'<meta http-equiv="refresh" content="0;URL={new_uri}">',
+                unsafe_allow_html=True,
+            )
+            st.stop()
     if "code" in st.query_params:
         if st.query_params["code"] != "":
-            code = str(st.query_params["code"])
+            if isinstance(st.query_params["code"], list):
+                code = str(st.query_params["code"][0])
+            else:
+                code = str(st.query_params["code"])
             response = requests.post(
                 f"{auth_uri}/v1/oauth2/google",
                 json={
@@ -63,7 +70,6 @@ def google_sso_button():
                         f'<meta http-equiv="refresh" content="0;URL={details}">',
                         unsafe_allow_html=True,
                     )
-                    st.stop()
                 else:
                     st.error(details)
                     logging.error(f"Error with Google SSO: {details}")
