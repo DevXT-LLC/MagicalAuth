@@ -81,7 +81,7 @@ def microsoft_sso_button():
                 "Sign in with Microsoft", use_container_width=True
             ):
                 st.markdown(
-                    f'<meta http-equiv="refresh" content="0;URL={microsoft_sso_uri}>',
+                    f'<meta http-equiv="refresh" content="0;URL={microsoft_sso_uri}">',
                     unsafe_allow_html=True,
                 )
                 st.stop()
