@@ -71,6 +71,7 @@ def google_sso_button():
                                 "referrer": magic_link_uri,
                             },
                         )
+                        st.session_state["oauth2_token_requested"] = False
                         if response.status_code == 200:
                             data = response.json()
                             if "token" in data:
@@ -80,9 +81,10 @@ def google_sso_button():
                                     f'<meta http-equiv="refresh" content="0;URL={magic_link_uri}?email={data["email"]}&token={data["token"]}">',
                                     unsafe_allow_html=True,
                                 )
+                                st.stop()  # Stop execution after redirection
                         else:
                             st.error(response.json()["detail"])
-                        st.session_state["oauth2_token_requested"] = False
+                            st.stop()
             else:
                 st.error("OAuth2 token request already in progress. Please wait.")
         else:
