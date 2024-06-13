@@ -86,6 +86,7 @@ def google_sso_button():
 
             if response.status_code == 200:
                 data = response.json()
+                logging.info(f"Data: {data}")
                 if "detail" in data:
                     new_uri = data["detail"]
                     st.write(f"Redirecting to: {new_uri}")  # Debug message
@@ -94,7 +95,7 @@ def google_sso_button():
                     st.session_state["oauth2_token_requested"] = False
                     # Use JavaScript to redirect immediately
                     st.write(
-                        f'<script>window.location.href = "{new_uri}";</script>',
+                        f'<meta http-equiv="refresh" content="0;URL={new_uri}">',
                         unsafe_allow_html=True,
                     )
                     st.stop()
@@ -110,7 +111,7 @@ def google_sso_button():
             new_uri = st.session_state["oauth2_redirect_url"]
             st.write(f"Redirecting to stored URL: {new_uri}")  # Debug message
             st.write(
-                f'<script>window.location.href = "{new_uri}";</script>',
+                f'<meta http-equiv="refresh" content="0;URL={new_uri}">',
                 unsafe_allow_html=True,
             )
             st.stop()
