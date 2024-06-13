@@ -94,7 +94,12 @@ def google_sso_button():
                         st.session_state["oauth2_redirect_url"] = new_uri
                         st.session_state["oauth2_token_completed"] = True
                         st.session_state["oauth2_token_requested"] = False
-                        st.experimental_rerun()  # Rerun to apply the state change and redirect
+                        # Use JavaScript to redirect immediately
+                        st.write(
+                            f'<script>window.location.href = "{new_uri}";</script>',
+                            unsafe_allow_html=True,
+                        )
+                        st.stop()
                     else:
                         st.session_state["oauth2_token_requested"] = False
                         st.error("Unexpected response structure from backend.")
@@ -106,8 +111,8 @@ def google_sso_button():
             elif st.session_state["oauth2_token_completed"]:
                 new_uri = st.session_state["oauth2_redirect_url"]
                 st.write(f"Redirecting to stored URL: {new_uri}")  # Debug message
-                st.markdown(
-                    f'<meta http-equiv="refresh" content="0;URL={new_uri}">',
+                st.write(
+                    f'<script>window.location.href = "{new_uri}";</script>',
                     unsafe_allow_html=True,
                 )
                 st.stop()
