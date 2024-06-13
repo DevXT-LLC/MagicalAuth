@@ -225,8 +225,7 @@ def log_out_button():
     if token != "":
         if st.button("Log Out"):
             set_cookie("token", "", 1, "logout_set_token")
-            st.query_params["email"] = ""
-            st.query_params["token"] = ""
+            st.query_params.clear()
             st.session_state["token"] = ""
             st.success("You have been logged out. Redirecting to login page...")
             st.markdown(
