@@ -59,124 +59,124 @@ from sso.yelp import yelp_sso
 from sso.zendesk import zendesk_sso
 
 
-def get_sso_provider(provider: str):
+def get_sso_provider(provider: str, code, redirect_uri=None):
     if provider == "amazon":
-        return amazon_sso
+        return amazon_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "aol":
-        return aol_sso
+        return aol_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "apple":
-        return apple_sso
+        return apple_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "autodesk":
-        return autodesk_sso
+        return autodesk_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "basecamp":
-        return basecamp_sso
+        return basecamp_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "battlenet":
-        return battlenet_sso
+        return battlenet_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "bitbucket":
-        return bitbucket_sso
+        return bitbucket_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "bitly":
-        return bitly_sso
+        return bitly_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "clearscore":
-        return clearscore_sso
+        return clearscore_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "cloud_foundry":
-        return cloud_foundry_sso
+        return cloud_foundry_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "deutsche_telekom":
-        return deutsche_telekom_sso
+        return deutsche_telekom_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "deviantart":
-        return deviantart_sso
+        return deviantart_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "discord":
-        return discord_sso
+        return discord_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "dropbox":
-        return dropbox_sso
+        return dropbox_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "facebook":
-        return facebook_sso
+        return facebook_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "fatsecret":
-        return fatsecret_sso
+        return fatsecret_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "fitbit":
-        return fitbit_sso
+        return fitbit_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "formstack":
-        return formstack_sso
+        return formstack_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "foursquare":
-        return foursquare_sso
+        return foursquare_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "github":
-        return github_sso
+        return github_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "gitlab":
-        return gitlab_sso
+        return gitlab_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "google":
-        return google_sso
+        return google_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "huddle":
-        return huddle_sso
+        return huddle_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "imgur":
-        return imgur_sso
+        return imgur_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "instagram":
-        return instagram_sso
+        return instagram_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "intel_cloud_services":
-        return intel_cloud_services_sso
+        return intel_cloud_services_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "jive":
-        return jive_sso
+        return jive_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "keycloak":
-        return keycloak_sso
+        return keycloak_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "linkedin":
-        return linkedin_sso
+        return linkedin_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "microsoft":
-        return microsoft_sso
+        return microsoft_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "netiq":
-        return netiq_sso
+        return netiq_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "okta":
-        return okta_sso
+        return okta_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "openam":
-        return openam_sso
+        return openam_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "openstreetmap":
-        return openstreetmap_sso
+        return openstreetmap_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "orcid":
-        return orcid_sso
+        return orcid_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "paypal":
-        return paypal_sso
+        return paypal_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "ping_identity":
-        return ping_identity_sso
+        return ping_identity_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "pixiv":
-        return pixiv_sso
+        return pixiv_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "reddit":
-        return reddit_sso
+        return reddit_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "salesforce":
-        return salesforce_sso
+        return salesforce_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "sina_weibo":
-        return sina_weibo_sso
+        return sina_weibo_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "spotify":
-        return spotify_sso
+        return spotify_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "stack_exchange":
-        return stack_exchange_sso
+        return stack_exchange_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "strava":
-        return strava_sso
+        return strava_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "stripe":
-        return stripe_sso
+        return stripe_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "twitch":
-        return twitch_sso
+        return twitch_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "viadeo":
-        return viadeo_sso
+        return viadeo_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "vimeo":
-        return vimeo_sso
+        return vimeo_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "vk":
-        return vk_sso
+        return vk_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "wechat":
-        return wechat_sso
+        return wechat_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "withings":
-        return withings_sso
+        return withings_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "wso2_identity":
-        return wso2_identity_sso
+        return wso2_identity_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "xero":
-        return xero_sso
+        return xero_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "xing":
-        return xing_sso
+        return xing_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "yahoo":
-        return yahoo_sso
+        return yahoo_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "yammer":
-        return yammer_sso
+        return yammer_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "yandex":
-        return yandex_sso
+        return yandex_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "yelp":
-        return yelp_sso
+        return yelp_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "zendesk":
-        return zendesk_sso
+        return zendesk_sso(code=code, redirect_uri=redirect_uri)
     else:
         return None

@@ -384,7 +384,7 @@ class MagicalAuth:
             referrer = getenv("MAGIC_LINK_URL")
         provider = str(provider).lower()
         sso_data = None
-        sso_data = get_sso_provider(code=code, redirect_uri=referrer)
+        sso_data = get_sso_provider(provider=provider, code=code, redirect_uri=referrer)
         if not sso_data:
             raise HTTPException(
                 status_code=400,
