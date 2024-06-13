@@ -87,12 +87,16 @@ def google_sso_button():
 
                 if response.status_code == 200:
                     data = response.json()
-                    if "token" in data:
-                        set_cookie("email", data["email"], 1)
-                        set_cookie("token", data["token"], 1)
+                    if "detail" in data:
+                        new_uri = data["detail"]
+                        st.write(f"Redirecting to: {new_uri}")
+                        st.markdown(
+                            f'<meta http-equiv="refresh" content="0;URL={new_uri}">',
+                            unsafe_allow_html=True,
+                        )
                         st.session_state["oauth2_token_completed"] = True
                         st.session_state["oauth2_token_requested"] = False
-                        st.rerun()  # Rerun to apply the state change and redirect
+
                 else:
                     st.session_state["oauth2_token_requested"] = False
                     st.error(response.json()["detail"])
