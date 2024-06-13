@@ -64,12 +64,12 @@ def google_sso_button():
             if "detail" in res:
                 details = res["detail"]
                 logging.info(f"Google SSO: {details}")
-                if details.startswith("http"):
+                if str(details).startswith("http"):
+                    # Token is in the url ?token= to end of url
+                    token = str(details).split("?token=")[1]
+                    set_cookie("token", token, 1, "google_sso_token")
                     # Redirect to the login link
-                    st.markdown(
-                        f'<meta http-equiv="refresh" content="0;URL={details}">',
-                        unsafe_allow_html=True,
-                    )
+                    st.rerun()
                 else:
                     st.error(details)
                     logging.error(f"Error with Google SSO: {details}")
