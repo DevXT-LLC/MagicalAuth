@@ -89,14 +89,18 @@ def google_sso_button():
                     data = response.json()
                     if "detail" in data:
                         new_uri = data["detail"]
-                        st.write(f"Redirecting to: {new_uri}")
+                        st.write(f"Redirecting to: {new_uri}")  # Debug message
+                        st.session_state["oauth2_token_completed"] = True
+                        st.session_state["oauth2_token_requested"] = False
                         st.markdown(
                             f'<meta http-equiv="refresh" content="0;URL={new_uri}">',
                             unsafe_allow_html=True,
                         )
-                        st.session_state["oauth2_token_completed"] = True
+                        st.stop()  # Ensure the script stops after redirection
+                    else:
                         st.session_state["oauth2_token_requested"] = False
-
+                        st.error("Unexpected response structure from backend.")
+                        st.stop()
                 else:
                     st.session_state["oauth2_token_requested"] = False
                     st.error(response.json()["detail"])
