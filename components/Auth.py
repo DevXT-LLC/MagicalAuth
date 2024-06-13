@@ -56,10 +56,7 @@ def google_sso_button():
             st.query_params["state"] = ""
             st.query_params["authuser"] = ""
             st.query_params["prompt"] = ""
-            st.markdown(
-                f'<meta http-equiv="refresh" content="0;URL=/">',
-                unsafe_allow_html=True,
-            )
+            st.rerun()
     # Get cookie of "code", if it exists
     code = get_cookie("code", "get_code_cookie")
     if code != "" and code is not None:
