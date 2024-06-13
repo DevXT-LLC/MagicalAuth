@@ -162,7 +162,11 @@ def get_user():
                     else:
                         st.error(res)
             google_token = google_sso_button()
-            if google_token != "":
+            if (
+                google_token != ""
+                and google_token is not None
+                and google_token != "None"
+            ):
                 st.query_params["token"] = google_token
                 return get_user()
         else:
