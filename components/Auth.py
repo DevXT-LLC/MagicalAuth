@@ -63,18 +63,31 @@ def google_sso_button():
                         "referrer": magic_link_uri,
                     },
                 )
-                res = response.json()
-                if "detail" in res:
-                    details = str(res["detail"])
-                    if details.startswith("http"):
-                        token = details.split("token=")[1]
-                        st.query_params["token"] = token
-                    else:
-                        st.error(details)
-                        logging.error(f"Error with Google SSO: {details}")
-                else:
-                    st.error(response.text)
-                    logging.error(f"Error with Google SSO: {response.text}")
+                st.session_state["magic_link"] = response.json()["detail"]
+    if "magic_link" in st.session_state:
+        magic_link = str(st.session_state["magic_link"])
+        if magic_link.startswith("http"):
+            token = magic_link.split("token=")[1]
+            st.query_params["token"] = token
+            user_request = requests.get(
+                f"{auth_uri}/v1/user",
+                headers={"Authorization": token},
+            )
+            if user_request.status_code == 200:
+                user = user_request.json()
+                set_cookie("email", user["email"], 1)
+                set_cookie("token", token, 1)
+                st.success("Login successful! Redirecting to the app...")
+                st.markdown(
+                    f'<meta http-equiv="refresh" content="2;URL=/">',
+                    unsafe_allow_html=True,
+                )
+        else:
+            st.error(magic_link)
+            logging.error(f"Error with Google SSO: {magic_link}")
+    else:
+        st.error(response.text)
+        logging.error(f"Error with Google SSO: {response.text}")
 
 
 def get_user():
