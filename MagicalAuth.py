@@ -440,7 +440,7 @@ class MagicalAuth:
         session.commit()
         session.close()
         totp = pyotp.TOTP(mfa_token)
-        login = Login(email=self.email, otp=totp.now())
+        login = Login(email=self.email, token=totp.now())
         # Will return the URL with the proper token
         return self.send_magic_link(
             ip_address=ip_address,

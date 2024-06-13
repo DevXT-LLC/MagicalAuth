@@ -79,6 +79,7 @@ class GoogleSSO:
                 "grant_type": "refresh_token",
             },
         )
+        logging.info(f"Google refresh token response: {response.text}")
         return response.json()["access_token"]
 
     def get_user_info(self):
