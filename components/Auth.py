@@ -34,7 +34,7 @@ def google_sso_button():
     if "code" in st.query_params:
         if st.query_params["code"] == "":
             del st.query_params["code"]
-    if "code" not in st.query_params:
+    if "code" not in st.query_params and "magic_link" not in st.session_state:
         result = st.button("Sign in with Google", key="google_sso_button")
         if result:
             scopes = urllib.parse.quote(
@@ -49,7 +49,7 @@ def google_sso_button():
                 unsafe_allow_html=True,
             )
             st.stop()
-    if "code" in st.query_params:
+    if "code" in st.query_params and "magic_link" not in st.session_state:
         if st.query_params["code"] != "" and st.query_params["code"] is not None:
             if isinstance(st.query_params["code"], list):
                 code = str(st.query_params["code"][0])
