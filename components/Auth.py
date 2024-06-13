@@ -63,7 +63,7 @@ def sso_buttons():
     # For each page in pages that ends in .py, create a button
     for page in os.listdir("./pages"):
         if page.endswith(".py"):
-            provider = page.split(".py")[0].upper()
+            provider = page.split(".py")[0].lower()
             # from {provider} import scopes, auth_uri
             module = importlib.import_module(f"pages.{provider}")
             scopes = module.scopes()
