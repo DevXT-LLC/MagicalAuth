@@ -32,10 +32,12 @@ def google_sso_button():
     if magic_link_uri.endswith("/"):
         magic_link_uri = magic_link_uri[:-1]
     code = st.query_params["code"] if "code" in st.query_params else ""
-    if isinstance(st.query_params["code"], list):
-        code = str(st.query_params["code"][0])
+    if isinstance(code, list):
+        code = str(code[0])
     else:
-        code = str(st.query_params["code"])
+        code = str(code)
+    if code == "None":
+        code = ""
     if code == "" and "token" not in st.query_params:
         result = st.button("Sign in with Google", key="google_sso_button")
         if result:
