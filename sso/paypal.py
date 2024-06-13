@@ -36,10 +36,11 @@ class PayPalSSO:
         self.user_info = self.get_user_info()
 
     def get_new_token(self):
+        token = base64.b64encode(f"{self.client_id}:{self.client_secret}".encode()).decode()
         response = requests.post(
             "https://api.paypal.com/v1/oauth2/token",
             headers={
-                "Authorization": f"Basic {base64.b64encode(f'{self.client_id}:{self.client_secret}'.encode()).decode()}",
+                "Authorization": f"Basic {token}",
                 "Content-Type": "application/x-www-form-urlencoded",
             },
             data={

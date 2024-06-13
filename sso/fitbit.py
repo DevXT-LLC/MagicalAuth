@@ -42,10 +42,11 @@ class FitbitSSO:
         self.user_info = self.get_user_info()
 
     def get_new_token(self):
+        decoded_token = base64.b64encode(f"{self.client_id}:{self.client_secret}".encode()).decode()
         response = requests.post(
             "https://api.fitbit.com/oauth2/token",
             headers={
-                "Authorization": f"Basic {base64.b64encode(f'{self.client_id}:{self.client_secret}'.encode()).decode()}",
+                "Authorization": f"Basic {decoded_token}",
                 "Content-Type": "application/x-www-form-urlencoded",
             },
             data={

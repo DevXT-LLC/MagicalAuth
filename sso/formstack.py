@@ -21,6 +21,7 @@ Required scopes for Formstack OAuth
 - formstack:write
 """
 
+
 class FormstackSSO:
     def __init__(
         self,
@@ -74,7 +75,9 @@ class FormstackSSO:
             )
 
     def send_form_submission(self, form_id, submission_data):
-        form_submission_url = f"https://www.formstack.com/api/v2/form/{form_id}/submission.json"
+        form_submission_url = (
+            f"https://www.formstack.com/api/v2/form/{form_id}/submission.json"
+        )
         headers = {
             "Authorization": f"Bearer {self.access_token}",
             "Content-Type": "application/json",
