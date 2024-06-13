@@ -98,7 +98,7 @@ def get_user():
         ):
             set_cookie("token", st.query_params["token"], 1)
             st.session_state["token"] = str(st.query_params["token"])
-            st.query_params["token"] = ""
+            st.query_params.clear()
     else:
         st.session_state["token"] = get_cookie("token")
     token = st.session_state["token"] if "token" in st.session_state else ""
