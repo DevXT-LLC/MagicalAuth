@@ -43,6 +43,7 @@ def google_sso_button():
         magic_link_uri = getenv("MAGIC_LINK_URL")
         if magic_link_uri.endswith("/"):
             magic_link_uri = magic_link_uri[:-1]
+        magic_link_uri = f"{magic_link_uri}/google"
         magic_link_uri_encoded = urllib.parse.quote(magic_link_uri)
         client_id_encoded = urllib.parse.quote(client_id)
         google_sso_uri = f"https://accounts.google.com/o/oauth2/auth?client_id={client_id_encoded}&redirect_uri={magic_link_uri_encoded}&scope={scopes}&response_type=code&access_type=offline&prompt=consent"
@@ -73,6 +74,7 @@ def microsoft_sso_button():
         magic_link_uri = getenv("MAGIC_LINK_URL")
         if magic_link_uri.endswith("/"):
             magic_link_uri = magic_link_uri[:-1]
+        magic_link_uri = f"{magic_link_uri}/microsoft"
         magic_link_uri_encoded = urllib.parse.quote(magic_link_uri)
         client_id_encoded = urllib.parse.quote(client_id)
         microsoft_sso_uri = f"https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id={client_id_encoded}&redirect_uri={magic_link_uri_encoded}&scope={scopes}&response_type=code"
@@ -103,6 +105,7 @@ def github_sso_button():
         magic_link_uri = getenv("MAGIC_LINK_URL")
         if magic_link_uri.endswith("/"):
             magic_link_uri = magic_link_uri[:-1]
+        magic_link_uri = f"{magic_link_uri}/github"
         magic_link_uri_encoded = urllib.parse.quote(magic_link_uri)
         client_id_encoded = urllib.parse.quote(client_id)
         github_sso_uri = f"https://github.com/login/oauth/authorize?client_id={client_id_encoded}&redirect_uri={magic_link_uri_encoded}&scope={scopes}&response_type=code"
