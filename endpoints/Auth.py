@@ -1,10 +1,8 @@
-from fastapi import APIRouter, Request, Header, Depends, HTTPException
+from fastapi import APIRouter, Request, Header, Depends
 from Models import Detail, Login, UserInfo, Register
 from MagicalAuth import MagicalAuth, verify_api_key
-from sso.Google import get_google_access_token
 from Globals import getenv
 import pyotp
-import logging
 
 router = APIRouter()
 
