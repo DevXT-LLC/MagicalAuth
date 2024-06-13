@@ -30,15 +30,18 @@ def google_sso_button():
     client_id = getenv("GOOGLE_CLIENT_ID")
     if client_id == "":
         return ""
+
     auth_uri = getenv("MAGICALAUTH_SERVER")
     magic_link_uri = getenv("MAGIC_LINK_URL")
     if magic_link_uri.endswith("/"):
         magic_link_uri = magic_link_uri[:-1]
+
     code = st.query_params.get("code", "")
     if isinstance(code, list):
         code = str(code[0])
     else:
         code = str(code)
+
     if code == "None" or code is None:
         code = ""
 
@@ -63,7 +66,7 @@ def google_sso_button():
         magic_link_uri_encoded = urllib.parse.quote(magic_link_uri)
         client_id_encoded = urllib.parse.quote(client_id)
         google_sso_uri = f"https://accounts.google.com/o/oauth2/auth?client_id={client_id_encoded}&redirect_uri={magic_link_uri_encoded}&scope={scopes}&response_type=code&access_type=offline&prompt=consent"
-        # Link to google sso
+
         with st.form("google_sso_form"):
             if st.form_submit_button("Sign in with Google", use_container_width=True):
                 st.markdown(
@@ -75,6 +78,7 @@ def google_sso_button():
             if not st.session_state["oauth2_token_requested"]:
                 st.session_state["oauth2_token_requested"] = True
                 st.write("Making request to backend...")  # Debug message
+
                 response = requests.post(
                     f"{auth_uri}/v1/oauth2/google",
                     json={
@@ -94,7 +98,6 @@ def google_sso_button():
                         st.session_state["oauth2_redirect_url"] = new_uri
                         st.session_state["oauth2_token_completed"] = True
                         st.session_state["oauth2_token_requested"] = False
-                        # Use JavaScript to redirect immediately
                         st.write(
                             f'<script>window.location.href = "{new_uri}";</script>',
                             unsafe_allow_html=True,
