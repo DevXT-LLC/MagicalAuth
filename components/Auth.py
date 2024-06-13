@@ -39,20 +39,17 @@ def google_sso_button():
     if code == "None":
         code = ""
     if code == "" and "token" not in st.query_params:
-        result = st.button("Sign in with Google", key="google_sso_button")
-        if result:
-            scopes = urllib.parse.quote(
-                "https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
-            )
-            magic_link_uri = urllib.parse.quote(magic_link_uri)
-            client_id = urllib.parse.quote(client_id)
-            new_uri = f"https://accounts.google.com/o/oauth2/auth?client_id={client_id}&redirect_uri={magic_link_uri}&scope={scopes}&response_type=code&access_type=offline&prompt=consent"
-            # Redirect to Google SSO
-            st.markdown(
-                f'<meta http-equiv="refresh" content="0;URL={new_uri}">',
-                unsafe_allow_html=True,
-            )
-            st.stop()
+        scopes = urllib.parse.quote(
+            "https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
+        )
+        magic_link_uri = urllib.parse.quote(magic_link_uri)
+        client_id = urllib.parse.quote(client_id)
+        google_sso_uri = f"https://accounts.google.com/o/oauth2/auth?client_id={client_id}&redirect_uri={magic_link_uri}&scope={scopes}&response_type=code&access_type=offline&prompt=consent"
+        # Link to google sso
+        st.markdown(
+            f'<a href="{google_sso_uri}" target="_blank">Sign in with Google</a>',
+            unsafe_allow_html=True,
+        )
     else:
         response = requests.post(
             f"{auth_uri}/v1/oauth2/google",
@@ -63,12 +60,8 @@ def google_sso_button():
         )
         if response.status_code == 200:
             url = response.json()["detail"]
-            # Redirect to the login link
-            st.markdown(
-                f'<meta http-equiv="refresh" content="1;URL={url}">',
-                unsafe_allow_html=True,
-            )
-            st.stop()
+            token = url.split("token=")[1]
+            return token
 
 
 def get_user():
@@ -168,7 +161,10 @@ def get_user():
                             st.success(res)
                     else:
                         st.error(res)
-            google_sso_button()
+            google_token = google_sso_button()
+            if google_token != "":
+                st.query_params["token"] = google_token
+                return get_user()
         else:
             with st.form("register_form"):
                 email = st.text_input("Email")
