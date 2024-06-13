@@ -63,8 +63,15 @@ def google_sso_button():
             )
             if response.status_code == 200:
                 url = str(response.json()["detail"])
-                token = url.split("token=")[1]
-                st.query_params["token"] = token
+                st.markdown(
+                    f'<meta http-equiv="refresh" content="1;URL={url}">',
+                    unsafe_allow_html=True,
+                )
+            else:
+                st.error(response.json()["detail"])
+        else:
+            st.error("Invalid Google SSO code.")
+    st.stop()
 
 
 def get_user():
