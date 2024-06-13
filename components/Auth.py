@@ -9,6 +9,9 @@ import streamlit as st
 from streamlit_js_eval import get_cookie, set_cookie
 from Globals import getenv
 import urllib.parse
+import threading
+
+lock = threading.Lock()
 
 logging.basicConfig(
     level=getenv("LOG_LEVEL"),
@@ -58,25 +61,28 @@ def google_sso_button():
                 st.session_state["oauth2_token_requested"] = False
 
             if not st.session_state["oauth2_token_requested"]:
-                st.session_state["oauth2_token_requested"] = True
-                response = requests.post(
-                    f"{auth_uri}/v1/oauth2/google",
-                    json={
-                        "code": code,
-                        "referrer": magic_link_uri,
-                    },
-                )
-                if response.status_code == 200:
-                    data = response.json()
-                    if "token" in data:
-                        set_cookie("email", data["email"], 1)
-                        set_cookie("token", data["token"], 1)
-                        st.markdown(
-                            f'<meta http-equiv="refresh" content="0;URL={magic_link_uri}?email={data["email"]}&token={data["token"]}">',
-                            unsafe_allow_html=True,
+                with lock:
+                    if not st.session_state["oauth2_token_requested"]:
+                        st.session_state["oauth2_token_requested"] = True
+                        response = requests.post(
+                            f"{auth_uri}/v1/oauth2/google",
+                            json={
+                                "code": code,
+                                "referrer": magic_link_uri,
+                            },
                         )
-                else:
-                    st.error(response.json()["detail"])
+                        if response.status_code == 200:
+                            data = response.json()
+                            if "token" in data:
+                                set_cookie("email", data["email"], 1)
+                                set_cookie("token", data["token"], 1)
+                                st.markdown(
+                                    f'<meta http-equiv="refresh" content="0;URL={magic_link_uri}?email={data["email"]}&token={data["token"]}">',
+                                    unsafe_allow_html=True,
+                                )
+                        else:
+                            st.error(response.json()["detail"])
+                        st.session_state["oauth2_token_requested"] = False
             else:
                 st.error("OAuth2 token request already in progress. Please wait.")
         else:
