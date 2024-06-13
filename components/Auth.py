@@ -41,13 +41,19 @@ def google_sso_button():
         code = str(code)
     if code == "None" or code is None:
         code = ""
+
+    # Initialize session states if not already present
+    if "oauth2_token_requested" not in st.session_state:
+        st.session_state["oauth2_token_requested"] = False
+        st.session_state["oauth2_token_completed"] = False
+
     if code == "" and "token" not in st.query_params:
         scopes = urllib.parse.quote(
             "https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
         )
-        magic_link_uri = urllib.parse.quote(magic_link_uri)
-        client_id = urllib.parse.quote(client_id)
-        google_sso_uri = f"https://accounts.google.com/o/oauth2/auth?client_id={client_id}&redirect_uri={magic_link_uri}&scope={scopes}&response_type=code&access_type=offline&prompt=consent"
+        magic_link_uri_encoded = urllib.parse.quote(magic_link_uri)
+        client_id_encoded = urllib.parse.quote(client_id)
+        google_sso_uri = f"https://accounts.google.com/o/oauth2/auth?client_id={client_id_encoded}&redirect_uri={magic_link_uri_encoded}&scope={scopes}&response_type=code&access_type=offline&prompt=consent"
         # Link to google sso
         with st.form("google_sso_form"):
             if st.form_submit_button("Sign in with Google", use_container_width=True):
@@ -56,12 +62,8 @@ def google_sso_button():
                     unsafe_allow_html=True,
                 )
     else:
-        st.write(f"Code received: {code}")  # Debug message
         if code != "":
-            if "oauth2_token_requested" not in st.session_state:
-                st.session_state["oauth2_token_requested"] = False
-                st.session_state["oauth2_token_completed"] = False
-
+            st.write(f"Code received: {code}")  # Debug message
             st.write(
                 f"Requested: {st.session_state['oauth2_token_requested']}"
             )  # Debug message
@@ -69,7 +71,10 @@ def google_sso_button():
                 f"Completed: {st.session_state['oauth2_token_completed']}"
             )  # Debug message
 
-            if not st.session_state["oauth2_token_requested"]:
+            if (
+                not st.session_state["oauth2_token_requested"]
+                and not st.session_state["oauth2_token_completed"]
+            ):
                 st.session_state["oauth2_token_requested"] = True
                 st.write("Making request to backend...")  # Debug message
                 response = requests.post(
@@ -89,7 +94,7 @@ def google_sso_button():
                         set_cookie("email", data["email"], 1)
                         set_cookie("token", data["token"], 1)
                         st.session_state["oauth2_token_completed"] = True
-                        st.rerun()  # Rerun to apply the state change and redirect
+                        st.experimental_rerun()  # Rerun to apply the state change and redirect
                 else:
                     st.error(response.json()["detail"])
                     st.stop()
