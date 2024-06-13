@@ -31,12 +31,12 @@ def google_sso_button():
     magic_link_uri = getenv("MAGIC_LINK_URL")
     if magic_link_uri.endswith("/"):
         magic_link_uri = magic_link_uri[:-1]
-    code = st.query_params["code"] if "code" in st.query_params else ""
+    code = st.query_params.get("code", "")
     if isinstance(code, list):
         code = str(code[0])
     else:
         code = str(code)
-    if code == "None" or code == None:
+    if code == "None" or code is None:
         code = ""
     if code == "" and "token" not in st.query_params:
         scopes = urllib.parse.quote(
@@ -54,24 +54,31 @@ def google_sso_button():
                 )
     else:
         if code != "":
-            response = requests.post(
-                f"{auth_uri}/v1/oauth2/google",
-                json={
-                    "code": code,
-                    "referrer": magic_link_uri,
-                },
-            )
-            if response.status_code == 200:
-                data = response.json()
-                if "token" in data:
-                    set_cookie("email", data["email"], 1)
-                    set_cookie("token", data["token"], 1)
-                    st.markdown(
-                        f'<meta http-equiv="refresh" content="0;URL={magic_link_uri}?email={data["email"]}&token={data["token"]}">',
-                        unsafe_allow_html=True,
-                    )
+            if "oauth2_token_requested" not in st.session_state:
+                st.session_state["oauth2_token_requested"] = False
+
+            if not st.session_state["oauth2_token_requested"]:
+                st.session_state["oauth2_token_requested"] = True
+                response = requests.post(
+                    f"{auth_uri}/v1/oauth2/google",
+                    json={
+                        "code": code,
+                        "referrer": magic_link_uri,
+                    },
+                )
+                if response.status_code == 200:
+                    data = response.json()
+                    if "token" in data:
+                        set_cookie("email", data["email"], 1)
+                        set_cookie("token", data["token"], 1)
+                        st.markdown(
+                            f'<meta http-equiv="refresh" content="0;URL={magic_link_uri}?email={data["email"]}&token={data["token"]}">',
+                            unsafe_allow_html=True,
+                        )
+                else:
+                    st.error(response.json()["detail"])
             else:
-                st.error(response.json()["detail"])
+                st.error("OAuth2 token request already in progress. Please wait.")
         else:
             st.error("Invalid Google SSO code.")
     st.stop()
