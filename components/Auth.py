@@ -338,7 +338,6 @@ def sso_redirect(provider: str):
         ):
             get_user()
     if "token" not in st.query_params and "code" not in st.query_params:
-        st.write("Redirecting to login page...")
         # Reload to ../ page
         st.markdown(
             f'<meta http-equiv="refresh" content="1;URL=../">',
