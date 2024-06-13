@@ -61,7 +61,7 @@ def google_sso_button():
         response = requests.post(
             f"{auth_uri}/v1/oauth2/google",
             json={
-                "code": st.session_state["code"],
+                "code": code,
                 "referrer": magic_link_uri,
             },
         )
