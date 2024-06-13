@@ -39,19 +39,23 @@ def google_sso_button():
     if code == "None" or code == None:
         code = ""
     if code == "" and "token" not in st.query_params:
-        scopes = urllib.parse.quote(
-            "https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
-        )
-        magic_link_uri = urllib.parse.quote(magic_link_uri)
-        client_id = urllib.parse.quote(client_id)
-        google_sso_uri = f"https://accounts.google.com/o/oauth2/auth?client_id={client_id}&redirect_uri={magic_link_uri}&scope={scopes}&response_type=code&access_type=offline&prompt=consent"
-        # Link to google sso
-        with st.form("google_sso_form"):
-            if st.form_submit_button("Sign in with Google", use_container_width=True):
-                st.markdown(
-                    f'<meta http-equiv="refresh" content="0;URL={google_sso_uri}">',
-                    unsafe_allow_html=True,
-                )
+        if "google_sso_redirect" not in st.session_state:
+            scopes = urllib.parse.quote(
+                "https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
+            )
+            magic_link_uri = urllib.parse.quote(magic_link_uri)
+            client_id = urllib.parse.quote(client_id)
+            google_sso_uri = f"https://accounts.google.com/o/oauth2/auth?client_id={client_id}&redirect_uri={magic_link_uri}&scope={scopes}&response_type=code&access_type=offline&prompt=consent"
+            # Link to google sso
+            with st.form("google_sso_form"):
+                if st.form_submit_button(
+                    "Sign in with Google", use_container_width=True
+                ):
+                    st.session_state["google_sso_redirect"] = True
+                    st.markdown(
+                        f'<meta http-equiv="refresh" content="0;URL={google_sso_uri}">',
+                        unsafe_allow_html=True,
+                    )
     else:
         if code != "":
             response = requests.post(
@@ -66,10 +70,8 @@ def google_sso_button():
                 if "token" in data:
                     set_cookie("email", data["email"], 1)
                     set_cookie("token", data["token"], 1)
-                    st.markdown(
-                        f'<meta http-equiv="refresh" content="0;URL={magic_link_uri}?email={data["email"]}&token={data["token"]}">',
-                        unsafe_allow_html=True,
-                    )
+                    st.session_state["google_sso_redirect"] = False
+                    st.rerun()
             else:
                 st.error(response.json()["detail"])
         else:
