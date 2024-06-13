@@ -62,11 +62,14 @@ def google_sso_button():
                 },
             )
             if response.status_code == 200:
-                url = str(response.json()["detail"])
-                st.markdown(
-                    f'<meta http-equiv="refresh" content="1;URL={url}">',
-                    unsafe_allow_html=True,
-                )
+                data = response.json()
+                if "token" in data:
+                    set_cookie("email", data["email"], 1)
+                    set_cookie("token", data["token"], 1)
+                    st.markdown(
+                        f'<meta http-equiv="refresh" content="0;URL={magic_link_uri}?email={data["email"]}&token={data["token"]}">',
+                        unsafe_allow_html=True,
+                    )
             else:
                 st.error(response.json()["detail"])
         else:

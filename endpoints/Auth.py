@@ -97,10 +97,11 @@ def delete_user(
 )
 async def google_login(request: Request):
     data = await request.json()
-    magic_link = MagicalAuth().sso(
+    auth = MagicalAuth()
+    magic_link = auth.sso(
         provider="google",
         code=data["code"],
         ip_address=request.client.host,
         referrer=data["referrer"] if "referrer" in data else getenv("MAGIC_LINK_URL"),
     )
-    return Detail(detail=magic_link)
+    return {"detail": magic_link, "email": auth.email, "token": auth.token}
