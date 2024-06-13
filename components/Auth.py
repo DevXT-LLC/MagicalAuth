@@ -20,6 +20,8 @@ Required environment variables:
 
 - APP_NAME: Name of the application
 - MAGICALAUTH_SERVER: URL of the MagicalAuth server
+- MAGIC_LINK_URL: URL of the application
+- GOOGLE_CLIENT_ID: Google OAuth client ID if using Google SSO
 """
 
 
@@ -27,42 +29,23 @@ def google_sso_button():
     client_id = getenv("GOOGLE_CLIENT_ID")
     if client_id == "":
         return ""
-
-    auth_uri = getenv("MAGICALAUTH_SERVER")
-    magic_link_uri = getenv("MAGIC_LINK_URL")
-    if magic_link_uri.endswith("/"):
-        magic_link_uri = magic_link_uri[:-1]
     code = st.query_params.get("code", "")
     if isinstance(code, list):
         code = str(code[0])
     else:
         code = str(code)
-
     if code == "None" or code is None:
         code = ""
-
-    # Initialize session states if not already present
-    if "oauth2_token_requested" not in st.session_state:
-        st.session_state["oauth2_token_requested"] = False
-        st.session_state["oauth2_token_completed"] = False
-        st.session_state["oauth2_redirect_url"] = ""
-
-    st.write(f"Code received: {code}")  # Debug message
-    st.write(
-        f"Requested: {st.session_state['oauth2_token_requested']}"
-    )  # Debug message
-    st.write(
-        f"Completed: {st.session_state['oauth2_token_completed']}"
-    )  # Debug message
-
     if code == "" and "token" not in st.query_params:
         scopes = urllib.parse.quote(
             "https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
         )
+        magic_link_uri = getenv("MAGIC_LINK_URL")
+        if magic_link_uri.endswith("/"):
+            magic_link_uri = magic_link_uri[:-1]
         magic_link_uri_encoded = urllib.parse.quote(magic_link_uri)
         client_id_encoded = urllib.parse.quote(client_id)
         google_sso_uri = f"https://accounts.google.com/o/oauth2/auth?client_id={client_id_encoded}&redirect_uri={magic_link_uri_encoded}&scope={scopes}&response_type=code&access_type=offline&prompt=consent"
-
         with st.form("google_sso_form"):
             if st.form_submit_button("Sign in with Google", use_container_width=True):
                 st.markdown(
@@ -101,7 +84,6 @@ def get_user():
                 else:
                     st.error(data)
                     st.stop()
-    email = get_cookie("email")
     token = get_cookie("token")
     if "mfa_confirmed" in st.session_state:
         st.title(app_name)
@@ -109,10 +91,6 @@ def get_user():
         time.sleep(1)
         del st.session_state["mfa_confirmed"]
         st.stop()
-    if "email" in st.query_params:
-        if st.query_params["email"] != "" and st.query_params["email"] is not None:
-            set_cookie("email", st.query_params["email"], 1)
-            email = st.query_params["email"]
     if "token" in st.query_params:
         if (
             st.query_params["token"] != ""
@@ -130,7 +108,6 @@ def get_user():
             user = user_request.json()
             return user
         else:
-            set_cookie("email", "", 1)
             set_cookie("token", "", 1)
     st.title(app_name)
     if "otp_uri" in st.session_state:
@@ -244,7 +221,6 @@ def log_out_button():
     token = get_cookie("token", "logout_token")
     if token != "":
         if st.button("Log Out"):
-            set_cookie("email", "", 1, "logout_set_email")
             set_cookie("token", "", 1, "logout_set_token")
             st.query_params["email"] = ""
             st.query_params["token"] = ""
