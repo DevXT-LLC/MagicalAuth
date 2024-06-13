@@ -62,8 +62,13 @@ def google_sso_button():
             },
         )
         if response.status_code == 200:
-            token = response.json()["detail"].split("token=")[1]
-            st.query_params["token"] = token
+            url = response.json()["detail"]
+            # Redirect to the login link
+            st.markdown(
+                f'<meta http-equiv="refresh" content="1;URL={url}">',
+                unsafe_allow_html=True,
+            )
+            st.stop()
 
 
 def get_user():
