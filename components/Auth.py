@@ -35,7 +35,6 @@ def google_sso_button():
     magic_link_uri = getenv("MAGIC_LINK_URL")
     if magic_link_uri.endswith("/"):
         magic_link_uri = magic_link_uri[:-1]
-
     code = st.query_params.get("code", "")
     if isinstance(code, list):
         code = str(code[0])
@@ -50,6 +49,7 @@ def google_sso_button():
         st.session_state["oauth2_token_requested"] = False
         st.session_state["oauth2_token_completed"] = False
         st.session_state["oauth2_redirect_url"] = ""
+        st.session_state["request_in_progress"] = False
 
     st.write(f"Code received: {code}")  # Debug message
     st.write(
@@ -74,55 +74,54 @@ def google_sso_button():
                     unsafe_allow_html=True,
                 )
     else:
-        if code != "":
-            if not st.session_state["oauth2_token_requested"]:
-                st.session_state["oauth2_token_requested"] = True
-                st.write("Making request to backend...")  # Debug message
-                time.sleep(1)
-                response = requests.post(
-                    f"{auth_uri}/v1/oauth2/google",
-                    json={
-                        "code": code,
-                        "referrer": magic_link_uri,
-                    },
-                )
+        if code != "" and not st.session_state["request_in_progress"]:
+            st.session_state["request_in_progress"] = True
+            st.write("Making request to backend...")  # Debug message
+            response = requests.post(
+                f"{auth_uri}/v1/oauth2/google",
+                json={
+                    "code": code,
+                    "referrer": magic_link_uri,
+                },
+            )
 
-                st.write(f"Response status: {response.status_code}")  # Debug message
-                st.write(f"Response content: {response.json()}")  # Debug message
+            st.write(f"Response status: {response.status_code}")  # Debug message
+            st.write(f"Response content: {response.json()}")  # Debug message
 
-                if response.status_code == 200:
-                    data = response.json()
-                    if "detail" in data:
-                        new_uri = data["detail"]
-                        st.write(f"Redirecting to: {new_uri}")  # Debug message
-                        st.session_state["oauth2_redirect_url"] = new_uri
-                        st.session_state["oauth2_token_completed"] = True
-                        st.session_state["oauth2_token_requested"] = False
-                        st.write(
-                            f'<meta http-equiv="refresh" content="0;URL={new_uri}">',
-                            unsafe_allow_html=True,
-                        )
-                        st.stop()
-                    else:
-                        st.session_state["oauth2_token_requested"] = False
-                        st.error("Unexpected response structure from backend.")
-                        st.stop()
+            if response.status_code == 200:
+                data = response.json()
+                if "detail" in data:
+                    new_uri = data["detail"]
+                    st.write(f"Redirecting to: {new_uri}")  # Debug message
+                    st.session_state["oauth2_redirect_url"] = new_uri
+                    st.session_state["oauth2_token_completed"] = True
+                    st.session_state["oauth2_token_requested"] = False
+                    # Use JavaScript to redirect immediately
+                    st.write(
+                        f'<script>window.location.href = "{new_uri}";</script>',
+                        unsafe_allow_html=True,
+                    )
+                    st.stop()
                 else:
                     st.session_state["oauth2_token_requested"] = False
-                    st.error(response.json()["detail"])
+                    st.session_state["request_in_progress"] = False
+                    st.error("Unexpected response structure from backend.")
                     st.stop()
-            elif st.session_state["oauth2_token_completed"]:
-                new_uri = st.session_state["oauth2_redirect_url"]
-                st.write(f"Redirecting to stored URL: {new_uri}")  # Debug message
-                st.write(
-                    f'<meta http-equiv="refresh" content="0;URL={new_uri}">',
-                    unsafe_allow_html=True,
-                )
-                st.stop()
             else:
-                st.error("OAuth2 token request already in progress. Please wait.")
+                st.session_state["oauth2_token_requested"] = False
+                st.session_state["request_in_progress"] = False
+                st.error(response.json()["detail"])
+                st.stop()
+        elif st.session_state["oauth2_token_completed"]:
+            new_uri = st.session_state["oauth2_redirect_url"]
+            st.write(f"Redirecting to stored URL: {new_uri}")  # Debug message
+            st.write(
+                f'<script>window.location.href = "{new_uri}";</script>',
+                unsafe_allow_html=True,
+            )
+            st.stop()
         else:
-            st.error("Invalid Google SSO code.")
+            st.error("OAuth2 token request already in progress. Please wait.")
     st.stop()
 
 
