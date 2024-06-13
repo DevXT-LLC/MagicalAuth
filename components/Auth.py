@@ -55,6 +55,66 @@ def google_sso_button():
                 st.stop()
 
 
+def microsoft_sso_button():
+    client_id = getenv("MICROSOFT_CLIENT_ID")
+    if client_id == "":
+        return ""
+    code = st.query_params.get("code", "")
+    if isinstance(code, list):
+        code = str(code[0])
+    else:
+        code = str(code)
+    if code == "None" or code is None:
+        code = ""
+    if code == "" and "token" not in st.query_params:
+        scopes = urllib.parse.quote(
+            "https://graph.microsoft.com/User.Read https://graph.microsoft.com/Mail.Send"
+        )
+        magic_link_uri = getenv("MAGIC_LINK_URL")
+        if magic_link_uri.endswith("/"):
+            magic_link_uri = magic_link_uri[:-1]
+        magic_link_uri_encoded = urllib.parse.quote(magic_link_uri)
+        client_id_encoded = urllib.parse.quote(client_id)
+        microsoft_sso_uri = f"https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id={client_id_encoded}&redirect_uri={magic_link_uri_encoded}&scope={scopes}&response_type=code"
+        with st.form("microsoft_sso_form"):
+            if st.form_submit_button(
+                "Sign in with Microsoft", use_container_width=True
+            ):
+                st.markdown(
+                    f'<meta http-equiv="refresh" content="0;URL={microsoft_sso_uri}>',
+                    unsafe_allow_html=True,
+                )
+                st.stop()
+
+
+def github_sso_button():
+    client_id = getenv("GITHUB_CLIENT_ID")
+    if client_id == "":
+        return ""
+    code = st.query_params.get("code", "")
+    if isinstance(code, list):
+        code = str(code[0])
+    else:
+        code = str(code)
+    if code == "None" or code is None:
+        code = ""
+    if code == "" and "token" not in st.query_params:
+        scopes = urllib.parse.quote("user:email read:user")
+        magic_link_uri = getenv("MAGIC_LINK_URL")
+        if magic_link_uri.endswith("/"):
+            magic_link_uri = magic_link_uri[:-1]
+        magic_link_uri_encoded = urllib.parse.quote(magic_link_uri)
+        client_id_encoded = urllib.parse.quote(client_id)
+        github_sso_uri = f"https://github.com/login/oauth/authorize?client_id={client_id_encoded}&redirect_uri={magic_link_uri_encoded}&scope={scopes}&response_type=code"
+        with st.form("github_sso_form"):
+            if st.form_submit_button("Sign in with GitHub", use_container_width=True):
+                st.markdown(
+                    f'<meta http-equiv="refresh" content="0;URL={github_sso_uri}">',
+                    unsafe_allow_html=True,
+                )
+                st.stop()
+
+
 def get_user():
     app_name = os.environ.get("APP_NAME", "Magical Auth")
     auth_uri = os.environ.get("MAGICALAUTH_SERVER", "http://localhost:12437")
@@ -180,6 +240,8 @@ def get_user():
                     else:
                         st.error(res)
             google_sso_button()
+            microsoft_sso_button()
+            github_sso_button()
         else:
             with st.form("register_form"):
                 email = st.text_input("Email")

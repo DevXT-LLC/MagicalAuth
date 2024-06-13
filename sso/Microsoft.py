@@ -24,36 +24,6 @@ Required scopes for Microsoft OAuth
 """
 
 
-def get_microsoft_access_token(code, redirect_uri=None):
-    if not redirect_uri:
-        redirect_uri = getenv("MAGIC_LINK_URL")
-    code = (
-        str(code)
-        .replace("%2F", "/")
-        .replace("%3D", "=")
-        .replace("%3F", "?")
-        .replace("%3D", "=")
-    )
-    response = requests.post(
-        f"https://login.microsoftonline.com/common/oauth2/v2.0/token",
-        data={
-            "code": code,
-            "client_id": getenv("MICROSOFT_CLIENT_ID"),
-            "client_secret": getenv("MICROSOFT_CLIENT_SECRET"),
-            "redirect_uri": redirect_uri,
-            "grant_type": "authorization_code",
-            "scope": "https://graph.microsoft.com/User.Read https://graph.microsoft.com/Mail.Send",
-        },
-    )
-    if response.status_code != 200:
-        logging.error(f"Error getting Microsoft access token: {response.text}")
-        return None, None
-    data = response.json()
-    access_token = data["access_token"]
-    refresh_token = data["refresh_token"]
-    return access_token, refresh_token
-
-
 class MicrosoftSSO:
     def __init__(
         self,
@@ -153,3 +123,32 @@ class MicrosoftSSO:
                 data=json.dumps(email_data),
             )
         return response.json()
+
+
+def microsoft_sso(code, redirect_uri=None) -> MicrosoftSSO:
+    if not redirect_uri:
+        redirect_uri = getenv("MAGIC_LINK_URL")
+    code = (
+        str(code)
+        .replace("%2F", "/")
+        .replace("%3D", "=")
+        .replace("%3F", "?")
+        .replace("%3D", "=")
+    )
+    response = requests.post(
+        f"https://login.microsoftonline.com/common/oauth2/v2.0/token",
+        params={
+            "code": code,
+            "client_id": getenv("MICROSOFT_CLIENT_ID"),
+            "client_secret": getenv("MICROSOFT_CLIENT_SECRET"),
+            "redirect_uri": redirect_uri,
+            "grant_type": "authorization_code",
+        },
+    )
+    if response.status_code != 200:
+        logging.error(f"Error getting Microsoft access token: {response.text}")
+        return None, None
+    data = response.json()
+    access_token = data["access_token"]
+    refresh_token = data["refresh_token"]
+    return MicrosoftSSO(access_token=access_token, refresh_token=refresh_token)

@@ -2,8 +2,9 @@ from DB import User, FailedLogins, UserOAuth, OAuthProvider, get_session
 from Models import UserInfo, Register, Login
 from fastapi import Header, HTTPException
 from Globals import getenv
-from sso.Google import GoogleSSO, get_google_access_token
-from sso.Microsoft import MicrosoftSSO, get_microsoft_access_token
+from sso.Google import google_sso
+from sso.Microsoft import microsoft_sso
+from sso.GitHub import github_sso
 from datetime import datetime, timedelta
 from fastapi import HTTPException
 from sendgrid import SendGridAPIClient
@@ -383,35 +384,39 @@ class MagicalAuth:
     ):
         if not referrer:
             referrer = getenv("MAGIC_LINK_URL")
+        provider = str(provider).lower()
         if provider == "google":
-            access_token, refresh_token = get_google_access_token(
-                code=code, redirect_uri=referrer
-            )
-            if not access_token:
+            google = google_sso(code=code, redirect_uri=referrer)
+            if not google.access_token:
                 raise HTTPException(
                     status_code=400,
                     detail="Failed to get access token from Google SSO.",
                 )
-            google = GoogleSSO(
-                access_token=access_token,
-                refresh_token=refresh_token,
-            )
             user_data = google.user_info
+            access_token = google.access_token
+            refresh_token = google.refresh_token
             self.email = str(user_data["email"]).lower()
         elif provider == "microsoft":
-            access_token, refresh_token = get_microsoft_access_token(
-                code=code, redirect_uri=referrer
-            )
-            if not access_token:
+            microsoft = microsoft_sso(code=code, redirect_uri=referrer)
+            if not microsoft.access_token:
                 raise HTTPException(
                     status_code=400,
                     detail="Failed to get access token from Microsoft SSO.",
                 )
-            microsoft = MicrosoftSSO(
-                access_token=access_token,
-                refresh_token=refresh_token,
-            )
             user_data = microsoft.user_info
+            access_token = microsoft.access_token
+            refresh_token = microsoft.refresh_token
+            self.email = str(user_data["email"]).lower()
+        elif provider == "github":
+            github = github_sso(code=code, redirect_uri=referrer)
+            if not github.access_token:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Failed to get access token from GitHub SSO.",
+                )
+            user_data = github.user_info
+            access_token = github.access_token
+            refresh_token = github.refresh_token
             self.email = str(user_data["email"]).lower()
         # Future SSO providers can be added here
         else:

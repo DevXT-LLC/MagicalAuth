@@ -28,35 +28,6 @@ Required scopes for Google SSO
 """
 
 
-def get_google_access_token(code, redirect_uri=None):
-    if not redirect_uri:
-        redirect_uri = getenv("MAGIC_LINK_URL")
-    code = (
-        str(code)
-        .replace("%2F", "/")
-        .replace("%3D", "=")
-        .replace("%3F", "?")
-        .replace("%3D", "=")
-    )
-    response = requests.post(
-        f"https://accounts.google.com/o/oauth2/token",
-        params={
-            "code": code,
-            "client_id": getenv("GOOGLE_CLIENT_ID"),
-            "client_secret": getenv("GOOGLE_CLIENT_SECRET"),
-            "redirect_uri": redirect_uri,
-            "grant_type": "authorization_code",
-        },
-    )
-    if response.status_code != 200:
-        logging.error(f"Error getting Google access token: {response.text}")
-        return None, None
-    data = response.json()
-    access_token = data["access_token"]
-    refresh_token = data["refresh_token"]
-    return access_token, refresh_token
-
-
 class GoogleSSO:
     def __init__(
         self,
@@ -139,3 +110,32 @@ class GoogleSSO:
                 data=json.dumps(message),
             )
         return response.json()
+
+
+def google_sso(code, redirect_uri=None) -> GoogleSSO:
+    if not redirect_uri:
+        redirect_uri = getenv("MAGIC_LINK_URL")
+    code = (
+        str(code)
+        .replace("%2F", "/")
+        .replace("%3D", "=")
+        .replace("%3F", "?")
+        .replace("%3D", "=")
+    )
+    response = requests.post(
+        f"https://accounts.google.com/o/oauth2/token",
+        params={
+            "code": code,
+            "client_id": getenv("GOOGLE_CLIENT_ID"),
+            "client_secret": getenv("GOOGLE_CLIENT_SECRET"),
+            "redirect_uri": redirect_uri,
+            "grant_type": "authorization_code",
+        },
+    )
+    if response.status_code != 200:
+        logging.error(f"Error getting Google access token: {response.text}")
+        return None, None
+    data = response.json()
+    access_token = data["access_token"]
+    refresh_token = data["refresh_token"]
+    return GoogleSSO(access_token=access_token, refresh_token=refresh_token)
