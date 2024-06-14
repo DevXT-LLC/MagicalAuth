@@ -18,5 +18,4 @@ log_out_button()
 ## The rest of the code for your app goes under here...
 
 st.write(f"Welcome, {user['first_name']} {user['last_name']}!")
-st.write(f"About you: {user['job_title']} at {user['company_name']}")
 st.write(f"Your email: {user['email']}")

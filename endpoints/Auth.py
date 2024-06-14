@@ -85,3 +85,20 @@ def delete_user(
 ):
     MagicalAuth(token=authorization).delete_user()
     return Detail(detail="User deleted successfully.")
+
+
+@router.post(
+    "/v1/oauth2/{provider}",
+    response_model=Detail,
+    summary="Login using OAuth2 provider",
+)
+async def oauth_login(request: Request, provider: str):
+    data = await request.json()
+    auth = MagicalAuth()
+    magic_link = auth.sso(
+        provider=provider.lower(),
+        code=data["code"],
+        ip_address=request.client.host,
+        referrer=data["referrer"] if "referrer" in data else getenv("MAGIC_LINK_URL"),
+    )
+    return {"detail": magic_link, "email": auth.email, "token": auth.token}
