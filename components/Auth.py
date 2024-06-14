@@ -93,6 +93,21 @@ def sso_buttons():
         "yelp": "https://upload.wikimedia.org/wikipedia/commons/a/ad/Yelp_logo.svg",
         "zendesk": "https://upload.wikimedia.org/wikipedia/commons/9/91/Zendesk_logo.svg",
     }
+    st.markdown(
+        """
+        <style>
+        .sso-button {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .sso-button img {
+            margin-right: 10px;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
     with st.form("sso_form"):
         for page in os.listdir("./pages"):
             if page.endswith(".py"):
@@ -114,112 +129,16 @@ def sso_buttons():
                     scopes = urllib.parse.quote(" ".join(scopes))
                     sso_uri = f"{auth_uri}?client_id={client_id_encoded}&redirect_uri={magic_link_uri_encoded}&scope={scopes}&response_type=code&access_type=offline&prompt=consent"
                     if sso_uri != "":
-                        col1, col2 = st.columns([1, 5])
-                        with col1:
-                            if provider in icons:
-                                icon = icons[provider]
-                                st.image(icon, width=40)
-                        with col2:
+                        if provider in icons:
+                            btn_label = f'<div class="sso-button"><img src="{icons[provider]}" width="24" height="24"><span>Continue with {provider.capitalize()}</span></div>'
+                        else:
                             btn_label = f"Continue with {provider.capitalize()}"
-                            if st.form_submit_button(btn_label):
-                                st.markdown(
-                                    f'<meta http-equiv="refresh" content="0;URL={sso_uri}">',
-                                    unsafe_allow_html=True,
-                                )
-                                st.stop()
-
-
-def google_sso_button():
-    client_id = getenv("GOOGLE_CLIENT_ID")
-    if client_id == "":
-        return ""
-    code = st.query_params.get("code", "")
-    if isinstance(code, list):
-        code = str(code[0])
-    else:
-        code = str(code)
-    if code == "None" or code is None:
-        code = ""
-    if code == "" and "token" not in st.query_params:
-        scopes = urllib.parse.quote(
-            "https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
-        )
-        magic_link_uri = getenv("MAGIC_LINK_URL")
-        if magic_link_uri.endswith("/"):
-            magic_link_uri = magic_link_uri[:-1]
-        magic_link_uri = f"{magic_link_uri}/google"
-        magic_link_uri_encoded = urllib.parse.quote(magic_link_uri)
-        client_id_encoded = urllib.parse.quote(client_id)
-        google_sso_uri = f"https://accounts.google.com/o/oauth2/auth?client_id={client_id_encoded}&redirect_uri={magic_link_uri_encoded}&scope={scopes}&response_type=code&access_type=offline&prompt=consent"
-        with st.form("google_sso_form"):
-            if st.form_submit_button("Sign in with Google", use_container_width=True):
-                st.markdown(
-                    f'<meta http-equiv="refresh" content="0;URL={google_sso_uri}">',
-                    unsafe_allow_html=True,
-                )
-                st.stop()
-
-
-def microsoft_sso_button():
-    client_id = getenv("MICROSOFT_CLIENT_ID")
-    if client_id == "":
-        return ""
-    code = st.query_params.get("code", "")
-    if isinstance(code, list):
-        code = str(code[0])
-    else:
-        code = str(code)
-    if code == "None" or code is None:
-        code = ""
-    if code == "" and "token" not in st.query_params:
-        scopes = urllib.parse.quote(
-            "https://graph.microsoft.com/User.Read https://graph.microsoft.com/Mail.Send https://graph.microsoft.com/Calendars.ReadWrite.Shared"
-        )
-        magic_link_uri = getenv("MAGIC_LINK_URL")
-        if magic_link_uri.endswith("/"):
-            magic_link_uri = magic_link_uri[:-1]
-        magic_link_uri = f"{magic_link_uri}/microsoft"
-        magic_link_uri_encoded = urllib.parse.quote(magic_link_uri)
-        client_id_encoded = urllib.parse.quote(client_id)
-        microsoft_sso_uri = f"https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id={client_id_encoded}&redirect_uri={magic_link_uri_encoded}&scope={scopes}&response_type=code"
-        with st.form("microsoft_sso_form"):
-            if st.form_submit_button(
-                "Sign in with Microsoft", use_container_width=True
-            ):
-                st.markdown(
-                    f'<meta http-equiv="refresh" content="0;URL={microsoft_sso_uri}">',
-                    unsafe_allow_html=True,
-                )
-                st.stop()
-
-
-def github_sso_button():
-    client_id = getenv("GITHUB_CLIENT_ID")
-    if client_id == "":
-        return ""
-    code = st.query_params.get("code", "")
-    if isinstance(code, list):
-        code = str(code[0])
-    else:
-        code = str(code)
-    if code == "None" or code is None:
-        code = ""
-    if code == "" and "token" not in st.query_params:
-        scopes = urllib.parse.quote("user:email read:user")
-        magic_link_uri = getenv("MAGIC_LINK_URL")
-        if magic_link_uri.endswith("/"):
-            magic_link_uri = magic_link_uri[:-1]
-        magic_link_uri = f"{magic_link_uri}/github"
-        magic_link_uri_encoded = urllib.parse.quote(magic_link_uri)
-        client_id_encoded = urllib.parse.quote(client_id)
-        github_sso_uri = f"https://github.com/login/oauth/authorize?client_id={client_id_encoded}&redirect_uri={magic_link_uri_encoded}&scope={scopes}&response_type=code"
-        with st.form("github_sso_form"):
-            if st.form_submit_button("Sign in with GitHub", use_container_width=True):
-                st.markdown(
-                    f'<meta http-equiv="refresh" content="0;URL={github_sso_uri}">',
-                    unsafe_allow_html=True,
-                )
-                st.stop()
+                        if st.form_submit_button(btn_label, unsafe_allow_html=True):
+                            st.markdown(
+                                f'<meta http-equiv="refresh" content="0;URL={sso_uri}">',
+                                unsafe_allow_html=True,
+                            )
+                            st.stop()
 
 
 def get_user():
