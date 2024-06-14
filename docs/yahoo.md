@@ -43,7 +43,6 @@ Add the following lines to your `.env` file:
 ```plaintext
 YAHOO_CLIENT_ID=your_yahoo_client_id
 YAHOO_CLIENT_SECRET=your_yahoo_client_secret
-MAGIC_LINK_URL=https://yourdomain.com/oauth/callback/yahoo
 ```
 
 Replace `your_yahoo_client_id` and `your_yahoo_client_secret` with the credentials you obtained from the Yahoo Developer Dashboard. Set `MAGIC_LINK_URL` to your application's redirect URI.

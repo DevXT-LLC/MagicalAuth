@@ -48,7 +48,6 @@ Follow these steps to acquire your keys and set up the required environment vari
 ### 4. Configure Instagram OAuth
 
 - Once the app is created, visit the "Basic Display" settings under the "Instagram" product.
-- Define the redirect URI (`MAGIC_LINK_URL`) for your app.
 - Add the necessary OAuth redirect URI based on your application's configuration.
 
 ### 5. Retrieve the Client ID and Client Secret

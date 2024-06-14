@@ -50,7 +50,7 @@ GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
 ```
 
-Replace `your_google_client_id` and `your_google_client_secret` with the values you obtained in the previous step. Additionally, set the `MAGIC_LINK_URL` if required.
+Replace `your_google_client_id` and `your_google_client_secret` with the values you obtained in the previous step.
 
 ### Required Scopes
 
