@@ -26,10 +26,7 @@ Required environment variables:
 """
 
 
-def sso_button(provider: str, auth_uri: str, scopes: list = []):
-    client_id = getenv(f"{provider.upper()}_CLIENT_ID")
-    if client_id == "":
-        return ""
+def sso_buttons():
     code = st.query_params.get("code", "")
     if isinstance(code, list):
         code = str(code[0])
@@ -37,38 +34,98 @@ def sso_button(provider: str, auth_uri: str, scopes: list = []):
         code = str(code)
     if code == "None" or code is None:
         code = ""
-    if code == "" and "token" not in st.query_params:
-        magic_link_uri = getenv("MAGIC_LINK_URL")
-        if magic_link_uri.endswith("/"):
-            magic_link_uri = magic_link_uri[:-1]
-        magic_link_uri = f"{magic_link_uri}/{provider}"
-        magic_link_uri_encoded = urllib.parse.quote(magic_link_uri)
-        client_id_encoded = urllib.parse.quote(client_id)
-        sso_uri = ""
-        scopes = urllib.parse.quote(" ".join(scopes))
-        sso_uri = f"{auth_uri}?client_id={client_id_encoded}&redirect_uri={magic_link_uri_encoded}&scope={scopes}&response_type=code&access_type=offline&prompt=consent"
-        if sso_uri != "":
-            with st.form(f"{provider}_sso_form"):
-                if st.form_submit_button(
-                    f"Sign in with {provider.capitalize()}", use_container_width=True
-                ):
-                    st.markdown(
-                        f'<meta http-equiv="refresh" content="0;URL={sso_uri}">',
-                        unsafe_allow_html=True,
-                    )
-                    st.stop()
-
-
-def sso_buttons():
     # For each page in pages that ends in .py, create a button
-    for page in os.listdir("./pages"):
-        if page.endswith(".py"):
-            provider = page.split(".py")[0].lower()
-            # from {provider} import scopes, auth_uri
-            module = importlib.import_module(f"pages.{provider}")
-            scopes = module.scopes()
-            auth_uri = module.auth_uri()
-            sso_button(provider, auth_uri, scopes)
+    icons = {
+        "amazon": "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",
+        "aol": "https://upload.wikimedia.org/wikipedia/commons/5/51/AOL.svg",
+        "apple": "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg",
+        "autodesk": "https://upload.wikimedia.org/wikipedia/commons/d/d7/Autodesk_logo_2019.svg",
+        "basecamp": "https://upload.wikimedia.org/wikipedia/en/8/8d/Basecamp-logo.png",
+        "battlenet": "https://upload.wikimedia.org/wikipedia/en/1/1b/Battle.net_Icon.svg",
+        "bitbucket": "https://upload.wikimedia.org/wikipedia/commons/0/0e/Bitbucket-blue-logomark-only.svg",
+        "bitly": "https://upload.wikimedia.org/wikipedia/commons/5/56/Bitly_logo.svg",
+        "clearscore": "https://upload.wikimedia.org/wikipedia/en/5/57/ClearScore_logo.png",
+        "cloud_foundry": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Cloud_Foundry_Logo.svg/512px-Cloud_Foundry_Logo.svg.png",
+        "deutsche_telekom": "https://upload.wikimedia.org/wikipedia/commons/d/d2/Logo_telekom_2013.svg",
+        "deviantart": "https://upload.wikimedia.org/wikipedia/commons/b/b5/DeviantArt_Logo.svg",
+        "discord": "https://upload.wikimedia.org/wikipedia/commons/9/98/Discord_logo.svg",
+        "dropbox": "https://upload.wikimedia.org/wikipedia/commons/7/7e/Dropbox_Icon.svg",
+        "facebook": "https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg",
+        "fatsecret": "https://upload.wikimedia.org/wikipedia/en/2/20/FatSecret.png",
+        "fitbit": "https://upload.wikimedia.org/wikipedia/commons/6/60/Fitbit_logo_2016.svg",
+        "formstack": "https://upload.wikimedia.org/wikipedia/en/0/09/Formstack_logo.png",
+        "foursquare": "https://upload.wikimedia.org/wikipedia/en/1/12/Foursquare_logo.svg",
+        "github": "https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg",
+        "gitlab": "https://upload.wikimedia.org/wikipedia/commons/1/18/GitLab_Logo.svg",
+        "google": "https://upload.wikimedia.org/wikipedia/commons/2/2d/Google-favicon-2015.png",
+        "imgur": "https://upload.wikimedia.org/wikipedia/en/a/a9/Imgur_logo.svg",
+        "instagram": "https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png",
+        "intel_cloud_services": "https://corporate-intelcom.azureedge.net/assets/Intel-Logo.svg",
+        "jive": "https://upload.wikimedia.org/wikipedia/en/8/8a/Jive_logo.png",
+        "keycloak": "https://www.keycloak.org/resources/images/keycloak_logo_400x.png",
+        "linkedin": "https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png",
+        "microsoft": "https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg",
+        "netiq": "https://upload.wikimedia.org/wikipedia/commons/3/30/NetIQ_logo.svg",
+        "okta": "https://upload.wikimedia.org/wikipedia/commons/5/50/Okta_Logo_Brandmark_Blue_RGB.png",
+        "openam": "https://avatars.githubusercontent.com/u/383598?v=4",
+        "openstreetmap": "https://upload.wikimedia.org/wikipedia/commons/6/66/OpenStreetMap-Logo.svg",
+        "orcid": "https://upload.wikimedia.org/wikipedia/commons/0/06/ORCID_iD.svg",
+        "paypal": "https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg",
+        "ping_identity": "https://upload.wikimedia.org/wikipedia/en/e/e2/Ping_Identity_logo.jpg",
+        "pixiv": "https://upload.wikimedia.org/wikipedia/commons/c/ce/Pixiv_comic_icon.svg",
+        "reddit": "https://upload.wikimedia.org/wikipedia/en/8/82/Reddit_logo_and_wordmark.svg",
+        "salesforce": "https://upload.wikimedia.org/wikipedia/en/b/b5/Salesforce_logo_transparent.png",
+        "spotify": "https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg",
+        "stack_exchange": "https://upload.wikimedia.org/wikipedia/commons/2/28/Stack_Exchange_logo.svg",
+        "strava": "https://upload.wikimedia.org/wikipedia/en/0/0d/Strava_Logo.svg",
+        "stripe": "https://upload.wikimedia.org/wikipedia/commons/3/3b/Stripe_Logo%2C_revised_2016.png",
+        "twitch": "https://upload.wikimedia.org/wikipedia/commons/7/7e/Twitch_logo_2019.svg",
+        "vimeo": "https://upload.wikimedia.org/wikipedia/commons/9/92/Vimeo_Logo.svg",
+        "vk": "https://upload.wikimedia.org/wikipedia/commons/2/21/VK.com-logo.svg",
+        "wechat": "https://upload.wikimedia.org/wikipedia/commons/9/9e/WeChat_Logo.svg",
+        "withings": "https://upload.wikimedia.org/wikipedia/en/a/a7/Withings_logo.svg",
+        "wso2_identity": "https://upload.wikimedia.org/wikipedia/commons/e/ee/WSO2_Logo.svg",
+        "xero": "https://images.squarespace-cdn.com/content/v1/600485aca07c94041769dbd3/1619704174874-KU8VVDKIHKB9YIS11836/XeroLogo.png",
+        "xing": "https://upload.wikimedia.org/wikipedia/commons/1/17/Xing_Logo.svg",
+        "yahoo": "https://s.yimg.com/rz/l/yahoo_en-US_f_p_bestfit_4x.png",
+        "yammer": "https://upload.wikimedia.org/wikipedia/commons/1/11/Yammer_logo.svg",
+        "yandex": "https://upload.wikimedia.org/wikipedia/commons/0/0f/Yandex_Logo_2016.svg",
+        "yelp": "https://upload.wikimedia.org/wikipedia/commons/a/ad/Yelp_logo.svg",
+        "zendesk": "https://upload.wikimedia.org/wikipedia/commons/9/91/Zendesk_logo.svg",
+    }
+    with st.form("sso_form"):
+        for page in os.listdir("./pages"):
+            if page.endswith(".py"):
+                provider = page.split(".py")[0].lower()
+                # from {provider} import scopes, auth_uri
+                module = importlib.import_module(f"pages.{provider}")
+                scopes = module.scopes()
+                auth_uri = module.auth_uri()
+                client_id = getenv(f"{provider.upper()}_CLIENT_ID")
+                if client_id == "":
+                    continue
+                if code == "" and "token" not in st.query_params:
+                    magic_link_uri = getenv("MAGIC_LINK_URL")
+                    if magic_link_uri.endswith("/"):
+                        magic_link_uri = magic_link_uri[:-1]
+                    magic_link_uri = f"{magic_link_uri}/{provider}"
+                    magic_link_uri_encoded = urllib.parse.quote(magic_link_uri)
+                    client_id_encoded = urllib.parse.quote(client_id)
+                    sso_uri = ""
+                    scopes = urllib.parse.quote(" ".join(scopes))
+                    sso_uri = f"{auth_uri}?client_id={client_id_encoded}&redirect_uri={magic_link_uri_encoded}&scope={scopes}&response_type=code&access_type=offline&prompt=consent"
+                    if sso_uri != "":
+                        # Add icon
+                        if provider in icons:
+                            icon = icons[provider]
+                            st.image(icon)
+                        title = f"Continue with {provider.capitalize()}"
+                        if st.form_submit_button(title):
+                            st.markdown(
+                                f'<meta http-equiv="refresh" content="0;URL={sso_uri}">',
+                                unsafe_allow_html=True,
+                            )
+                            st.stop()
 
 
 def google_sso_button():
