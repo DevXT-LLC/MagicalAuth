@@ -9,7 +9,7 @@ import streamlit as st
 from streamlit_js_eval import get_cookie, set_cookie
 from Globals import getenv
 import urllib.parse
-from OAuth2Providers import get_scopes, get_icon, get_authorization_url
+from OAuth2Providers import get_provider_info
 
 logging.basicConfig(
     level=getenv("LOG_LEVEL"),
@@ -41,6 +41,7 @@ def sso_buttons():
                 client_id = getenv(f"{provider.upper()}_CLIENT_ID")
                 if client_id == "":
                     continue
+                provider_info = get_provider_info(provider=provider)
                 if code == "" and "token" not in st.query_params:
                     magic_link_uri = getenv("MAGIC_LINK_URL")
                     if magic_link_uri.endswith("/"):
@@ -49,13 +50,13 @@ def sso_buttons():
                     magic_link_uri_encoded = urllib.parse.quote(magic_link_uri)
                     client_id_encoded = urllib.parse.quote(client_id)
                     sso_uri = ""
-                    scopes = get_scopes(provider=provider)
+                    scopes = provider_info["scopes"]
                     scopes = urllib.parse.quote(" ".join(scopes))
-                    sso_uri = f"{get_authorization_url(provider=provider)}?client_id={client_id_encoded}&redirect_uri={magic_link_uri_encoded}&scope={scopes}&response_type=code&access_type=offline&prompt=consent"
+                    sso_uri = f"{provider_info['authorization_url']}?client_id={client_id_encoded}&redirect_uri={magic_link_uri_encoded}&scope={scopes}&response_type=code&access_type=offline&prompt=consent"
                     if sso_uri != "":
                         col1, col2 = st.columns([1, 5])
                         with col1:
-                            icon = get_icon(provider=provider)
+                            icon = provider_info["icon"]
                             if icon:
                                 st.image(icon, width=40)
                         with col2:
