@@ -1,6 +1,6 @@
 # MagicalAuth
 
-MagicalAuth is a simple but magical authentication system for Python applications. It is designed to be easy to use and easy to understand. It is also designed to be secure and reliable utilizing magic links and multi-factor authentication.
+MagicalAuth is a simple but magical authentication system for Python applications. It is designed to be easy to use and easy to understand. It is also designed to be secure and reliable utilizing magic links and multi-factor authentication or your choice of OAuth2 providers.
 
 ## Table of Contents
 
@@ -9,6 +9,7 @@ MagicalAuth is a simple but magical authentication system for Python application
   - [Project Purpose](#project-purpose)
   - [Tech Stack](#tech-stack)
   - [Environment Variables](#environment-variables)
+  - [OAuth2 Providers](#oauth2-providers)
   - [Getting Started](#getting-started)
     - [Prerequisites](#prerequisites)
     - [Clone the repository](#clone-the-repository)
@@ -57,6 +58,10 @@ By leveraging this tech stack, developers can build scalable, secure, and effici
 - `DATABASE_NAME`: The name of the database.
 - `UVICORN_WORKERS`: The number of Uvicorn workers to use. This should be an integer.
 - `LOG_LEVEL`: The log level for the application. This should be one of `DEBUG`, `INFO`, `WARNING`, `ERROR`, or `CRITICAL`.
+
+## OAuth2 Providers
+
+MagicalAuth supports OAuth2 providers for authentication. [Visit the docs directory](docs/microsoft.md) and browse the directory for more guides on integrating with specific OAuth2 providers. We support many OAuth2 providers, including [amazon](docs/amazon.md), [aol](docs/aol.md), [apple](docs/apple.md), [autodesk](docs/autodesk.md), [basecamp](docs/basecamp.md), [battlenet](docs/battlenet.md), [bitbucket](docs/bitbucket.md), [bitly](docs/bitly.md), [clearscore](docs/clearscore.md), [cloud_foundry](docs/cloud_foundry.md), [deutsche_telekom](docs/deutsche_telekom.md), [deviantart](docs/deviantart.md), [discord](docs/discord.md), [dropbox](docs/dropbox.md), [facebook](docs/facebook.md), [fatsecret](docs/fatsecret.md), [fitbit](docs/fitbit.md), [formstack](docs/formstack.md), [foursquare](docs/foursquare.md), [github](docs/github.md), [gitlab](docs/gitlab.md), [google](docs/google.md), [huddle](docs/huddle.md), [imgur](docs/imgur.md), [instagram](docs/instagram.md), [intel_cloud_services](docs/intel_cloud_services.md), [jive](docs/jive.md), [keycloak](docs/keycloak.md), [linkedin](docs/linkedin.md), [microsoft](docs/microsoft.md), [netiq](docs/netiq.md), [okta](docs/okta.md), [openam](docs/openam.md), [openstreetmap](docs/openstreetmap.md), [orcid](docs/orcid.md), [paypal](docs/paypal.md), [ping_identity](docs/ping_identity.md), [pixiv](docs/pixiv.md), [reddit](docs/reddit.md), [salesforce](docs/salesforce.md), [sina_weibo](docs/sina_weibo.md), [spotify](docs/spotify.md), [stack_exchange](docs/stack_exchange.md), [strava](docs/strava.md), [stripe](docs/stripe.md), [twitch](docs/twitch.md), [viadeo](docs/viadeo.md), [vimeo](docs/vimeo.md), [vk](docs/vk.md), [wechat](docs/wechat.md), [withings](docs/withings.md), [wso2_identity](docs/wso2_identity.md), [xero](docs/xero.md), [xing](docs/xing.md), [yahoo](docs/yahoo.md), [yammer](docs/yammer.md), [yandex](docs/yandex.md), [yelp](docs/yelp.md), and[zendesk](docs/zendesk.md).
 
 ## Getting Started
 
