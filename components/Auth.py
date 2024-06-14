@@ -114,17 +114,20 @@ def sso_buttons():
                     scopes = urllib.parse.quote(" ".join(scopes))
                     sso_uri = f"{auth_uri}?client_id={client_id_encoded}&redirect_uri={magic_link_uri_encoded}&scope={scopes}&response_type=code&access_type=offline&prompt=consent"
                     if sso_uri != "":
-                        # Add icon
-                        if provider in icons:
-                            icon = icons[provider]
-                            st.image(icon, width=40)
-                        title = f"Continue with {provider.capitalize()}"
-                        if st.form_submit_button(title):
-                            st.markdown(
-                                f'<meta http-equiv="refresh" content="0;URL={sso_uri}">',
-                                unsafe_allow_html=True,
-                            )
-                            st.stop()
+                        col1, col2 = st.columns([1, 5])
+                        with col1:
+                            if provider in icons:
+                                icon = icons[provider]
+                                st.image(icon, width=40)
+                        with col2:
+                            if st.form_submit_button(
+                                f"Continue with {provider.capitalize()}"
+                            ):
+                                st.markdown(
+                                    f'<meta http-equiv="refresh" content="0;URL={sso_uri}">',
+                                    unsafe_allow_html=True,
+                                )
+                                st.stop()
 
 
 def google_sso_button():
