@@ -41,7 +41,6 @@ def sso_buttons():
                 client_id = getenv(f"{provider.upper()}_CLIENT_ID")
                 if client_id == "":
                     continue
-
                 if code == "" and "token" not in st.query_params:
                     magic_link_uri = getenv("MAGIC_LINK_URL")
                     if magic_link_uri.endswith("/"):
@@ -50,18 +49,19 @@ def sso_buttons():
                     magic_link_uri_encoded = urllib.parse.quote(magic_link_uri)
                     client_id_encoded = urllib.parse.quote(client_id)
                     sso_uri = ""
-                    scopes = get_scopes(provider)
+                    scopes = get_scopes(provider=provider)
                     scopes = urllib.parse.quote(" ".join(scopes))
-                    sso_uri = f"{get_authorization_url()}?client_id={client_id_encoded}&redirect_uri={magic_link_uri_encoded}&scope={scopes}&response_type=code&access_type=offline&prompt=consent"
+                    sso_uri = f"{get_authorization_url(provider=provider)}?client_id={client_id_encoded}&redirect_uri={magic_link_uri_encoded}&scope={scopes}&response_type=code&access_type=offline&prompt=consent"
                     if sso_uri != "":
                         col1, col2 = st.columns([1, 5])
                         with col1:
-                            icon = get_icon(provider)
+                            icon = get_icon(provider=provider)
                             if icon:
                                 st.image(icon, width=40)
                         with col2:
-                            btn_label = f"Continue with {provider.capitalize()}"
-                            if st.form_submit_button(btn_label):
+                            if st.form_submit_button(
+                                f"Continue with {provider.capitalize()}"
+                            ):
                                 st.markdown(
                                     f'<meta http-equiv="refresh" content="0;URL={sso_uri}">',
                                     unsafe_allow_html=True,
