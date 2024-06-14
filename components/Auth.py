@@ -122,6 +122,7 @@ def sso_buttons():
                         with col2:
                             if st.form_submit_button(
                                 f"Continue with {provider.capitalize()}"
+                                use_container_width=True
                             ):
                                 st.markdown(
                                     f'<meta http-equiv="refresh" content="0;URL={sso_uri}">',
