@@ -118,7 +118,7 @@ def sso_buttons():
                         # Add icon
                         if provider in icons:
                             icon = icons[provider]
-                            st.image(icon)
+                            st.image(icon, width=40)
                         title = f"Continue with {provider.capitalize()}"
                         if st.form_submit_button(title):
                             st.markdown(
