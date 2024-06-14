@@ -1,6 +1,6 @@
 # MagicalAuth
 
-MagicalAuth is a simple but magical authentication system for Python applications. It is designed to be easy to use and easy to understand. It is also designed to be secure and reliable utilizing magic links and multi-factor authentication or your choice of OAuth2 providers.
+MagicalAuth is a simple but magical authentication system for Python applications. It is designed to be easy to use, secure, and reliable. Choose your method to authenticate between a magic link with multi-factor auth, or an OAuth2 Single Sign-On provider.
 
 ## Table of Contents
 
