@@ -52,38 +52,3 @@ Add the obtained credentials and required environment variables to your `.env` f
 LINKEDIN_CLIENT_ID=your_linkedin_client_id
 LINKEDIN_CLIENT_SECRET=your_linkedin_client_secret
 ```
-
-Additionally, ensure you have `MAGIC_LINK_URL` in your `.env` file if it's being used as the redirect URI:
-
-```env
-MAGIC_LINK_URL=your_redirect_uri
-```
-
-## Example Usage
-
-Here is an example of how you can use the LinkedInSSO class and the `linkedin_sso` function in your application:
-
-```python
-from linkedin import linkedin_sso
-
-# Assume `code` is received from LinkedIn after user authorization
-code = "authorization_code_received_from_linkedin"
-redirect_uri = "your_redirect_uri"  # optional, defaults to MAGIC_LINK_URL
-
-linkedin_sso_instance = linkedin_sso(code, redirect_uri)
-
-if linkedin_sso_instance:
-    user_info = linkedin_sso_instance.user_info
-    print("User Info:", user_info)
-else:
-    print("Failed to authenticate with LinkedIn.")
-```
-
-### Notes
-
-- **Token Management**: The `LinkedInSSO` class handles token refreshing if the access token expires.
-- **Error Handling**: The class raises an `HTTPException` if it fails to retrieve user information from LinkedIn.
-
-## Conclusion
-
-By following these steps, you can integrate LinkedIn SSO into your application seamlessly. Ensure all necessary permissions and APIs are enabled, and properly manage environment variables.

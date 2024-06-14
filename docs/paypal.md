@@ -28,8 +28,9 @@ Ensure you add these environment variables to your `.env` file.
 
 3. **Get Client ID and Secret:**
 
-   - Once the app is created, you’ll find your **Client ID** and **Secret** on the app’s page.
+   - Once the app is created, youï¿½ll find your **Client ID** and **Secret** on the appï¿½s page.
    - Copy the **Client ID** and **Secret** and add them to your `.env` file as follows:
+
      ```plaintext
      PAYPAL_CLIENT_ID=YOUR_CLIENT_ID
      PAYPAL_CLIENT_SECRET=YOUR_CLIENT_SECRET
@@ -38,6 +39,7 @@ Ensure you add these environment variables to your `.env` file.
 ## Configuration of Redirect URI
 
 Make sure your `redirect_uri` is correctly set up in the PayPal Developer Dashboard:
+
 - Go to your app settings.
 - Add the `redirect_uri` to the **Return URL** section under the **App settings**.
 
@@ -48,45 +50,6 @@ Ensure that you have the PayPal REST API enabled and the appropriate client cred
 ## Required Scopes for PayPal OAuth
 
 To authenticate users and retrieve their information, you will need the following OAuth scopes:
+
 - `email`
 - `openid`
-
-## Implementation Details
-
-### Class: `PayPalSSO`
-
-#### `__init__(access_token=None, refresh_token=None)`
-
-- **Parameters:**
-  - `access_token` (Optional): The access token obtained from PayPal OAuth.
-  - `refresh_token` (Optional): The refresh token obtained from PayPal OAuth.
-- **Description:** Initializes the PayPal SSO by retrieving user info based on the access token.
-
-#### Method: `get_new_token()`
-
-- **Description:** Refreshes the OAuth token using the refresh token.
-- **Returns:** New access token.
-
-#### Method: `get_user_info()`
-
-- **Description:** Fetches the user info (email, first name, last name) from PayPal.
-- **Returns:** Dictionary containing user info.
-
-#### Method: `send_payment(recipient_email, amount, currency="USD")`
-
-- **Parameters:**
-  - `recipient_email`: The email of the payment recipient.
-  - `amount`: The amount to be sent.
-  - `currency` (Default: "USD"): The currency of the payment.
-- **Description:** Sends a payment via PayPal.
-
-### Function: `paypal_sso(code, redirect_uri=None) -> PayPalSSO`
-
-  - **Parameters:**
-    - `code`: The authorization code obtained from the PayPal OAuth flow.
-    - `redirect_uri` (Optional): The URI to redirect to after authorization, defaults to `MAGIC_LINK_URL`.
-  - **Returns:** An instance of `PayPalSSO` with initialized access and refresh tokens.
-
----
-
-This documentation details the process of setting up the PayPal SSO integration by acquiring necessary keys and setting environment variables. Follow these steps carefully to ensure smooth integration.

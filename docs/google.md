@@ -1,6 +1,6 @@
 # Google SSO Module Documentation
 
-This module allows you to implement Google Single Sign-On (SSO) and send emails using the Gmail API. 
+This module allows you to implement Google Single Sign-On (SSO) and send emails using the Gmail API.
 
 ## Setup Instructions
 
@@ -48,7 +48,6 @@ Add the obtained credentials to your environment variables. Create a `.env` file
 ```dotenv
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
-MAGIC_LINK_URL=your_redirect_url   # Optional, can be set during function call
 ```
 
 Replace `your_google_client_id` and `your_google_client_secret` with the values you obtained in the previous step. Additionally, set the `MAGIC_LINK_URL` if required.
@@ -62,65 +61,3 @@ The following OAuth 2.0 scopes are required for the module to function correctly
 - `https://www.googleapis.com/auth/gmail.send`
 
 Ensure these scopes are specified when requesting user consent.
-
-## Module Usage
-
-### GoogleSSO Class
-
-This class is the main interface for Google SSO and Gmail functionalities.
-
-#### Initialization
-
-```python
-sso_instance = GoogleSSO(access_token=your_access_token, refresh_token=your_refresh_token)
-```
-
-Initialize the class with access and refresh tokens obtained from Google OAuth.
-
-#### Methods
-
-- `get_user_info()`: Fetches the authenticated user's information such as first name, last name, and email.
-- `send_email(to, subject, message_text)`: Sends an email using the authenticated user's Gmail account.
-
-### google_sso Function
-
-Use this function to obtain an instance of `GoogleSSO` after completing the OAuth flow.
-
-#### Example:
-
-```python
-from sso.google import google_sso
-
-code = "authorization_code_returned_by_google"
-redirect_uri = "your_redirect_url"  # Optional, can be configured in .env
-
-sso_instance = google_sso(code, redirect_uri)
-```
-
-This function handles exchanging the authorization code for access and refresh tokens.
-
-## Example
-
-Below is an example of how to use the module:
-
-```python
-from sso.google import google_sso
-
-# Obtain instance after OAuth flow
-code = "authorization_code_returned_by_google"
-sso_instance = google_sso(code)
-
-# Fetch user information
-user_info = sso_instance.get_user_info()
-print(user_info)  # {'email': 'example@gmail.com', 'first_name': 'John', 'last_name': 'Doe'}
-
-# Send an email
-result = sso_instance.send_email(
-    to="recipient@example.com",
-    subject="Test Email",
-    message_text="This is a test email sent using Google SSO."
-)
-print(result)
-```
-
-This completes the setup and usage instructions for the Google SSO module. Make sure to handle errors and access token expirations appropriately in your implementation.

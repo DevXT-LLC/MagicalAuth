@@ -1,9 +1,11 @@
-## Discord Single Sign-On (SSO)
+# Discord Single Sign-On (SSO)
 
-### Overview
+## Overview
+
 This module allows you to integrate Discord's OAuth2 functionality into your application, enabling Single Sign-On using Discord credentials. This can be useful for authentication and fetching user information such as their Discord username, discriminator, and email.
 
-### Required Environment Variables
+## Required Environment Variables
+
 To use the Discord SSO functionality, you need to create a Discord application and obtain the necessary credentials. The required environment variables are:
 
 - `DISCORD_CLIENT_ID`: Discord OAuth client ID
@@ -29,7 +31,8 @@ These variables should be added to your `.env` file for ease of use and security
    - Select the `email` scope to ensure you have permission to access the user's email.
 
 5. **Add Credentials to Your `.env` File:**
-   ```
+
+   ```env
    DISCORD_CLIENT_ID=your_client_id_here
    DISCORD_CLIENT_SECRET=your_client_secret_here
    ```
@@ -39,28 +42,3 @@ These variables should be added to your `.env` file for ease of use and security
 Make sure you have the following scopes set up for your Discord application:
 
 - `email` (Refer to the [Discord OAuth2 Scopes Documentation](https://discord.com/developers/docs/topics/oauth2#shared-resources-oauth2-scopes))
-
-### Example Usage
-
-This module defines a `DiscordSSO` class to manage OAuth tokens and retrieve user information. Here’s how you can use it:
-
-```python
-from sso.discord import DiscordSSO, discord_sso
-
-# Suppose 'code' and 'redirect_uri' are obtained via your OAuth callback endpoint
-code = "your_authorization_code"
-redirect_uri = "your_redirect_uri"
-
-# Initialize the DiscordSSO object using an authorization code
-sso, error = discord_sso(code, redirect_uri)
-
-if sso:
-    # Access user info
-    user_info = sso.user_info
-    print(f"Username: {user_info['username']}")
-    print(f"Email: {user_info['email']}")
-else:
-    print("Error:", error)
-```
-
-This integration allows you to effortlessly handle Discord OAuth2 authentication within your application. Make sure to set up your environment variables correctly and follow the instructions to obtain necessary API credentials and scopes.

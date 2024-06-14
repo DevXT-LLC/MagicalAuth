@@ -1,25 +1,25 @@
-## Apple
+# Apple
 
 Apple Sign-In (SSO) allows you to use Apple's secure authentication service for user login and data retrieval. Setting up Apple SSO involves creating the required OAuth credentials and configuring your environment variables.
 
-### Required Environment Variables
+## Required Environment Variables
 
 Before you begin, ensure you have the following environment variables set up in your `.env` file:
 
 - `APPLE_CLIENT_ID`: Your Apple OAuth client ID
 - `APPLE_CLIENT_SECRET`: Your Apple OAuth client secret
 
-### Acquiring Apple OAuth Client ID and Client Secret
+## Acquiring Apple OAuth Client ID and Client Secret
 
 1. **Create an Apple Developer Account**: If you don't have an Apple Developer account, you will need to [register](https://developer.apple.com/programs/).
 
-2. **Create an App ID**: 
+2. **Create an App ID**:
     - Go to [Apple Developer Portal](https://developer.apple.com/account/ios/identifier/bundle).
     - Under **Certificates, Identifiers & Profiles**, select **Identifiers**.
     - Click the "+" button to create a new App ID.
     - Register your App ID and ensure it has the appropriate capabilities for Sign-In with Apple.
 
-3. **Configure Sign-In with Apple**: 
+3. **Configure Sign-In with Apple**:
     - After creating the App ID, configure it to use Sign-In with Apple.
     - Navigate to the **Keys** section in the [Apple Developer Portal](https://developer.apple.com/account/resources/authkeys/list).
     - Click the "+" button to create a new key.
@@ -67,10 +67,9 @@ Before you begin, ensure you have the following environment variables set up in 
 
 Once you have the `APPLE_CLIENT_ID` and `APPLE_CLIENT_SECRET`, add them to your `.env` file:
 
-```
+```env
 APPLE_CLIENT_ID=your_apple_client_id
 APPLE_CLIENT_SECRET=your_apple_client_secret
-MAGIC_LINK_URL=your_redirect_uri
 ```
 
 ### Required Scopes for Apple SSO
@@ -79,31 +78,6 @@ The required scopes for Apple SSO include:
 
 - `name`: To get the user's name.
 - `email`: To get the user's email address.
-
-### Integration Guide
-
-#### Instantiating AppleSSO Object
-
-Here is an example of how to instantiate the `AppleSSO` object and perform authentication using the provided class methods:
-
-```python
-from sso.apple import AppleSSO, apple_sso
-
-# Example authorization code obtained from Apple after user signs in
-authorization_code = "your_auth_code_from_apple"
-
-# Authenticate using the authorization code
-apple_user = apple_sso(authorization_code)
-
-if apple_user:
-    print(f"User's email: {apple_user.user_info['email']}")
-    print(f"User's first name: {apple_user.user_info['first_name']}")
-    print(f"User's last name: {apple_user.user_info['last_name']}")
-else:
-    print("Authentication failed.")
-```
-
-This class is mainly for handling authentication and fetching user info based on the tokens provided by Apple's authentication response. Please note that due to Apple’s unique SSO structure, additional logic is required to properly extract user information during the initial authentication exchange.
 
 ### Additional Notes
 

@@ -10,7 +10,6 @@ To start using Instagram SSO, you need to provide the following environment vari
 
 - `INSTAGRAM_CLIENT_ID`: Instagram OAuth client ID
 - `INSTAGRAM_CLIENT_SECRET`: Instagram OAuth client secret
-- `MAGIC_LINK_URL`: The redirect URL for the OAuth process
 
 Add these environment variables to your `.env` file.
 
@@ -69,36 +68,4 @@ Ensure your `.env` file looks something like:
 ```plaintext
 INSTAGRAM_CLIENT_ID=your_client_id_here
 INSTAGRAM_CLIENT_SECRET=your_client_secret_here
-MAGIC_LINK_URL=https://your-redirect-url.com
 ```
-
-## Example
-
-### Usage
-
-Here's an example of how to use the `InstagramSSO` class in your application:
-
-```python
-from sso.instagram import InstagramSSO, instagram_sso
-
-# After the user approved access in Instagram, you will receive a `code`
-authorization_code = 'received_auth_code'
-redirect_uri = 'https://your-redirect-url.com'
-
-# Acquiring Instagram SSO
-instagram_sso_instance = instagram_sso(authorization_code, redirect_uri)
-
-# Fetching user info
-user_info = instagram_sso_instance.user_info
-print(user_info)
-
-# Sending a media post
-image_url = 'https://example.com/image.jpg'
-caption = "Your caption text"
-response = instagram_sso_instance.send_media_post(image_url, caption)
-print(response)
-```
-
-This example demonstrates initializing an Instagram SSO instance after receiving an authorization code, fetching user information, and posting media on behalf of the user.
-
-By following this documentation, users can quickly and efficiently set up their environment variables and start utilizing Instagram SSO within their applications.

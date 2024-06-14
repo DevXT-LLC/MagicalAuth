@@ -32,7 +32,7 @@ Ensure you have set these variables in your `.env` file.
    - Find the **Client ID** and **Client Secret** on this page.
    - Add these values to your `.env` file as shown below:
 
-     ```
+     ```env
      SPOTIFY_CLIENT_ID=your-client-id
      SPOTIFY_CLIENT_SECRET=your-client-secret
      ```
@@ -44,46 +44,3 @@ You need to enable the necessary scopes to allow your application to access user
 - `user-read-email`: Allows reading user's email.
 - `user-read-private`: Allows reading user's subscription details.
 - `playlist-read-private`: Allows reading user's private playlists.
-
-## Code Implementation
-
-The provided code integrates Spotify SSO using the environment variables set earlier. The `SpotifySSO` class handles the SSO process, including getting user information and refreshing access tokens.
-
-### SpotifySSO Class
-
-- **Initialization**: Accepts `access_token` and `refresh_token`. Retrieves the client ID and secret from environment variables and fetches user information.
-- **get_new_token**: Refreshes the access token using the refresh token.
-- **get_user_info**: Gets user information from the Spotify API. If the access token is expired, it gets a new one and retries.
-- **send_email**: Prepares an email message in a format that can be used for sending emails (Note: Spotify does not have a direct API for sending emails).
-
-### spotify_sso Function
-
-- Accepts `code` and `redirect_uri`.
-- Exchange the authorization code for access and refresh tokens using the Spotify API.
-
-### Example Usage
-
-```python
-from spotify import spotify_sso
-
-# After redirect from Spotify's auth page
-code = "AUTHORIZATION_CODE_FROM_SPOTIFY"
-redirect_uri = "REDIRECT_URI_REGISTERED_WITH_SPOTIFY"
-
-# Initiate Spotify SSO
-spotify_user = spotify_sso(code, redirect_uri)
-
-if spotify_user:
-    # Access user info
-    print(spotify_user.user_info)
-else:
-    print("Spotify SSO failed.")
-```
-
-Ensure you have the following environment variable set:
-
-```ini
-MAGIC_LINK_URL=your-redirect-uri
-```
-
-By following these steps and using the provided code, you can set up Spotify SSO in your application quickly and easily.

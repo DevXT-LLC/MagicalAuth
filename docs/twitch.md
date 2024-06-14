@@ -1,21 +1,21 @@
-## Twitch
+# Twitch
 
 The integration for Twitch Single Sign-On (SSO) requires setting up environment variables and acquiring special identifiers and keys from the Twitch Developer Console. Below you'll find detailed instructions to guide you through the process.
 
-### Required Environment Variables
+## Required Environment Variables
 
 Ensure the following environment variables are added to your `.env` file:
 
 - `TWITCH_CLIENT_ID`: Your Twitch OAuth client ID
 - `TWITCH_CLIENT_SECRET`: Your Twitch OAuth client secret
 
-### Required Scope for Twitch OAuth
+## Required Scope for Twitch OAuth
 
 To successfully use Twitch SSO, the following OAuth scope must be enabled:
 
 - `user:read:email`
 
-### Instructions to Acquire Required Keys
+## Instructions to Acquire Required Keys
 
 1. **Create a Twitch Developer Account**
    - Navigate to [Twitch Developer Console](https://dev.twitch.tv/).
@@ -27,41 +27,20 @@ To successfully use Twitch SSO, the following OAuth scope must be enabled:
    - Click on "Register Your Application".
    - Fill out the required details, including:
      - **Name**: Name your application.
-     - **OAuth Redirect URLs**: Add the URLs that Twitch should redirect to after OAuth authentication. 
+     - **OAuth Redirect URLs**: Add the URLs that Twitch should redirect to after OAuth authentication.
      - **Category**: Select the category that best describes your application.
 
 3. **Retrieve Your Client ID and Client Secret**
-   - After registering, your application will be assigned a **Client ID** and a **Client Secret**. 
+   - After registering, your application will be assigned a **Client ID** and a **Client Secret**.
    - Copy the Client ID to `TWITCH_CLIENT_ID` and the Client Secret to `TWITCH_CLIENT_SECRET` in your `.env` file.
 
-### Summary
+## Summary
 
 Your `.env` file should look something like this:
 
 ```dotenv
 TWITCH_CLIENT_ID=your_twitch_client_id
 TWITCH_CLIENT_SECRET=your_twitch_client_secret
-MAGIC_LINK_URL=your_redirect_uri
 ```
 
-Replace `your_twitch_client_id`, `your_twitch_client_secret`, and `your_redirect_uri` with the actual values obtained from the Twitch Developer Console.
-
-### Example
-Here's an example of how to instantiate the `TwitchSSO` class in your application:
-
-```python
-from sso.twitch import twitch_sso
-
-# Suppose 'code' is the code received from Twitch OAuth after user authorization
-code = "authorization_code_received_from_twitch"
-twitch_sso_instance, _ = twitch_sso(code)
-user_info = twitch_sso_instance.user_info
-
-print("User Email: ", user_info["email"])
-print("User First Name: ", user_info["first_name"])
-```
-
-### Note
-While Twitch doesn't support email sending directly via their API, you can implement custom messaging functions, such as notifications via whispers or chat messages.
-
-Following these instructions will enable you to efficiently set up and use Twitch SSO in your application. Make sure to keep your client secrets secure and never expose them in public repositories.
+Replace `your_twitch_client_id` and `your_twitch_client_secret` with the actual values obtained from the Twitch Developer Console.

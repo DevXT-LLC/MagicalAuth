@@ -50,7 +50,6 @@ Add the following environment variables to your `.env` file:
 ```sh
 MICROSOFT_CLIENT_ID=your_client_id
 MICROSOFT_CLIENT_SECRET=your_client_secret
-MAGIC_LINK_URL=your_redirect_uri   # The same redirect URI configured during app registration
 ```
 
 ## Required Scopes for Microsoft OAuth
@@ -60,35 +59,3 @@ MAGIC_LINK_URL=your_redirect_uri   # The same redirect URI configured during app
 - `https://graph.microsoft.com/Calendars.ReadWrite.Shared`
 
 These scopes are requested when obtaining access tokens, allowing your application to read user profile information, send emails on behalf of the user, and access shared calendars.
-
-## Microsoft SSO Example Usage
-
-Here's an example of how you can use the `MicrosoftSSO` class to authenticate a user and send an email:
-
-### Initializing MicrosoftSSO
-
-```python
-from sso.microsoft import microsoft_sso
-
-# Assume 'code' is obtained from the redirection URL after user consent
-microsoft_sso_instance = microsoft_sso(code, redirect_uri="your_redirect_uri")
-```
-
-### Sending an Email
-
-```python
-if microsoft_sso_instance:
-    ms_sso = microsoft_sso_instance
-
-    # Sending an email
-    to_email = "recipient@example.com"
-    subject = "Test Email"
-    message_text = "Hello, this is a test email from Microsoft SSO integration."
-
-    response = ms_sso.send_email(to_email, subject, message_text)
-    print(response)
-```
-
-This concludes the setup and usage guide for integrating Microsoft's Single Sign-On (SSO) into your application. 
-
-Be sure to follow each step carefully to ensure you have all necessary permissions and environment variables configured correctly.

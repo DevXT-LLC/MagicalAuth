@@ -29,63 +29,8 @@ Before you begin, ensure you have the following:
 3. **Add Environment Variables**:
    - Create a `.env` file in your project's root directory if it does not exist.
    - Add the following entries to the `.env` file:
+
      ```env
      BASECAMP_CLIENT_ID=your_basecamp_client_id
      BASECAMP_CLIENT_SECRET=your_basecamp_client_secret
      ```
-
-## Code Overview
-
-The following section provides an overview of the implementation code and its functionalities:
-
-### Class: `BasecampSSO`
-
-- **Attributes**:
-  - `access_token`: The OAuth access token.
-  - `refresh_token`: The OAuth refresh token.
-  - `client_id`: Basecamp OAuth client ID.
-  - `client_secret`: Basecamp OAuth client secret.
-  - `account_id`: The ID of the authenticated user's Basecamp account.
-  - `user_info`: A dictionary containing the user's information, such as email, first name, and last name.
-
-- **Methods**:
-  - `__init__(self, access_token=None, refresh_token=None, account_id=None)`: Initializes the access and refresh tokens, client credentials, and user information.
-  - `get_new_token(self)`: Refreshes the access token using the refresh token.
-  - `get_user_info(self)`: Retrieves the authenticated user's information from the Basecamp API.
-  - `send_email(self, to, subject, message_text)`: Raises `NotImplementedError` since Basecamp does not have a native email API.
-
-### Function: `basecamp_sso`
-
-This function handles the OAuth flow to authenticate a user and obtain the access and refresh tokens.
-
-- **Parameters**:
-  - `code`: The authorization code received from the OAuth flow.
-  - `redirect_uri`: The redirect URI registered with Basecamp (default is `MAGIC_LINK_URL` from the environment).
-
-- **Returns**: An instance of `BasecampSSO` containing the authenticated user's access and refresh tokens and user information.
-
-### Example Usage
-
-Here's an example of how to use the `BasecampSSO` class in your application:
-
-```python
-from your_module_path import basecamp_sso
-
-# Assume `code` is obtained from the OAuth flow
-code = "your_authorization_code"
-
-# Initialize Basecamp SSO
-basecamp_sso_instance = basecamp_sso(code)
-
-if basecamp_sso_instance:
-    # Access user information
-    user_info = basecamp_sso_instance.user_info
-    print(f"User Email: {user_info['email']}")
-    print(f"User Name: {user_info['first_name']} {user_info['last_name']}")
-else:
-    print("Error: Unable to authenticate user with Basecamp.")
-```
-
-## Conclusion
-
-By following this guide, you should be able to set up and integrate Basecamp SSO into your application. Make sure to replace placeholder values with your actual Basecamp application credentials and handle the authorization code flow appropriately in your application to obtain the `code` parameter required for authentication.

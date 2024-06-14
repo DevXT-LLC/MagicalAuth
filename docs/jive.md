@@ -52,41 +52,13 @@ The required scopes for Jive OAuth will depend on what operations you wish to pe
 - **Write**: To send emails or perform other writing operations.
 - **Admin**: For administrative tasks.
 
-Refer to Jive’s API documentation for a detailed list of available scopes.
+Refer to Jiveï¿½s API documentation for a detailed list of available scopes.
 
 ## Setting Environment Variables
 
 Add the following lines to your `.env` file:
 
-```
+```env
 JIVE_CLIENT_ID=your_jive_client_id
 JIVE_CLIENT_SECRET=your_jive_client_secret
 ```
-
-## Usage Example
-
-Once the environment variables are set, you can use the `JiveSSO` class to perform operations such as obtaining user info and sending emails.
-
-```python
-import os
-from sso.jive import JiveSSO 
-
-# Initialize the JiveSSO instance with the authorization code
-jive_sso = JiveSSO(access_token='your_access_token', refresh_token='your_refresh_token')
-
-# Fetch user info
-user_info = jive_sso.get_user_info()
-print(user_info)
-
-# Send an email
-response = jive_sso.send_email(to='recipient@example.com', subject='Test Email', message_text='This is a test email.')
-print(response)
-```
-
-## Error Handling
-
-The `JiveSSO` class is designed to handle authentication errors, such as token expiration. If the access token expires, it will automatically use the `refresh_token` to get a new access token.
-
-## Conclusion
-
-Setting up Jive SSO requires creating an OAuth application in your Jive instance, obtaining the `Client ID` and `Client Secret`, and setting the required scopes. By following the steps outlined in this document, you can integrate Jive SSO into your application and perform various actions such as fetching user information and sending emails.

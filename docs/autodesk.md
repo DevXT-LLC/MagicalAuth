@@ -1,15 +1,15 @@
-## Autodesk Single Sign-On (SSO) using OAuth
+# Autodesk Single Sign-On (SSO) using OAuth
 
 The `AutodeskSSO` class provides a way to authenticate Autodesk users and retrieve their profile information from Autodesk's API. This guide describes how to configure and use the Autodesk SSO mechanism in your application.
 
-### Required Environment Variables
+## Required Environment Variables
 
 To use Autodesk SSO in your project, you need to set up the Autodesk OAuth client credentials:
 
 - `AUTODESK_CLIENT_ID`: This is the client ID obtained from Autodesk when you create an OAuth application.
 - `AUTODESK_CLIENT_SECRET`: This is the client secret obtained from Autodesk.
 
-#### Steps to Obtain the Autodesk Client ID and Secret
+## Steps to Obtain the Autodesk Client ID and Secret
 
 1. **Register your application**:
     - Go to the [Autodesk Developer Portal](https://forge.autodesk.com).
@@ -21,10 +21,11 @@ To use Autodesk SSO in your project, you need to set up the Autodesk OAuth clien
 
 2. **Add Environment Variables**:
     - Create or update your `.env` file to include:
-      ```
-      AUTODESK_CLIENT_ID=your_client_id_here
-      AUTODESK_CLIENT_SECRET=your_client_secret_here
-      ```
+
+    ```env
+    AUTODESK_CLIENT_ID=your_client_id_here
+    AUTODESK_CLIENT_SECRET=your_client_secret_here
+    ```
 
 ### Required APIs
 
@@ -42,40 +43,3 @@ When setting up OAuth, the following scopes should be included:
 - `data:write`
 - `bucket:read`
 - `bucket:create`
-
-### Usage Example
-
-Below is an example of how to use the `AutodeskSSO` class to authenticate a user and retrieve their profile information.
-
-1. **Initialize AutodeskSSO**:
-
-    ```python
-    from sso.autodesk import AutodeskSSO, autodesk_sso
-
-    # Assume you have a valid OAuth code and redirect_uri
-    code = "your_oauth_code"
-    redirect_uri = "your_redirect_uri"
-
-    autodesk_sso_instance, _ = autodesk_sso(
-        code=code,
-        redirect_uri=redirect_uri
-    )
-
-    if autodesk_sso_instance:
-        user_info = autodesk_sso_instance.user_info
-        print(f"User Info: {user_info}")
-
-    ```
-
-### Class Definitions and Methods
-
-- **`AutodeskSSO` Class**:
-    - `__init__(self, access_token=None, refresh_token=None)`: Initializes the instance with access and refresh tokens.
-    - `get_new_token(self)`: Obtains a new access token using the refresh token.
-    - `get_user_info(self)`: Fetches user information (`email`, `first_name`, `last_name`) using the access token.
-    - `send_email(self, to, subject, message_text)`: Placeholder for sending an email (not implemented).
-
-- **`autodesk_sso` Function**:
-    - `autodesk_sso(code, redirect_uri=None)`: Handles the OAuth flow to obtain access and refresh tokens, and returns an instance of `AutodeskSSO`.
-
-This setup allows you to quickly and easily integrate Autodesk SSO into your application, providing seamless access to Autodesk services using OAuth tokens.
