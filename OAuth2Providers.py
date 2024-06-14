@@ -48,7 +48,6 @@ from sso.vimeo import vimeo_sso
 from sso.vk import vk_sso
 from sso.wechat import wechat_sso
 from sso.withings import withings_sso
-from sso.wso2_identity import wso2_identity_sso
 from sso.xero import xero_sso
 from sso.xing import xing_sso
 from sso.yahoo import yahoo_sso
@@ -56,6 +55,7 @@ from sso.yammer import yammer_sso
 from sso.yandex import yandex_sso
 from sso.yelp import yelp_sso
 from sso.zendesk import zendesk_sso
+from Globals import getenv
 
 
 def get_sso_provider(provider: str, code, redirect_uri=None):
@@ -159,8 +159,6 @@ def get_sso_provider(provider: str, code, redirect_uri=None):
         return wechat_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "withings":
         return withings_sso(code=code, redirect_uri=redirect_uri)
-    elif provider == "wso2_identity":
-        return wso2_identity_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "xero":
         return xero_sso(code=code, redirect_uri=redirect_uri)
     elif provider == "xing":
@@ -255,7 +253,6 @@ def get_scopes(provider):
         "vk": ["email"],
         "wechat": ["snsapi_userinfo"],
         "withings": ["user.info", "user.metrics", "user.activity"],
-        "wso2_identity": ["openid", "profile", "email", "wso2.send_email"],
         "xero": ["openid", "profile", "email", "offline_access"],
         "xing": [
             "https://api.xing.com/v1/users/me",
@@ -272,7 +269,7 @@ def get_scopes(provider):
 
 def get_authorization_url(provider):
     uris = {
-        "amazon": "https://<AWS_USER_POOL_ID>.auth.<AWS_REGION>.amazoncognito.com/oauth2/authorize",
+        "amazon": f"https://{getenv('AWS_USER_POOL_ID')}.auth.{getenv('AWS_REGION')}.amazoncognito.com/oauth2/authorize",
         "aol": "https://api.login.aol.com/oauth2/authorize",
         "apple": "https://appleid.apple.com/auth/authorize",
         "autodesk": "https://developer.api.autodesk.com/authentication/v1/authorize",
@@ -322,14 +319,13 @@ def get_authorization_url(provider):
         "vk": "https://oauth.vk.com/authorize",
         "wechat": "https://open.weixin.qq.com/connect/qrconnect",
         "withings": "https://account.withings.com/oauth2_user/authorize2",
-        "wso2_identity": "https://<your-wso2-server>/oauth2/authorize",
         "xero": "https://login.xero.com/identity/connect/authorize",
         "xing": "https://api.xing.com/v1/authorize",
         "yahoo": "https://api.login.yahoo.com/oauth2/request_auth",
         "yammer": "https://www.yammer.com/oauth2/authorize",
         "yandex": "https://oauth.yandex.com/authorize",
         "yelp": "https://api.yelp.com/oauth2/authorize",
-        "zendesk": "https://<your-zendesk-subdomain>.zendesk.com/oauth/authorizations/new",
+        "zendesk": f"https://{getenv('ZENDESK_SUBDOMAIN')}.zendesk.com/oauth/authorizations/new",
     }
     return uris[provider] if provider in uris else None
 
@@ -383,7 +379,6 @@ def get_icon(provider):
         "vk": "https://upload.wikimedia.org/wikipedia/commons/2/21/VK.com-logo.svg",
         "wechat": "https://upload.wikimedia.org/wikipedia/commons/9/9e/WeChat_Logo.svg",
         "withings": "https://upload.wikimedia.org/wikipedia/en/a/a7/Withings_logo.svg",
-        "wso2_identity": "https://upload.wikimedia.org/wikipedia/commons/e/ee/WSO2_Logo.svg",
         "xero": "https://images.squarespace-cdn.com/content/v1/600485aca07c94041769dbd3/1619704174874-KU8VVDKIHKB9YIS11836/XeroLogo.png",
         "xing": "https://upload.wikimedia.org/wikipedia/commons/1/17/Xing_Logo.svg",
         "yahoo": "https://s.yimg.com/rz/l/yahoo_en-US_f_p_bestfit_4x.png",
