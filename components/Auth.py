@@ -97,13 +97,12 @@ def sso_buttons():
         for page in os.listdir("./pages"):
             if page.endswith(".py"):
                 provider = page.split(".py")[0].lower()
-                # from {provider} import scopes, auth_uri
-                module = importlib.import_module(f"pages.{provider}")
-                scopes = module.scopes()
-                auth_uri = module.auth_uri()
                 client_id = getenv(f"{provider.upper()}_CLIENT_ID")
                 if client_id == "":
                     continue
+                module = importlib.import_module(f"pages.{provider}")
+                scopes = module.scopes()
+                auth_uri = module.auth_uri()
                 if code == "" and "token" not in st.query_params:
                     magic_link_uri = getenv("MAGIC_LINK_URL")
                     if magic_link_uri.endswith("/"):
