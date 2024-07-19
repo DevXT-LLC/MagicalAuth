@@ -54,6 +54,7 @@ def verify_api_key(authorization: str = Header(None)):
                 jwt=authorization,
                 key=ENCRYPTION_SECRET,
                 algorithms=["HS256"],
+                leeway=timedelta(hours=5),
             )
             db = get_session()
             user = db.query(User).filter(User.id == token["sub"]).first()
@@ -144,7 +145,10 @@ class MagicalAuth:
         try:
             # Decode jwt
             decoded = jwt.decode(
-                jwt=token, key=self.encryption_key, algorithms=["HS256"]
+                jwt=token,
+                key=self.encryption_key,
+                algorithms=["HS256"],
+                leeway=timedelta(hours=5),
             )
             self.email = decoded["email"]
             self.token = token
@@ -278,7 +282,10 @@ class MagicalAuth:
             )
         try:
             user_info = jwt.decode(
-                jwt=self.token, key=self.encryption_key, algorithms=["HS256"]
+                jwt=self.token,
+                key=self.encryption_key,
+                algorithms=["HS256"],
+                leeway=timedelta(hours=5),
             )
         except:
             self.add_failed_login(ip_address=ip_address)
