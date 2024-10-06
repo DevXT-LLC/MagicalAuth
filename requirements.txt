@@ -10,5 +10,5 @@ psycopg2-binary
 pycryptodome
 pyotp
 sendgrid
-qrcode
+qrcode==7.4.2
 pyjwt

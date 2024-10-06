@@ -51,5 +51,5 @@ jobs:
       notebook: tests.ipynb
       image: ghcr.io/devxt-llc/magicalauth:dev
       port: "12437"
-      additional-python-dependencies: pyotp requests qrcode
+      additional-python-dependencies: pyotp requests qrcode==7.4.2
     needs: build-magicalauth
